@@ -259,7 +259,7 @@ function AppRoutes() {
       <Route
         path="/users"
         element={
-          <ProtectedRoute allowedRoles={['Admin']}>
+          <ProtectedRoute allowedRoles={['Admin', 'Project Manager']}>
             <Users />
           </ProtectedRoute>
         }

@@ -16,11 +16,29 @@ const Users = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingUser, setEditingUser] = useState(null);
   const [search, setSearch] = useState('');
+  const [hasPermission, setHasPermission] = useState(true);
 
   useEffect(() => {
+    // Check if Project Manager has permission
+    if (user?.role === 'Project Manager') {
+      console.log('PM Permission Check:', {
+        role: user.role,
+        can_manage_users: user.can_manage_users,
+        hasPermission: user.can_manage_users === true
+      });
+      
+      // Explicitly check if can_manage_users is true
+      if (user.can_manage_users !== true) {
+        setHasPermission(false);
+        setLoading(false);
+        return;
+      }
+    }
     fetchUsers();
-  }, []);
+  }, [user]);
 
   const fetchUsers = async () => {
     try {
@@ -34,15 +52,21 @@ const Users = () => {
     }
   };
 
+  const handleEdit = (userToEdit) => {
+    setEditingUser(userToEdit);
+    setShowEditModal(true);
+  };
+
   const handleDelete = async (userId) => {
-    if (!window.confirm('Are you sure you want to deactivate this user?')) return;
+    const confirmMessage = 'Are you sure you want to PERMANENTLY DELETE this user? This action cannot be undone, and the user will receive an email notification.';
+    if (!window.confirm(confirmMessage)) return;
 
     try {
       await userAPI.delete(userId);
-      toast.success('User deactivated successfully');
+      toast.success('User deleted successfully. Notification email sent.');
       fetchUsers();
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to deactivate user');
+      toast.error(error.response?.data?.message || 'Failed to delete user');
     }
   };
 
@@ -60,6 +84,43 @@ const Users = () => {
     return (
       <div className="flex items-center justify-center py-12">
         <LoadingSpinner size="lg" />
+      </div>
+    );
+  }
+
+  // Show access denied message for PMs without permission
+  if (!hasPermission && user?.role === 'Project Manager') {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Team Members</h1>
+          <p className="text-gray-600 mt-1">Manage your team members</p>
+        </div>
+        
+        <Card>
+          <CardContent className="p-12 text-center">
+            <div className="mx-auto h-16 w-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+              <Users className="h-8 w-8 text-red-600" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Access Denied</h3>
+            <p className="text-gray-600 mb-4">
+              You do not have permission to manage users. 
+            </p>
+            <p className="text-sm text-gray-500 mb-4">
+              Please contact your administrator to request user management permissions.
+            </p>
+            <div className="text-xs text-gray-400 bg-gray-100 p-3 rounded mt-4">
+              <p><strong>Debug Info:</strong></p>
+              <p>User Role: {user?.role}</p>
+              <p>can_manage_users value: {JSON.stringify(user?.can_manage_users)}</p>
+              <p>Permission Check Result: {user?.can_manage_users === true ? '✅ TRUE - Should have access' : user?.can_manage_users === false ? '❌ FALSE - No permission' : '⚠️ UNDEFINED - Need to logout/login'}</p>
+              <p className="mt-2 font-semibold">Action Required:</p>
+              <p>1. Admin must run SQL: UPDATE users SET can_manage_users = TRUE WHERE email = 'your-pm-email@example.com';</p>
+              <p>2. Then LOGOUT completely</p>
+              <p>3. Then LOGIN again</p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -125,6 +186,11 @@ const Users = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Hourly Rate
                   </th>
+                  {user?.role === 'Admin' && (
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Permissions
+                    </th>
+                  )}
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Status
                   </th>
@@ -157,6 +223,16 @@ const Users = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       ₹{parseFloat(user.hourly_rate || 0).toFixed(2)}/hr
                     </td>
+                    {user?.role === 'Admin' && (
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {user.role === 'Project Manager' && user.can_manage_users && (
+                          <Badge variant="success">Can Manage Users</Badge>
+                        )}
+                        {user.role === 'Project Manager' && !user.can_manage_users && (
+                          <Badge variant="secondary">No Permissions</Badge>
+                        )}
+                      </td>
+                    )}
                     <td className="px-6 py-4 whitespace-nowrap">
                       <Badge variant={user.is_active ? 'success' : 'error'}>
                         {user.is_active ? 'Active' : 'Inactive'}
@@ -164,9 +240,16 @@ const Users = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <button
+                        onClick={() => handleEdit(user)}
+                        className="text-primary-600 hover:text-primary-900"
+                        title="Edit user"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </button>
+                      <button
                         onClick={() => handleDelete(user.id)}
                         className="text-error-600 hover:text-error-900 ml-4"
-                        title="Deactivate user"
+                        title="Delete user permanently"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -193,6 +276,33 @@ const Users = () => {
               fetchUsers();
             }}
             onCancel={() => setShowCreateModal(false)}
+          />
+        </Modal>
+      )}
+
+      {/* Edit User Modal */}
+      {showEditModal && editingUser && (
+        <Modal
+          isOpen={showEditModal}
+          onClose={() => {
+            setShowEditModal(false);
+            setEditingUser(null);
+          }}
+          title="Edit User"
+          size="md"
+        >
+          <UserForm
+            editMode={true}
+            existingUser={editingUser}
+            onSuccess={() => {
+              setShowEditModal(false);
+              setEditingUser(null);
+              fetchUsers();
+            }}
+            onCancel={() => {
+              setShowEditModal(false);
+              setEditingUser(null);
+            }}
           />
         </Modal>
       )}

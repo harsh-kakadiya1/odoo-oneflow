@@ -190,10 +190,65 @@ const sendNotificationEmail = async (user, notification) => {
   });
 };
 
+// Send user deletion notification email
+const sendUserDeletionEmail = async (userEmail, userName) => {
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background-color: #dc2626; color: white; padding: 20px; text-align: center; border-radius: 5px 5px 0 0; }
+        .content { background-color: #f9fafb; padding: 30px; border: 1px solid #e5e7eb; }
+        .warning { background-color: #fee2e2; padding: 20px; margin: 20px 0; border-radius: 5px; border-left: 4px solid #dc2626; }
+        .footer { text-align: center; margin-top: 20px; color: #6b7280; font-size: 14px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>Account Deleted</h1>
+        </div>
+        <div class="content">
+          <h2>Hello ${userName},</h2>
+          
+          <div class="warning">
+            <h3>⚠️ Your Account Has Been Deleted</h3>
+            <p>Your account in the OneFlow Project Management System has been permanently deleted by your administrator.</p>
+          </div>
+
+          <p><strong>What this means:</strong></p>
+          <ul>
+            <li>You can no longer access the OneFlow system</li>
+            <li>All your data has been removed from the system</li>
+            <li>This email address can now be used for a new account if needed</li>
+          </ul>
+
+          <p>If you believe this was done in error, please contact your system administrator.</p>
+
+          <p>Thank you for using OneFlow.</p>
+        </div>
+        <div class="footer">
+          <p>&copy; ${new Date().getFullYear()} OneFlow. All rights reserved.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  return await sendEmail({
+    to: userEmail,
+    subject: 'OneFlow - Account Deleted',
+    html: html,
+  });
+};
+
 module.exports = {
   sendEmail,
   sendWelcomeEmail,
   sendPasswordResetEmail,
   sendNotificationEmail,
+  sendUserDeletionEmail,
 };
 
