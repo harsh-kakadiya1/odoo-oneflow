@@ -15,8 +15,19 @@ import ResetPassword from './pages/Auth/ResetPassword';
 // Main Pages
 import Dashboard from './pages/Dashboard/Dashboard';
 import Projects from './pages/Projects/Projects';
+import Analytics from './pages/Analytics/Analytics';
 import Users from './pages/Users/Users';
 import Profile from './pages/Profile/Profile';
+
+// Settings Pages
+import Settings from './pages/Settings/Settings';
+import SalesOrdersList from './pages/Settings/SalesOrdersList';
+import PurchaseOrdersList from './pages/Settings/PurchaseOrdersList';
+import CustomerInvoicesList from './pages/Settings/CustomerInvoicesList';
+import VendorBillsList from './pages/Settings/VendorBillsList';
+import ExpensesList from './pages/Settings/ExpensesList';
+import SalesOrderForm from './pages/Settings/SalesOrderForm';
+import ExpenseForm from './pages/Settings/ExpenseForm';
 
 // Protected Route Component
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -151,22 +162,98 @@ function AppRoutes() {
         path="/analytics"
         element={
           <ProtectedRoute allowedRoles={['Admin', 'Project Manager', 'Sales/Finance']}>
-            <div className="text-center py-12">
-              <h2 className="text-2xl font-bold text-gray-900">Analytics</h2>
-              <p className="text-gray-600 mt-2">Coming soon...</p>
-            </div>
+            <Analytics />
           </ProtectedRoute>
         }
       />
 
       <Route
-        path="/settings/*"
+        path="/settings"
         element={
           <ProtectedRoute allowedRoles={['Admin', 'Sales/Finance', 'Project Manager']}>
-            <div className="text-center py-12">
-              <h2 className="text-2xl font-bold text-gray-900">Settings</h2>
-              <p className="text-gray-600 mt-2">Coming soon...</p>
-            </div>
+            <Settings />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/settings/sales-orders"
+        element={
+          <ProtectedRoute allowedRoles={['Admin', 'Sales/Finance', 'Project Manager']}>
+            <SalesOrdersList />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/settings/purchase-orders"
+        element={
+          <ProtectedRoute allowedRoles={['Admin', 'Sales/Finance', 'Project Manager']}>
+            <PurchaseOrdersList />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/settings/customer-invoices"
+        element={
+          <ProtectedRoute allowedRoles={['Admin', 'Sales/Finance', 'Project Manager']}>
+            <CustomerInvoicesList />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/settings/vendor-bills"
+        element={
+          <ProtectedRoute allowedRoles={['Admin', 'Sales/Finance', 'Project Manager']}>
+            <VendorBillsList />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/settings/expenses"
+        element={
+          <ProtectedRoute allowedRoles={['Admin', 'Sales/Finance', 'Project Manager']}>
+            <ExpensesList />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Form Routes */}
+      <Route
+        path="/settings/sales-orders/new"
+        element={
+          <ProtectedRoute allowedRoles={['Admin', 'Sales/Finance', 'Project Manager']}>
+            <SalesOrderForm />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/settings/sales-orders/:id/edit"
+        element={
+          <ProtectedRoute allowedRoles={['Admin', 'Sales/Finance', 'Project Manager']}>
+            <SalesOrderForm />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/settings/expenses/new"
+        element={
+          <ProtectedRoute allowedRoles={['Admin', 'Sales/Finance', 'Project Manager']}>
+            <ExpenseForm />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/settings/expenses/:id/edit"
+        element={
+          <ProtectedRoute allowedRoles={['Admin', 'Sales/Finance', 'Project Manager']}>
+            <ExpenseForm />
           </ProtectedRoute>
         }
       />
