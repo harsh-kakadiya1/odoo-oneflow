@@ -8,9 +8,21 @@ const User = sequelize.define('User', {
     primaryKey: true,
     autoIncrement: true
   },
+  firstName: {
+    type: DataTypes.STRING(50),
+    allowNull: false,
+    field: 'first_name'
+  },
+  lastName: {
+    type: DataTypes.STRING(50),
+    allowNull: false,
+    field: 'last_name'
+  },
   name: {
-    type: DataTypes.STRING(100),
-    allowNull: false
+    type: DataTypes.VIRTUAL,
+    get() {
+      return `${this.firstName} ${this.lastName}`;
+    }
   },
   email: {
     type: DataTypes.STRING(100),
