@@ -169,9 +169,15 @@ router.get('/', protect, async (req, res) => {
     }
   } catch (error) {
     console.error('Get projects error:', error);
+    console.error('Error details:', {
+      message: error.message,
+      name: error.name,
+      sql: error.sql
+    });
     res.status(500).json({
       success: false,
-      message: 'Server error fetching projects'
+      message: 'Server error fetching projects',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
@@ -327,9 +333,15 @@ router.post('/', protect, authorize('Admin', 'Project Manager'), async (req, res
     });
   } catch (error) {
     console.error('Create project error:', error);
+    console.error('Error details:', {
+      message: error.message,
+      name: error.name,
+      sql: error.sql
+    });
     res.status(500).json({
       success: false,
-      message: 'Server error creating project'
+      message: 'Server error creating project',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });

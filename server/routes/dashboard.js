@@ -175,9 +175,15 @@ router.get('/stats', protect, async (req, res) => {
     });
   } catch (error) {
     console.error('Get dashboard stats error:', error);
+    console.error('Error details:', {
+      message: error.message,
+      name: error.name,
+      sql: error.sql
+    });
     res.status(500).json({
       success: false,
-      message: 'Server error fetching dashboard statistics'
+      message: 'Server error fetching dashboard statistics',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
@@ -237,9 +243,15 @@ router.get('/recent-projects', protect, async (req, res) => {
     });
   } catch (error) {
     console.error('Get recent projects error:', error);
+    console.error('Error details:', {
+      message: error.message,
+      name: error.name,
+      sql: error.sql
+    });
     res.status(500).json({
       success: false,
-      message: 'Server error fetching recent projects'
+      message: 'Server error fetching recent projects',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
