@@ -58,7 +58,7 @@ export const validateName = (name, fieldName = 'Name') => {
 export const validatePhone = (phone) => {
   if (!phone) return { isValid: true, message: '' }; // Phone is optional
   
-  const phoneRegex = /^[\d\s\-\+\(\)]{10,15}$/;
+  const phoneRegex = /^[\d\s\-+()]{10,15}$/;
   if (!phoneRegex.test(phone)) {
     return { isValid: false, message: 'Please enter a valid phone number' };
   }
