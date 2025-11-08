@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Home, 
   FolderKanban,
@@ -10,14 +10,31 @@ import {
   User,
   FileText,
   X,
-  DollarSign
+  DollarSign,
+  LogOut
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { clsx } from 'clsx';
 
 const Sidebar = ({ onClose }) => {
   const location = useLocation();
-  const { user, hasRole } = useAuth();
+  const navigate = useNavigate();
+  const { user, hasRole, logout } = useAuth();
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const userMenuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+        setShowUserMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const navigation = [
     {
@@ -164,6 +181,66 @@ const Sidebar = ({ onClose }) => {
           );
         })}
       </nav>
+
+      {/* User Profile Button - Bottom Left */}
+      <div className="border-t border-gray-200 p-4">
+        <div className="relative" ref={userMenuRef}>
+          <button
+            type="button"
+            onClick={() => setShowUserMenu(!showUserMenu)}
+            className="flex items-center space-x-3 w-full p-2 rounded-lg text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors"
+          >
+            <div className="h-10 w-10 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <User className="h-5 w-5 text-primary-600" />
+            </div>
+            <div className="flex-1 text-left min-w-0">
+              <p className="text-sm font-medium text-gray-900 truncate">
+                {user?.name}
+              </p>
+              <p className="text-xs text-gray-500 truncate">
+                {user?.role}
+              </p>
+            </div>
+          </button>
+
+          {/* Dropdown menu */}
+          {showUserMenu && (
+            <div className="absolute bottom-full left-0 mb-2 w-full bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
+              <div className="px-4 py-2 border-b border-gray-100">
+                <p className="text-sm font-medium text-gray-900 truncate">
+                  {user?.name}
+                </p>
+                <p className="text-xs text-gray-500 truncate">
+                  {user?.role}
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  setShowUserMenu(false);
+                  navigate('/profile');
+                  if (onClose) onClose();
+                }}
+                className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+              >
+                <Settings className="h-4 w-4 mr-2" />
+                Profile Settings
+              </button>
+              <button
+                onClick={() => {
+                  setShowUserMenu(false);
+                  logout();
+                  navigate('/login');
+                  if (onClose) onClose();
+                }}
+                className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Sign out
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
