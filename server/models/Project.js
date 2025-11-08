@@ -36,6 +36,14 @@ const Project = sequelize.define('Project', {
       key: 'id'
     }
   },
+  company_id: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references: {
+      model: 'companies',
+      key: 'id'
+    }
+  },
   budget: {
     type: DataTypes.DECIMAL(12, 2),
     allowNull: true,

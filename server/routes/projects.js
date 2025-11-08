@@ -7,12 +7,18 @@ const { notifyProjectAssigned } = require('../services/notificationService');
 const { Op } = require('sequelize');
 
 // @route   GET /api/projects
-// @desc    Get all projects (filtered by role)
+// @desc    Get projects from same company (filtered by role)
 // @access  Private
 router.get('/', protect, async (req, res) => {
   try {
     const { status, search } = req.query;
-    let where = {};
+    
+    // Get current user's company_id for multi-tenancy
+    const currentUser = await User.findByPk(req.user.id);
+    
+    let where = {
+      company_id: currentUser.company_id // Only show projects from user's company
+    };
 
     if (status) {
       where.status = status;
@@ -253,7 +259,10 @@ router.post('/', protect, authorize('Admin', 'Project Manager'), async (req, res
       });
     }
 
-    // Create project
+    // Get current user's company for multi-tenancy
+    const currentUser = await User.findByPk(req.user.id);
+
+    // Create project associated with user's company
     const project = await Project.create({
       name,
       description,
@@ -261,6 +270,7 @@ router.post('/', protect, authorize('Admin', 'Project Manager'), async (req, res
       end_date,
       status: status || 'Planned',
       project_manager_id: pmId,
+      company_id: currentUser.company_id, // Associate with company
       budget
     });
 
