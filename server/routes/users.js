@@ -1,26 +1,40 @@
 const express = require('express');
 const router = express.Router();
-const { User } = require('../models');
+const { User, Company } = require('../models');
 const { protect, authorize } = require('../middleware/auth');
 const { generatePassword } = require('../utils/generatePassword');
 const { sendWelcomeEmail } = require('../services/emailService');
 
 // @route   GET /api/users
-// @desc    Get all users
+// @desc    Get users from same company (Admin sees all company users, PM sees only users they created)
 // @access  Private (Admin, Project Manager, Sales/Finance)
 router.get('/', protect, authorize('Admin', 'Project Manager', 'Sales/Finance'), async (req, res) => {
   try {
     const { role, search } = req.query;
-    let where = { is_active: true };
+    const { Op } = require('sequelize');
+    
+    // Get current user's company_id
+    const currentUser = await User.findByPk(req.user.id);
+    
+    let where = { 
+      is_active: true,
+      company_id: currentUser.company_id // Only show users from same company
+    };
+
+    // Project Managers can only see users they created (within their company)
+    if (req.user.role === 'Project Manager') {
+      where.created_by = req.user.id;
+    }
 
     if (role) {
       where.role = role;
     }
 
     if (search) {
-      const { Op } = require('sequelize');
+      // Build search condition for first_name, last_name, and email
       where[Op.or] = [
-        { name: { [Op.like]: `%${search}%` } },
+        { first_name: { [Op.like]: `%${search}%` } },
+        { last_name: { [Op.like]: `%${search}%` } },
         { email: { [Op.like]: `%${search}%` } }
       ];
     }
@@ -28,6 +42,18 @@ router.get('/', protect, authorize('Admin', 'Project Manager', 'Sales/Finance'),
     const users = await User.findAll({
       where,
       attributes: { exclude: ['password_hash', 'reset_password_token', 'reset_password_expire'] },
+      include: [
+        {
+          model: Company,
+          as: 'company',
+          attributes: ['id', 'name', 'country', 'currency']
+        },
+        {
+          model: User,
+          as: 'creator',
+          attributes: ['id', 'firstName', 'lastName', 'email']
+        }
+      ],
       order: [['created_at', 'DESC']]
     });
 
@@ -75,9 +101,9 @@ router.get('/:id', protect, async (req, res) => {
 });
 
 // @route   POST /api/users
-// @desc    Create new user (Admin only)
-// @access  Private (Admin)
-router.post('/', protect, authorize('Admin'), async (req, res) => {
+// @desc    Create new user (Admin creates any role, PM creates Team Members only)
+// @access  Private (Admin, Project Manager)
+router.post('/', protect, authorize('Admin', 'Project Manager'), async (req, res) => {
   try {
     const { firstName, lastName, email, role, hourly_rate } = req.body;
 
@@ -86,6 +112,14 @@ router.post('/', protect, authorize('Admin'), async (req, res) => {
       return res.status(400).json({
         success: false,
         message: 'Please provide first name, last name, email, and role'
+      });
+    }
+
+    // Project Managers can only create Team Members
+    if (req.user.role === 'Project Manager' && role !== 'Team Member') {
+      return res.status(403).json({
+        success: false,
+        message: 'Project Managers can only create Team Member accounts'
       });
     }
 
@@ -102,8 +136,8 @@ router.post('/', protect, authorize('Admin'), async (req, res) => {
     // Generate temporary password
     const temporaryPassword = generatePassword();
 
-    // Get admin's company_id to associate new user with same company
-    const adminUser = await User.findByPk(req.user.id);
+    // Get current user's company_id to associate new user with same company
+    const currentUser = await User.findByPk(req.user.id);
     
     // Create user
     const user = await User.create({
@@ -112,7 +146,8 @@ router.post('/', protect, authorize('Admin'), async (req, res) => {
       email,
       password_hash: temporaryPassword,
       role,
-      company_id: adminUser.company_id,
+      company_id: currentUser.company_id,
+      created_by: req.user.id, // Track who created this user
       hourly_rate: hourly_rate || 0,
       is_active: true
     });
