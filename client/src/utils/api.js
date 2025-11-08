@@ -150,5 +150,14 @@ export const dashboardAPI = {
   getRecentTasks: () => api.get('/dashboard/recent-tasks'),
 };
 
+// Company APIs
+export const companyAPI = {
+  getById: (id) => api.get(`/companies/${id}`),
+  update: (id, data) => api.put(`/companies/${id}`, data),
+  uploadLogo: (id, formData) => api.post(`/companies/${id}/logo`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }),
+};
+
 export default api;
 

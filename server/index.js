@@ -46,6 +46,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Import routes
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
+const companyRoutes = require('./routes/companies');
 const projectRoutes = require('./routes/projects');
 const taskRoutes = require('./routes/tasks');
 const salesOrderRoutes = require('./routes/salesOrders');
@@ -59,6 +60,7 @@ const dashboardRoutes = require('./routes/dashboard');
 // Mount routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/companies', companyRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/sales-orders', salesOrderRoutes);
