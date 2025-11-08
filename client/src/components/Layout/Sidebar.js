@@ -61,7 +61,7 @@ const Sidebar = ({ onClose }) => {
       name: 'Users',
       href: '/users',
       icon: Users,
-      roles: ['Admin']
+      roles: ['Admin', 'Project Manager']
     },
     {
       name: 'Profile',

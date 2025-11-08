@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const { Project, Task, Expense, Timesheet, CustomerInvoice, User } = require('../models');
+const { Project, Task, Expense, Timesheet, CustomerInvoice, User, Company } = require('../models');
 const { protect } = require('../middleware/auth');
 const { getProjectFinancials } = require('../utils/financialCalculations');
 const { Op } = require('sequelize');
 const { sequelize } = require('../config/database');
 
 // @route   GET /api/dashboard/stats
-// @desc    Get dashboard statistics based on user role
+// @desc    Get dashboard statistics based on user role (scoped to company)
 // @access  Private
 router.get('/stats', protect, async (req, res) => {
   try {
@@ -16,12 +16,16 @@ router.get('/stats', protect, async (req, res) => {
     const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
     const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
 
+    // Get current user's company for multi-tenancy
+    const currentUser = await User.findByPk(req.user.id);
+
     if (req.user.role === 'Admin' || req.user.role === 'Sales/Finance') {
-      // Global statistics for Admin and Sales/Finance
+      // Company-wide statistics for Admin and Sales/Finance
       
-      // Active projects
+      // Active projects (only from user's company)
       stats.activeProjects = await Project.count({
         where: {
+          company_id: currentUser.company_id,
           status: { [Op.in]: ['Planned', 'In Progress'] }
         }
       });
@@ -56,8 +60,10 @@ router.get('/stats', protect, async (req, res) => {
         where: { status: 'Pending' }
       });
 
-      // Total projects
-      stats.totalProjects = await Project.count();
+      // Total projects (only from user's company)
+      stats.totalProjects = await Project.count({
+        where: { company_id: currentUser.company_id }
+      });
 
       // Open sales orders
       stats.openSalesOrders = await require('../models').SalesOrder.count({
@@ -70,11 +76,14 @@ router.get('/stats', protect, async (req, res) => {
       });
 
     } else if (req.user.role === 'Project Manager') {
-      // Statistics for Project Manager's projects
+      // Statistics for Project Manager's projects (within their company)
       
-      // Get PM's projects
+      // Get PM's projects (only from their company)
       const myProjects = await Project.findAll({
-        where: { project_manager_id: req.user.id },
+        where: { 
+          project_manager_id: req.user.id,
+          company_id: currentUser.company_id
+        },
         attributes: ['id']
       });
       const myProjectIds = myProjects.map(p => p.id);
@@ -174,14 +183,19 @@ router.get('/stats', protect, async (req, res) => {
 });
 
 // @route   GET /api/dashboard/recent-projects
-// @desc    Get recent projects for dashboard
+// @desc    Get recent projects for dashboard (scoped to company)
 // @access  Private
 router.get('/recent-projects', protect, async (req, res) => {
   try {
-    let where = {};
+    // Get current user's company for multi-tenancy
+    const currentUser = await User.findByPk(req.user.id);
+    
+    let where = {
+      company_id: currentUser.company_id // Only show projects from user's company
+    };
 
     if (req.user.role === 'Team Member') {
-      // Show projects where user is a member
+      // Show projects where user is a member (within their company)
       const { ProjectMember } = require('../models');
       const memberships = await ProjectMember.findAll({
         where: { user_id: req.user.id },

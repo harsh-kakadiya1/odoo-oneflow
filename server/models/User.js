@@ -39,19 +39,6 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING(255),
     allowNull: false
   },
-  phone: {
-    type: DataTypes.STRING(20),
-    allowNull: true
-  },
-  department: {
-    type: DataTypes.STRING(100),
-    allowNull: true
-  },
-  employeeId: {
-    type: DataTypes.STRING(50),
-    allowNull: true,
-    field: 'employee_id'
-  },
   role: {
     type: DataTypes.ENUM('Admin', 'Project Manager', 'Team Member', 'Sales/Finance'),
     allowNull: false,
@@ -75,6 +62,14 @@ const User = sequelize.define('User', {
     allowNull: true,
     references: {
       model: 'companies',
+      key: 'id'
+    }
+  },
+  created_by: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references: {
+      model: 'users',
       key: 'id'
     }
   },

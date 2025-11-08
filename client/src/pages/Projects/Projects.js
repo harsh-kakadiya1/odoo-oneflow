@@ -13,7 +13,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import toast from 'react-hot-toast';
 
 const Projects = () => {
-  const { hasRole } = useAuth();
+  const { user, hasRole } = useAuth();
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -73,8 +73,15 @@ const Projects = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Projects</h1>
-          <p className="text-gray-600 mt-1">Manage your projects and track progress</p>
+          <h1 className="text-2xl font-bold text-gray-900">
+            {user?.role === 'Project Manager' ? 'My Projects' : 'Projects'}
+          </h1>
+          <p className="text-gray-600 mt-1">
+            {user?.role === 'Admin' && 'Manage all projects and track progress'}
+            {user?.role === 'Project Manager' && 'Manage your projects and team members'}
+            {user?.role === 'Team Member' && 'View your assigned projects'}
+            {user?.role === 'Sales/Finance' && 'View all projects and financials'}
+          </p>
         </div>
         {hasRole(['Admin', 'Project Manager']) && (
           <Button onClick={() => setShowCreateModal(true)}>

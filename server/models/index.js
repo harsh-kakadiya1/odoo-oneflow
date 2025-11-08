@@ -15,6 +15,14 @@ const Notification = require('./Notification');
 User.belongsTo(Company, { foreignKey: 'company_id', as: 'company' });
 Company.hasMany(User, { foreignKey: 'company_id', as: 'users' });
 
+// Project-Company Relationships
+Project.belongsTo(Company, { foreignKey: 'company_id', as: 'company' });
+Company.hasMany(Project, { foreignKey: 'company_id', as: 'projects' });
+
+// User-Creator Relationships (who created this user)
+User.belongsTo(User, { foreignKey: 'created_by', as: 'creator' });
+User.hasMany(User, { foreignKey: 'created_by', as: 'createdUsers' });
+
 // User-Project Relationships
 User.hasMany(Project, { foreignKey: 'project_manager_id', as: 'managedProjects' });
 Project.belongsTo(User, { foreignKey: 'project_manager_id', as: 'projectManager' });

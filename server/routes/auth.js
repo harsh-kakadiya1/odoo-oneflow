@@ -83,9 +83,9 @@ router.post('/signup', async (req, res) => {
       is_active: true
     });
 
-    // Check if this is the first user (make them admin)
-    const userCount = await User.count();
-    const role = userCount === 0 ? 'Admin' : 'Team Member';
+    // The first user to register with a company becomes Admin of that company
+    // Since we just created a new company, this user is the first and becomes Admin
+    const role = 'Admin';
 
     // Create user with company association
     const user = await User.create({
@@ -114,7 +114,7 @@ router.post('/signup', async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: userCount === 0 ? 'Admin account created successfully' : 'Account created successfully',
+      message: 'Admin account created successfully! You are the company owner.',
       token,
       user: userWithCompany
     });
