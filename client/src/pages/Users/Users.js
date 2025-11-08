@@ -151,8 +151,8 @@ const Users = () => {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Team Members</h1>
-          <p className="text-gray-600 mt-1">Manage your team members</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Team Members</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">Manage your team members</p>
         </div>
         
         <Card>
@@ -160,14 +160,14 @@ const Users = () => {
             <div className="mx-auto h-16 w-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
               <Users className="h-8 w-8 text-red-600" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Access Denied</h3>
-            <p className="text-gray-600 mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Access Denied</h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
               You do not have permission to manage users. 
             </p>
-            <p className="text-sm text-gray-500 mb-4">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
               Please contact your administrator to request user management permissions.
             </p>
-            <div className="text-xs text-gray-400 bg-gray-100 p-3 rounded mt-4">
+            <div className="text-xs text-gray-400 bg-gray-100 dark:bg-gray-700 p-3 rounded mt-4">
               <p><strong>Debug Info:</strong></p>
               <p>User Role: {user?.role}</p>
               <p>can_manage_users value: {JSON.stringify(user?.can_manage_users)}</p>
@@ -186,7 +186,7 @@ const Users = () => {
   return (
     <div className="space-y-6">
       {/* Search, Filters, and Add User */}
-      <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mb-4">
           {/* Search Field - Left Side */}
           <div className="md:col-span-6">
@@ -203,7 +203,7 @@ const Users = () => {
             <select
               value={roleFilter}
               onChange={(e) => setRoleFilter(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
             >
               <option value="">All Roles</option>
               <option value="Admin">Admin</option>
@@ -218,7 +218,7 @@ const Users = () => {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
             >
               <option value="all">All Users</option>
               <option value="newest">Newest First</option>
@@ -239,20 +239,20 @@ const Users = () => {
               className="w-full"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Add User
+              {user?.role === 'Project Manager' ? 'Add Team Member' : 'Add User'}
             </Button>
           </div>
         </div>
 
         {/* Status Info */}
-        <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-          <div className="text-sm text-gray-600">
+        <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-700">
+          <div className="text-sm text-gray-600 dark:text-gray-400">
             Showing <span className="font-semibold">{filteredUsers.length}</span> of <span className="font-semibold">{users.length}</span> users
             {roleFilter && ` • ${roleFilter}`}
           </div>
           <button
             onClick={fetchUsers}
-            className="text-sm text-primary-600 hover:text-primary-700 font-medium flex items-center"
+            className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium flex items-center"
           >
             <Search className="h-4 w-4 mr-1" />
             Refresh
@@ -261,60 +261,60 @@ const Users = () => {
       </div>
 
       {/* Users Table */}
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-100">
-        <div className="p-6 border-b border-gray-100">
-          <h3 className="text-lg font-bold text-gray-900">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700">
+        <div className="p-6 border-b border-gray-100 dark:border-gray-700">
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white">
             {user?.role === 'Project Manager' ? 'Your Team Members' : 'All Users'} ({filteredUsers.length})
           </h3>
         </div>
         <div className="overflow-x-auto p-6">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-700">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     User
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Role
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Hourly Rate
                   </th>
                   {user?.role === 'Admin' && (
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Permissions
                     </th>
                   )}
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200">
                 {filteredUsers.length === 0 ? (
                   <tr>
-                    <td colSpan="6" className="px-6 py-12 text-center text-gray-500">
+                    <td colSpan="6" className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
                       No users found. Try adjusting your filters.
                     </td>
                   </tr>
                 ) : (
                   filteredUsers.map((userItem) => (
-                  <tr key={userItem.id} className="hover:bg-gray-50">
+                  <tr key={userItem.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div className="h-10 w-10 bg-primary-100 rounded-full flex items-center justify-center">
+                        <div className="h-10 w-10 bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center">
                           <span className="text-primary-600 font-medium">
                             {userItem.firstName?.charAt(0).toUpperCase() || userItem.name?.charAt(0).toUpperCase()}
                           </span>
                         </div>
                         <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">
+                          <div className="text-sm font-medium text-gray-900 dark:text-white">
                             {userItem.firstName} {userItem.lastName}
                           </div>
-                          <div className="text-sm text-gray-500">{userItem.email}</div>
+                          <div className="text-sm text-gray-500 dark:text-gray-400">{userItem.email}</div>
                         </div>
                       </div>
                     </td>
@@ -323,7 +323,7 @@ const Users = () => {
                         {userItem.role}
                       </Badge>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                       ₹{parseFloat(userItem.hourly_rate || 0).toFixed(2)}/hr
                     </td>
                     {user?.role === 'Admin' && (

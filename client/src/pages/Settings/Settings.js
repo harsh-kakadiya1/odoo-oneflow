@@ -18,8 +18,8 @@ const SettingsCard = ({ title, description, icon: Icon, href, color }) => (
           <Icon className="h-6 w-6 text-white" />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">{title}</h3>
-          <p className="text-gray-600 text-sm">{description}</p>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{title}</h3>
+          <p className="text-gray-600 dark:text-gray-400 text-sm">{description}</p>
         </div>
       </div>
     </Card>
@@ -76,46 +76,39 @@ const Settings = () => {
   }
 
   return (
-    <div className="container mx-auto px-6 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-        <p className="text-gray-600 mt-2">
-          Manage global lists and configurations for your business documents
-        </p>
-      </div>
-
+    <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {settingsModules.map((module, index) => (
           <SettingsCard key={index} {...module} />
         ))}
       </div>
 
-      <div className="mt-12 bg-gray-50 rounded-lg p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">About Settings</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-600">
+      <div className="mt-12 bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">About Settings</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-600 dark:text-gray-400">
           <div>
-            <h3 className="font-medium text-gray-900 mb-2">Global Lists</h3>
+            <h3 className="font-medium text-gray-900 dark:text-white mb-2">Global Lists</h3>
             <p>
               Each module shows a global list of all documents across all projects. 
               Use these lists to get a comprehensive view of your business operations.
             </p>
           </div>
           <div>
-            <h3 className="font-medium text-gray-900 mb-2">Search & Filter</h3>
+            <h3 className="font-medium text-gray-900 dark:text-white mb-2">Search & Filter</h3>
             <p>
               Search documents by number, partner, amount, or state. 
               Filter by date ranges, partners, status, or specific projects.
             </p>
           </div>
           <div>
-            <h3 className="font-medium text-gray-900 mb-2">Group & Organize</h3>
+            <h3 className="font-medium text-gray-900 dark:text-white mb-2">Group & Organize</h3>
             <p>
               Group documents by project, partner, or state to organize your view. 
               Create new documents or link existing ones to projects.
             </p>
           </div>
           <div>
-            <h3 className="font-medium text-gray-900 mb-2">Project Integration</h3>
+            <h3 className="font-medium text-gray-900 dark:text-white mb-2">Project Integration</h3>
             <p>
               Documents created here can be linked to projects. 
               View project-specific documents in the project's Links panel.

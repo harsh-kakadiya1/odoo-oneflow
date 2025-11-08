@@ -7,14 +7,14 @@ const Layout = ({ children }) => {
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Mobile sidebar */}
       <div className={`fixed inset-0 flex z-40 md:hidden ${sidebarOpen ? '' : 'hidden'}`}>
         <div 
           className="fixed inset-0 bg-gray-600 bg-opacity-75 transition-opacity" 
           onClick={() => setSidebarOpen(false)} 
         />
-        <div className="relative flex-1 flex flex-col max-w-xs w-full">
+        <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white dark:bg-gray-800">
           <Sidebar 
             onClose={() => setSidebarOpen(false)}
             isExpanded={true}

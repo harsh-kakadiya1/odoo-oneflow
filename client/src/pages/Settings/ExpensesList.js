@@ -97,7 +97,7 @@ const ExpensesList = () => {
   ];
 
   const renderRow = (expense) => (
-    <tr key={expense.id} className="hover:bg-gray-50">
+    <tr key={expense.id} className="hover:bg-gray-50 dark:bg-gray-700">
       <td className="px-6 py-4">
         <div className="flex items-center">
           <span className="mr-2">{getCategoryIcon(expense.category)}</span>
@@ -109,25 +109,25 @@ const ExpensesList = () => {
               {expense.description}
             </Link>
             {expense.receipt_url && (
-              <div className="text-xs text-gray-500 mt-1">📎 Receipt attached</div>
+              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">📎 Receipt attached</div>
             )}
           </div>
         </div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
-        <div className="text-sm text-gray-900">{expense.user?.name}</div>
-        <div className="text-sm text-gray-500">{expense.user?.email}</div>
+        <div className="text-sm text-gray-900 dark:text-white">{expense.user?.name}</div>
+        <div className="text-sm text-gray-500 dark:text-gray-400">{expense.user?.email}</div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
-        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
           {expense.category}
         </span>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
         {expense.expense_date ? format(new Date(expense.expense_date), 'MMM dd, yyyy') : '-'}
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-        ${expense.amount?.toLocaleString() || '0.00'}
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+        ₹{expense.amount?.toLocaleString('en-IN') || '0'}
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         <Badge color={getStatusColor(expense.status)}>

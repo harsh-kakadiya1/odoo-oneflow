@@ -51,7 +51,15 @@ const Project = sequelize.define('Project', {
   }
 }, {
   tableName: 'projects',
-  timestamps: true
+  timestamps: true,
+  hooks: {
+    beforeValidate: (project) => {
+      // Sanitize budget - convert empty string to null/default
+      if (project.budget === '' || project.budget === null || project.budget === undefined) {
+        project.budget = 0.00;
+      }
+    }
+  }
 });
 
 module.exports = Project;

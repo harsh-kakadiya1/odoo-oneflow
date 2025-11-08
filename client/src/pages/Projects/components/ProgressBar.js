@@ -21,8 +21,8 @@ const ProgressBar = ({ project, className = '' }) => {
           {/* Project Progress */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-semibold text-gray-700">Project Progress</h3>
-              <span className="text-sm font-medium text-gray-600">
+              <h3 className="font-semibold text-gray-700 dark:text-gray-300">Project Progress</h3>
+              <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
                 {completedTasks}/{totalTasks} Tasks
               </span>
             </div>
@@ -35,7 +35,7 @@ const ProgressBar = ({ project, className = '' }) => {
             </div>
             
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-500">
+              <span className="text-sm text-gray-500 dark:text-gray-400">
                 {progressPercentage}% Complete
               </span>
               <div className="flex items-center space-x-1">
@@ -52,8 +52,8 @@ const ProgressBar = ({ project, className = '' }) => {
           {/* Budget Usage */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-semibold text-gray-700">Budget Usage</h3>
-              <span className="text-sm font-medium text-gray-600">
+              <h3 className="font-semibold text-gray-700 dark:text-gray-300">Budget Usage</h3>
+              <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
                 ${budgetUsed.toLocaleString()} / ${totalBudget.toLocaleString()}
               </span>
             </div>
@@ -74,7 +74,7 @@ const ProgressBar = ({ project, className = '' }) => {
             </div>
             
             <div className="flex items-center justify-between">
-              <span className={`text-sm ${isOverBudget ? 'text-red-600' : 'text-gray-500'}`}>
+              <span className={`text-sm ${isOverBudget ? 'text-red-600' : 'text-gray-500 dark:text-gray-400'}`}>
                 {budgetPercentage}% Used
                 {isOverBudget && ' (Over Budget)'}
               </span>

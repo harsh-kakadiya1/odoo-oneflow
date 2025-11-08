@@ -300,6 +300,15 @@ router.post('/', protect, authorize('Admin', 'Project Manager'), async (req, res
       }
     }
 
+    // Sanitize budget - convert empty string/null/undefined to 0
+    let sanitizedBudget = 0;
+    if (budget !== '' && budget !== null && budget !== undefined) {
+      const parsedBudget = parseFloat(budget);
+      if (!isNaN(parsedBudget) && parsedBudget >= 0) {
+        sanitizedBudget = parsedBudget;
+      }
+    }
+
     // Create project associated with user's company
     const project = await Project.create({
       name,
@@ -309,7 +318,7 @@ router.post('/', protect, authorize('Admin', 'Project Manager'), async (req, res
       status: status || 'Planned',
       project_manager_id: pmId,
       company_id: currentUser.company_id, // Associate with company
-      budget
+      budget: sanitizedBudget
     });
 
     // Add project members
@@ -426,7 +435,16 @@ router.put('/:id', protect, async (req, res) => {
     }
     
     if (status) project.status = status;
-    if (budget !== undefined) project.budget = budget;
+    
+    // Sanitize budget before updating
+    if (budget !== undefined) {
+      if (budget === '' || budget === null) {
+        project.budget = 0;
+      } else {
+        const parsedBudget = parseFloat(budget);
+        project.budget = !isNaN(parsedBudget) && parsedBudget >= 0 ? parsedBudget : 0;
+      }
+    }
 
     await project.save();
 
