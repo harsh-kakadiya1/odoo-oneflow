@@ -5,7 +5,6 @@ import {
   Clock, 
   DollarSign,
   AlertCircle,
-  TrendingUp,
   Calendar,
   CheckCircle2,
   CheckSquare
@@ -246,10 +245,6 @@ const Dashboard = () => {
               <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
                 {stats?.activeProjects || 0}
               </p>
-              <p className="text-sm text-green-600 dark:text-green-400 mt-2 flex items-center">
-                <TrendingUp className="h-4 w-4 mr-1" />
-                +{stats?.totalProjects || 0} total
-              </p>
             </div>
             <div className="h-14 w-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
               <FolderKanban className="h-7 w-7 text-white" />
@@ -264,10 +259,6 @@ const Dashboard = () => {
               <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Delayed Tasks</p>
               <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
                 {stats?.overdueTasks || 0}
-              </p>
-              <p className="text-sm text-red-600 dark:text-red-400 mt-2 flex items-center">
-                <AlertCircle className="h-4 w-4 mr-1" />
-                Needs attention
               </p>
             </div>
             <div className="h-14 w-14 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center shadow-lg">
@@ -284,10 +275,6 @@ const Dashboard = () => {
               <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
                 {stats?.hoursLoggedWeek || 0}
               </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 flex items-center">
-                <Clock className="h-4 w-4 mr-1" />
-                This week
-              </p>
             </div>
             <div className="h-14 w-14 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
               <Clock className="h-7 w-7 text-white" />
@@ -302,10 +289,6 @@ const Dashboard = () => {
               <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Revenue Earned</p>
               <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
                 ₹{(stats?.revenueBilledMonth || 0).toLocaleString()}
-              </p>
-              <p className="text-sm text-green-600 dark:text-green-400 mt-2 flex items-center">
-                <TrendingUp className="h-4 w-4 mr-1" />
-                This month
               </p>
             </div>
             <div className="h-14 w-14 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center shadow-lg">

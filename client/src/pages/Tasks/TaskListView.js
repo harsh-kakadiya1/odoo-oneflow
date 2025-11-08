@@ -8,8 +8,10 @@ import {
   CheckCircle,
   Clock
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 import Badge from '../../components/UI/Badge';
 import TaskCardMenu from '../../components/UI/TaskCardMenu';
+import { taskAPI } from '../../utils/api';
 
 const TaskListView = ({ tasks: initialTasks, onEdit, onDelete, onStatusChange, onChangeCover }) => {
   const [tasks, setTasks] = useState(initialTasks || []);
@@ -115,12 +117,24 @@ const TaskListView = ({ tasks: initialTasks, onEdit, onDelete, onStatusChange, o
     </th>
   );
 
-  const handleStatusChange = (taskId, newStatus) => {
+  const handleStatusChange = async (taskId, newStatus) => {
+    // Optimistically update local state
     const updatedTasks = tasks.map(task => 
       task.id === taskId ? { ...task, status: newStatus } : task
     );
     setTasks(updatedTasks);
-    if (onStatusChange) onStatusChange(taskId, newStatus);
+
+    try {
+      // Update backend
+      await taskAPI.updateStatus(taskId, newStatus);
+      toast.success('Task status updated');
+      if (onStatusChange) onStatusChange(taskId, newStatus);
+    } catch (error) {
+      console.error('Error updating task status:', error);
+      toast.error('Failed to update task status');
+      // Revert on error
+      setTasks(tasks);
+    }
   };
 
   return (
