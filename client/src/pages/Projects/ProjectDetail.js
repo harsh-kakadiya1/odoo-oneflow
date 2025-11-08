@@ -129,12 +129,12 @@ const ProjectDetail = () => {
             Back to Projects
           </Button>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">{project.name}</h1>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{project.name}</h1>
             <div className="flex items-center space-x-3 mt-2">
               <Badge variant={getStatusColor(project.status)}>
                 {project.status}
               </Badge>
-              <span className="text-sm text-gray-500">
+              <span className="text-sm text-gray-500 dark:text-gray-400">
                 Manager: {project.projectManager?.name}
               </span>
             </div>
@@ -172,7 +172,7 @@ const ProjectDetail = () => {
       {project.description && (
         <Card className="mb-6">
           <CardContent>
-            <p className="text-gray-700">{project.description}</p>
+            <p className="text-gray-700 dark:text-gray-300">{project.description}</p>
           </CardContent>
         </Card>
       )}
@@ -182,7 +182,7 @@ const ProjectDetail = () => {
         <Card>
           <CardContent className="text-center">
             <Calendar className="h-8 w-8 mx-auto text-blue-500 mb-2" />
-            <p className="text-sm text-gray-500">Start Date</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Start Date</p>
             <p className="font-semibold">
               {project.start_date ? new Date(project.start_date).toLocaleDateString() : 'Not set'}
             </p>
@@ -192,7 +192,7 @@ const ProjectDetail = () => {
         <Card>
           <CardContent className="text-center">
             <Calendar className="h-8 w-8 mx-auto text-orange-500 mb-2" />
-            <p className="text-sm text-gray-500">End Date</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">End Date</p>
             <p className="font-semibold">
               {project.end_date ? new Date(project.end_date).toLocaleDateString() : 'Not set'}
             </p>
@@ -202,7 +202,7 @@ const ProjectDetail = () => {
         <Card>
           <CardContent className="text-center">
             <DollarSign className="h-8 w-8 mx-auto text-green-500 mb-2" />
-            <p className="text-sm text-gray-500">Budget</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Budget</p>
             <p className="font-semibold">
               ${project.budget ? Number(project.budget).toLocaleString() : '0'}
             </p>
@@ -212,7 +212,7 @@ const ProjectDetail = () => {
         <Card>
           <CardContent className="text-center">
             <Users className="h-8 w-8 mx-auto text-purple-500 mb-2" />
-            <p className="text-sm text-gray-500">Team Members</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Team Members</p>
             <p className="font-semibold">{project.members?.length || 0}</p>
           </CardContent>
         </Card>
@@ -222,7 +222,7 @@ const ProjectDetail = () => {
       <ProgressBar project={project} className="mb-6" />
 
       {/* Tabs */}
-      <div className="border-b border-gray-200 mb-6">
+      <div className="border-b border-gray-200 dark:border-gray-700 mb-6">
         <nav className="-mb-px flex space-x-8">
           {tabs.map((tab) => {
             const Icon = tab.icon;
@@ -234,7 +234,7 @@ const ProjectDetail = () => {
                   py-2 px-1 border-b-2 font-medium text-sm flex items-center space-x-2
                   ${activeTab === tab.id
                     ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:border-gray-600'
                   }
                 `}
               >
@@ -255,21 +255,21 @@ const ProjectDetail = () => {
               <CardContent>
                 <h3 className="text-lg font-semibold mb-4">Team Members</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <p className="font-medium text-gray-700">Project Manager</p>
+                  <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                    <p className="font-medium text-gray-700 dark:text-gray-300">Project Manager</p>
                     <div className="flex items-center space-x-2 mt-2">
                       <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
                         {project.projectManager?.name?.charAt(0)}
                       </div>
                       <div>
                         <p className="font-medium">{project.projectManager?.name}</p>
-                        <p className="text-sm text-gray-500">{project.projectManager?.email}</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{project.projectManager?.email}</p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <p className="font-medium text-gray-700 mb-3">Team Members ({project.members?.length || 0})</p>
+                  <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                    <p className="font-medium text-gray-700 dark:text-gray-300 mb-3">Team Members ({project.members?.length || 0})</p>
                     <div className="space-y-2 max-h-32 overflow-y-auto">
                       {project.members?.map((member) => (
                         <div key={member.id} className="flex items-center space-x-2">
@@ -292,21 +292,21 @@ const ProjectDetail = () => {
                   <h3 className="text-lg font-semibold mb-4">Financial Overview</h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="text-center p-4 bg-green-50 rounded-lg">
-                      <p className="text-sm text-gray-600">Revenue</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Revenue</p>
                       <p className="text-2xl font-bold text-green-600">
-                        ${project.financials.totalRevenue?.toLocaleString() || '0'}
+                        ₹{project.financials.totalRevenue?.toLocaleString('en-IN') || '0'}
                       </p>
                     </div>
                     <div className="text-center p-4 bg-red-50 rounded-lg">
-                      <p className="text-sm text-gray-600">Cost</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Cost</p>
                       <p className="text-2xl font-bold text-red-600">
-                        ${project.financials.totalCost?.toLocaleString() || '0'}
+                        ₹{project.financials.totalCost?.toLocaleString('en-IN') || '0'}
                       </p>
                     </div>
                     <div className="text-center p-4 bg-blue-50 rounded-lg">
-                      <p className="text-sm text-gray-600">Profit</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Profit</p>
                       <p className="text-2xl font-bold text-blue-600">
-                        ${project.financials.profit?.toLocaleString() || '0'}
+                        ₹{project.financials.profit?.toLocaleString('en-IN') || '0'}
                       </p>
                     </div>
                   </div>
@@ -351,7 +351,7 @@ const ProjectDetail = () => {
           title="Delete Project"
         >
           <div className="space-y-4">
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-400">
               Are you sure you want to delete this project? This action cannot be undone.
             </p>
             <div className="flex justify-end space-x-3">

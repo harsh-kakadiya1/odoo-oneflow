@@ -34,10 +34,10 @@ const ListFilters = ({ filters, onFilterChange, onClear, projects }) => {
         <Card className="absolute top-full left-0 mt-2 w-80 p-4 shadow-lg z-10">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="font-medium text-gray-900">Filters</h3>
+              <h3 className="font-medium text-gray-900 dark:text-white">Filters</h3>
               <button
                 onClick={() => setIsOpen(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-600 dark:text-gray-400"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -45,13 +45,13 @@ const ListFilters = ({ filters, onFilterChange, onClear, projects }) => {
 
             {/* Status Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Status
               </label>
               <select
                 value={filters.status || ''}
                 onChange={(e) => onFilterChange('status', e.target.value)}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                className="w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm"
               >
                 <option value="">All Statuses</option>
                 <option value="Draft">Draft</option>
@@ -64,13 +64,13 @@ const ListFilters = ({ filters, onFilterChange, onClear, projects }) => {
 
             {/* Project Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Project
               </label>
               <select
                 value={filters.projectId || ''}
                 onChange={(e) => onFilterChange('projectId', e.target.value)}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                className="w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm"
               >
                 <option value="">All Projects</option>
                 {projects?.map((project) => (
@@ -84,7 +84,7 @@ const ListFilters = ({ filters, onFilterChange, onClear, projects }) => {
             {/* Date Range */}
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   From Date
                 </label>
                 <Input
@@ -94,7 +94,7 @@ const ListFilters = ({ filters, onFilterChange, onClear, projects }) => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   To Date
                 </label>
                 <Input
@@ -108,7 +108,7 @@ const ListFilters = ({ filters, onFilterChange, onClear, projects }) => {
             {/* Amount Range */}
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Min Amount
                 </label>
                 <Input
@@ -119,7 +119,7 @@ const ListFilters = ({ filters, onFilterChange, onClear, projects }) => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Max Amount
                 </label>
                 <Input
@@ -148,12 +148,12 @@ const ListFilters = ({ filters, onFilterChange, onClear, projects }) => {
 
 const ListGroupBy = ({ groupBy, onGroupChange, options }) => {
   return (
-    <div className="flex items-center space-x-2">
-      <span className="text-sm text-gray-600">Group by:</span>
+    <div className="flex items-center space-x-2 w-full lg:w-auto">
+      <span className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">Group by:</span>
       <select
         value={groupBy}
         onChange={(e) => onGroupChange(e.target.value)}
-        className="rounded-md border border-gray-300 px-2 py-1 text-sm"
+        className="flex-1 lg:flex-none px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
       >
         <option value="">None</option>
         {options.map((option) => (
@@ -230,58 +230,61 @@ const DocumentListView = ({
   }
 
   return (
-    <div className="container mx-auto px-6 py-8">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">{title}</h1>
-          <p className="text-gray-600 mt-1">
-            {documents?.length || 0} records found
-          </p>
+    <div className="space-y-6">
+      {/* Search, Filters, and Action Bar */}
+      <div className="flex flex-col lg:flex-row gap-4 items-center">
+        {/* Search Bar */}
+        <div className="flex-1 w-full">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
+            <Input
+              type="text"
+              placeholder={searchPlaceholder}
+              value={localSearch}
+              onChange={(e) => setLocalSearch(e.target.value)}
+              className="pl-10"
+            />
+          </div>
         </div>
-        <div className="flex items-center space-x-3">
-          <Button variant="outline" onClick={onRefresh}>
+
+        {/* Group By */}
+        <div className="w-full lg:w-auto">
+          <ListGroupBy
+            groupBy={groupBy}
+            onGroupChange={onGroupChange}
+            options={groupByOptions}
+          />
+        </div>
+
+        {/* Filters */}
+        <div className="w-full lg:w-auto">
+          <ListFilters
+            filters={filters}
+            onFilterChange={onFilterChange}
+            onClear={onClearFilters}
+            projects={projects}
+          />
+        </div>
+
+        {/* Create New Button */}
+        <Link to={createHref} className="w-full lg:w-auto">
+          <Button className="w-full lg:w-auto whitespace-nowrap">
+            <Plus className="h-4 w-4 mr-2" />
+            Create New
+          </Button>
+        </Link>
+      </div>
+
+      {/* Info Card */}
+      <Card className="p-4">
+        <div className="flex items-center justify-between">
+          <div className="text-sm text-gray-600 dark:text-gray-400">
+            {documents?.length || 0} records found
+          </div>
+          <Button variant="outline" size="sm" onClick={onRefresh}>
             <RefreshCw className="h-4 w-4 mr-2" />
             Refresh
           </Button>
-          <Link to={createHref}>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Create New
-            </Button>
-          </Link>
-        </div>
-      </div>
-
-      {/* Search and Filters */}
-      <Card className="p-4 mb-6">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
-          <div className="flex-1 max-w-md">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                type="text"
-                placeholder={searchPlaceholder}
-                value={localSearch}
-                onChange={(e) => setLocalSearch(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-          </div>
-          
-          <div className="flex items-center space-x-4">
-            <ListGroupBy
-              groupBy={groupBy}
-              onGroupChange={onGroupChange}
-              options={groupByOptions}
-            />
-            <ListFilters
-              filters={filters}
-              onFilterChange={onFilterChange}
-              onClear={onClearFilters}
-              projects={projects}
-            />
-          </div>
         </div>
       </Card>
 
@@ -290,7 +293,7 @@ const DocumentListView = ({
         {Object.entries(groupedDocuments).map(([groupKey, groupDocs]) => (
           <div key={groupKey}>
             {groupKey && (
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 border-b pb-2">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 border-b pb-2">
                 {groupKey} ({groupDocs.length})
               </h3>
             )}
@@ -298,24 +301,24 @@ const DocumentListView = ({
             <Card className="overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+                  <thead className="bg-gray-50 dark:bg-gray-700">
                     <tr>
                       {columns.map((col) => (
                         <th
                           key={col.key}
-                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
                         >
                           {col.label}
                         </th>
                       ))}
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200">
                     {groupDocs.length === 0 ? (
                       <tr>
                         <td
                           colSpan={columns.length}
-                          className="px-6 py-12 text-center text-gray-500"
+                          className="px-6 py-12 text-center text-gray-500 dark:text-gray-400"
                         >
                           No records found
                         </td>

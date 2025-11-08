@@ -120,14 +120,14 @@ const DocumentForm = ({
       case 'select':
         return (
           <div key={name}>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               {label} {required && <span className="text-red-500">*</span>}
             </label>
             <select
               value={value}
               onChange={(e) => handleChange(name, e.target.value)}
               required={required}
-              className="w-full rounded-md border border-gray-300 px-3 py-2"
+              className="w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2"
               {...fieldProps}
             >
               <option value="">Select {label}</option>
@@ -143,7 +143,7 @@ const DocumentForm = ({
       case 'textarea':
         return (
           <div key={name}>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               {label} {required && <span className="text-red-500">*</span>}
             </label>
             <textarea
@@ -152,7 +152,7 @@ const DocumentForm = ({
               placeholder={placeholder}
               required={required}
               rows={3}
-              className="w-full rounded-md border border-gray-300 px-3 py-2"
+              className="w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2"
               {...fieldProps}
             />
           </div>
@@ -161,7 +161,7 @@ const DocumentForm = ({
       case 'number':
         return (
           <div key={name}>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               {label} {required && <span className="text-red-500">*</span>}
             </label>
             <Input
@@ -180,7 +180,7 @@ const DocumentForm = ({
       default:
         return (
           <div key={name}>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               {label} {required && <span className="text-red-500">*</span>}
             </label>
             <Input
@@ -211,15 +211,15 @@ const DocumentForm = ({
         <div className="flex items-center space-x-4">
           <Link
             to={backPath}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-gray-400 hover:text-gray-600 dark:text-gray-400 transition-colors"
           >
             <ArrowLeft className="h-6 w-6" />
           </Link>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
               {isEdit ? `Edit ${title}` : `Create ${title}`}
             </h1>
-            <p className="text-gray-600 mt-1">
+            <p className="text-gray-600 dark:text-gray-400 mt-1">
               {isEdit ? 'Update document details' : 'Fill in the form to create a new document'}
             </p>
           </div>
@@ -245,14 +245,14 @@ const DocumentForm = ({
             {/* Project Linking */}
             {allowProjectLinking && (
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   <LinkIcon className="h-4 w-4 inline mr-1" />
                   Link to Project
                 </label>
                 <select
                   value={formData.project_id || ''}
                   onChange={(e) => handleChange('project_id', e.target.value || null)}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2"
+                  className="w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2"
                 >
                   <option value="">No project</option>
                   {projects.map((project) => (
@@ -261,7 +261,7 @@ const DocumentForm = ({
                     </option>
                   ))}
                 </select>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                   Optional: Link this document to a project for better organization
                 </p>
               </div>

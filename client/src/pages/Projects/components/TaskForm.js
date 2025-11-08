@@ -102,7 +102,7 @@ const TaskForm = ({ projectId, task, onSuccess, onCancel }) => {
 
       {/* Description - Only editable by admins/PMs */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           Description
         </label>
         <textarea
@@ -111,8 +111,8 @@ const TaskForm = ({ projectId, task, onSuccess, onCancel }) => {
           onChange={handleChange}
           rows={4}
           disabled={!canEditDetails}
-          className={`w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-            !canEditDetails ? 'bg-gray-100 cursor-not-allowed' : ''
+          className={`w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+            !canEditDetails ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed' : ''
           }`}
           placeholder="Task description (optional)"
         />
@@ -121,7 +121,7 @@ const TaskForm = ({ projectId, task, onSuccess, onCancel }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Assignee - Only editable by admins/PMs */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Assignee
           </label>
           <select
@@ -129,8 +129,8 @@ const TaskForm = ({ projectId, task, onSuccess, onCancel }) => {
             value={formData.assignee_id}
             onChange={handleChange}
             disabled={!canEditDetails}
-            className={`w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-              !canEditDetails ? 'bg-gray-100 cursor-not-allowed' : ''
+            className={`w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+              !canEditDetails ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed' : ''
             }`}
           >
             <option value="">Select Assignee</option>
@@ -156,7 +156,7 @@ const TaskForm = ({ projectId, task, onSuccess, onCancel }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Priority - Only editable by admins/PMs */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Priority
           </label>
           <select
@@ -164,8 +164,8 @@ const TaskForm = ({ projectId, task, onSuccess, onCancel }) => {
             value={formData.priority}
             onChange={handleChange}
             disabled={!canEditDetails}
-            className={`w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-              !canEditDetails ? 'bg-gray-100 cursor-not-allowed' : ''
+            className={`w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+              !canEditDetails ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed' : ''
             }`}
           >
             <option value="Low">Low</option>
@@ -176,7 +176,7 @@ const TaskForm = ({ projectId, task, onSuccess, onCancel }) => {
 
         {/* Status - Editable by assignee and admins/PMs */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Status
           </label>
           <select
@@ -184,8 +184,8 @@ const TaskForm = ({ projectId, task, onSuccess, onCancel }) => {
             value={formData.status}
             onChange={handleChange}
             disabled={!canEditDetails && !isAssignee}
-            className={`w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-              (!canEditDetails && !isAssignee) ? 'bg-gray-100 cursor-not-allowed' : ''
+            className={`w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+              (!canEditDetails && !isAssignee) ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed' : ''
             }`}
           >
             <option value="New">New</option>

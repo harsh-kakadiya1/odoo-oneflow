@@ -22,7 +22,7 @@ const LoadingSpinner = ({
   return (
     <div
       className={clsx(
-        'animate-spin rounded-full border-2 border-gray-200',
+        'animate-spin rounded-full border-2 border-gray-200 dark:border-gray-700',
         sizeClasses[size],
         colorClasses[color],
         className

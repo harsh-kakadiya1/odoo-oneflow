@@ -104,7 +104,7 @@ const ProjectForm = ({ project, onSuccess, onCancel }) => {
       />
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           Description
         </label>
         <textarea
@@ -112,7 +112,7 @@ const ProjectForm = ({ project, onSuccess, onCancel }) => {
           value={formData.description}
           onChange={handleChange}
           rows={3}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
           placeholder="Enter project description"
         />
       </div>
@@ -136,14 +136,14 @@ const ProjectForm = ({ project, onSuccess, onCancel }) => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Status <span className="text-error-500">*</span>
           </label>
           <select
             name="status"
             value={formData.status}
             onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
           >
             <option value="Planned">Planned</option>
             <option value="In Progress">In Progress</option>
@@ -153,14 +153,14 @@ const ProjectForm = ({ project, onSuccess, onCancel }) => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Project Manager <span className="text-error-500">*</span>
           </label>
           <select
             name="project_manager_id"
             value={formData.project_manager_id}
             onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
           >
             <option value="">Select Manager</option>
             {managers.map(manager => (
@@ -185,10 +185,10 @@ const ProjectForm = ({ project, onSuccess, onCancel }) => {
       />
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Team Members
         </label>
-        <div className="border border-gray-300 rounded-lg p-4 max-h-48 overflow-y-auto">
+        <div className="border border-gray-300 dark:border-gray-600 rounded-lg p-4 max-h-48 overflow-y-auto">
           {users.length > 0 ? (
             <div className="space-y-2">
               {users.map(user => (
@@ -199,14 +199,14 @@ const ProjectForm = ({ project, onSuccess, onCancel }) => {
                     onChange={() => handleMemberToggle(user.id)}
                     className="rounded text-primary-600 focus:ring-primary-500"
                   />
-                  <span className="text-sm text-gray-900">
+                  <span className="text-sm text-gray-900 dark:text-white">
                     {user.name} ({user.role})
                   </span>
                 </label>
               ))}
             </div>
           ) : (
-            <p className="text-sm text-gray-500">No users available</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">No users available</p>
           )}
         </div>
       </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Button from '../../components/UI/Button';
 import Input from '../../components/UI/Input';
@@ -7,7 +7,6 @@ import { FileText, Eye, EyeOff } from 'lucide-react';
 import { authAPI } from '../../utils/api';
 import toast from 'react-hot-toast';
 import { validateEmail, validatePassword, validateName } from '../../utils/validation';
-import { fetchCountries } from '../../services/currencyService';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -16,34 +15,13 @@ const Register = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    companyName: '',
-    country: '',
-    currency: 'USD'
+    companyName: ''
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [countries, setCountries] = useState([]);
-  const [loadingCountries, setLoadingCountries] = useState(false);
   const navigate = useNavigate();
-
-  // Load countries on mount
-  useEffect(() => {
-    const loadCountries = async () => {
-      setLoadingCountries(true);
-      try {
-        const data = await fetchCountries();
-        setCountries(data);
-      } catch (error) {
-        console.error('Error loading countries:', error);
-        toast.error('Failed to load countries list');
-      } finally {
-        setLoadingCountries(false);
-      }
-    };
-    loadCountries();
-  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -57,18 +35,6 @@ const Register = () => {
         ...errors,
         [name]: ''
       });
-    }
-
-    // Auto-update currency when country changes
-    if (name === 'country') {
-      const countryData = countries.find(c => c.code === value);
-      if (countryData) {
-        setFormData(prev => ({
-          ...prev,
-          [name]: value,
-          currency: countryData.currency || 'USD'
-        }));
-      }
     }
   };
 
@@ -99,11 +65,6 @@ const Register = () => {
       newErrors.companyName = 'Company name must be at least 2 characters long';
     } else if (formData.companyName.trim().length > 50) {
       newErrors.companyName = 'Company name must be less than 50 characters';
-    }
-
-    // Country validation
-    if (!formData.country) {
-      newErrors.country = 'Please select a country';
     }
 
     // Password validation
@@ -146,8 +107,8 @@ const Register = () => {
         email: formData.email,
         password: formData.password,
         companyName: formData.companyName,
-        country: formData.country,
-        currency: formData.currency
+        country: 'IN',
+        currency: 'INR'
       });
 
       // Store token and user
@@ -171,12 +132,12 @@ const Register = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-secondary-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg">
+      <div className="max-w-md w-full space-y-8 bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg">
         <div>
           <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-primary-100">
             <FileText className="h-6 w-6 text-primary-600" />
           </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
             Create your account
           </h2>
         </div>
@@ -229,50 +190,6 @@ const Register = () => {
               error={errors.companyName}
               placeholder="Enter your company name"
             />
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="country" className="block text-sm font-medium text-gray-700">
-                  Country <span className="text-red-500">*</span>
-                </label>
-                <select
-                  id="country"
-                  name="country"
-                  required
-                  value={formData.country}
-                  onChange={handleChange}
-                  disabled={loadingCountries}
-                  className={`mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 ${
-                    errors.country ? 'border-red-500 focus:border-red-500' : ''
-                  } ${loadingCountries ? 'bg-gray-100' : ''}`}
-                >
-                  <option value="">Select country</option>
-                  {countries.map((country) => (
-                    <option key={country.code} value={country.code}>
-                      {country.name}
-                    </option>
-                  ))}
-                </select>
-                {errors.country && (
-                  <p className="mt-1 text-sm text-red-600">{errors.country}</p>
-                )}
-                {loadingCountries && (
-                  <p className="mt-1 text-sm text-gray-500">Loading countries...</p>
-                )}
-              </div>
-
-              <Input
-                label="Currency"
-                name="currency"
-                type="text"
-                required
-                value={formData.currency}
-                onChange={handleChange}
-                placeholder="Currency"
-                readOnly
-                className="bg-gray-50"
-              />
-            </div>
 
             <div>
               <div className="relative">
@@ -341,7 +258,7 @@ const Register = () => {
               type="submit"
               className="w-full"
               loading={isSubmitting}
-              disabled={isSubmitting || loadingCountries}
+              disabled={isSubmitting}
             >
               Create Account
             </Button>
@@ -350,10 +267,10 @@ const Register = () => {
           {/* Divider */}
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300"></div>
+              <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">Or</span>
+              <span className="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">Or</span>
             </div>
           </div>
 
@@ -361,7 +278,7 @@ const Register = () => {
           <div>
             <Link
               to="/login"
-              className="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
+              className="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
             >
               Sign in instead
             </Link>
