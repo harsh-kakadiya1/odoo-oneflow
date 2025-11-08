@@ -69,10 +69,10 @@ const Dashboard = () => {
     <div className="space-y-6">
       {/* Welcome Section */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white dark:text-white">
           Welcome back, {user?.name}!
         </h1>
-        <p className="text-gray-600 mt-1">
+        <p className="text-gray-600 dark:text-gray-400 dark:text-gray-400 mt-1">
           Here's what's happening with your projects today.
         </p>
       </div>
@@ -84,13 +84,13 @@ const Dashboard = () => {
             <Card>
               <CardContent className="flex items-center justify-between p-6">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Active Projects</p>
-                  <p className="text-3xl font-bold text-gray-900 mt-2">
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 dark:text-gray-400">Active Projects</p>
+                  <p className="text-3xl font-bold text-gray-900 dark:text-white dark:text-white mt-2">
                     {stats?.activeProjects || 0}
                   </p>
                 </div>
-                <div className="h-12 w-12 bg-primary-100 rounded-lg flex items-center justify-center">
-                  <FolderKanban className="h-6 w-6 text-primary-600" />
+                <div className="h-12 w-12 bg-primary-100 dark:bg-primary-900 rounded-lg flex items-center justify-center">
+                  <FolderKanban className="h-6 w-6 text-primary-600 dark:text-primary-400" />
                 </div>
               </CardContent>
             </Card>
@@ -98,13 +98,13 @@ const Dashboard = () => {
             <Card>
               <CardContent className="flex items-center justify-between p-6">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Hours Logged (Week)</p>
-                  <p className="text-3xl font-bold text-gray-900 mt-2">
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 dark:text-gray-400">Hours Logged (Week)</p>
+                  <p className="text-3xl font-bold text-gray-900 dark:text-white dark:text-white mt-2">
                     {stats?.hoursLoggedWeek || 0}
                   </p>
                 </div>
-                <div className="h-12 w-12 bg-success-100 rounded-lg flex items-center justify-center">
-                  <Clock className="h-6 w-6 text-success-600" />
+                <div className="h-12 w-12 bg-success-100 dark:bg-success-900 rounded-lg flex items-center justify-center">
+                  <Clock className="h-6 w-6 text-success-600 dark:text-success-400" />
                 </div>
               </CardContent>
             </Card>
@@ -112,13 +112,13 @@ const Dashboard = () => {
             <Card>
               <CardContent className="flex items-center justify-between p-6">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Revenue (Month)</p>
-                  <p className="text-3xl font-bold text-gray-900 mt-2">
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 dark:text-gray-400">Revenue (Month)</p>
+                  <p className="text-3xl font-bold text-gray-900 dark:text-white dark:text-white mt-2">
                     ₹{(stats?.revenueBilledMonth || 0).toLocaleString()}
                   </p>
                 </div>
-                <div className="h-12 w-12 bg-warning-100 rounded-lg flex items-center justify-center">
-                  <DollarSign className="h-6 w-6 text-warning-600" />
+                <div className="h-12 w-12 bg-warning-100 dark:bg-warning-900 rounded-lg flex items-center justify-center">
+                  <DollarSign className="h-6 w-6 text-warning-600 dark:text-warning-400" />
                 </div>
               </CardContent>
             </Card>
@@ -126,13 +126,13 @@ const Dashboard = () => {
             <Card>
               <CardContent className="flex items-center justify-between p-6">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Overdue Tasks</p>
-                  <p className="text-3xl font-bold text-gray-900 mt-2">
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 dark:text-gray-400">Overdue Tasks</p>
+                  <p className="text-3xl font-bold text-gray-900 dark:text-white dark:text-white mt-2">
                     {stats?.overdueTasks || 0}
                   </p>
                 </div>
-                <div className="h-12 w-12 bg-error-100 rounded-lg flex items-center justify-center">
-                  <AlertCircle className="h-6 w-6 text-error-600" />
+                <div className="h-12 w-12 bg-error-100 dark:bg-error-900 rounded-lg flex items-center justify-center">
+                  <AlertCircle className="h-6 w-6 text-error-600 dark:text-error-400" />
                 </div>
               </CardContent>
             </Card>
@@ -142,13 +142,13 @@ const Dashboard = () => {
             <Card>
               <CardContent className="flex items-center justify-between p-6">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">My Projects</p>
-                  <p className="text-3xl font-bold text-gray-900 mt-2">
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 dark:text-gray-400">My Projects</p>
+                  <p className="text-3xl font-bold text-gray-900 dark:text-white dark:text-white mt-2">
                     {stats?.activeProjects || 0}
                   </p>
                 </div>
-                <div className="h-12 w-12 bg-primary-100 rounded-lg flex items-center justify-center">
-                  <FolderKanban className="h-6 w-6 text-primary-600" />
+                <div className="h-12 w-12 bg-primary-100 dark:bg-primary-900 rounded-lg flex items-center justify-center">
+                  <FolderKanban className="h-6 w-6 text-primary-600 dark:text-primary-400" />
                 </div>
               </CardContent>
             </Card>
@@ -156,13 +156,13 @@ const Dashboard = () => {
             <Card>
               <CardContent className="flex items-center justify-between p-6">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Team Hours (Week)</p>
-                  <p className="text-3xl font-bold text-gray-900 mt-2">
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 dark:text-gray-400">Team Hours (Week)</p>
+                  <p className="text-3xl font-bold text-gray-900 dark:text-white dark:text-white mt-2">
                     {stats?.teamHoursWeek || 0}
                   </p>
                 </div>
-                <div className="h-12 w-12 bg-success-100 rounded-lg flex items-center justify-center">
-                  <Clock className="h-6 w-6 text-success-600" />
+                <div className="h-12 w-12 bg-success-100 dark:bg-success-900 rounded-lg flex items-center justify-center">
+                  <Clock className="h-6 w-6 text-success-600 dark:text-success-400" />
                 </div>
               </CardContent>
             </Card>
@@ -170,13 +170,13 @@ const Dashboard = () => {
             <Card>
               <CardContent className="flex items-center justify-between p-6">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Pending Expenses</p>
-                  <p className="text-3xl font-bold text-gray-900 mt-2">
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 dark:text-gray-400">Pending Expenses</p>
+                  <p className="text-3xl font-bold text-gray-900 dark:text-white dark:text-white mt-2">
                     {stats?.pendingExpenses || 0}
                   </p>
                 </div>
-                <div className="h-12 w-12 bg-warning-100 rounded-lg flex items-center justify-center">
-                  <AlertCircle className="h-6 w-6 text-warning-600" />
+                <div className="h-12 w-12 bg-warning-100 dark:bg-warning-900 rounded-lg flex items-center justify-center">
+                  <AlertCircle className="h-6 w-6 text-warning-600 dark:text-warning-400" />
                 </div>
               </CardContent>
             </Card>
@@ -184,13 +184,13 @@ const Dashboard = () => {
             <Card>
               <CardContent className="flex items-center justify-between p-6">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Overdue Tasks</p>
-                  <p className="text-3xl font-bold text-gray-900 mt-2">
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 dark:text-gray-400">Overdue Tasks</p>
+                  <p className="text-3xl font-bold text-gray-900 dark:text-white dark:text-white mt-2">
                     {stats?.overdueTasks || 0}
                   </p>
                 </div>
-                <div className="h-12 w-12 bg-error-100 rounded-lg flex items-center justify-center">
-                  <CheckSquare className="h-6 w-6 text-error-600" />
+                <div className="h-12 w-12 bg-error-100 dark:bg-error-900 rounded-lg flex items-center justify-center">
+                  <CheckSquare className="h-6 w-6 text-error-600 dark:text-error-400" />
                 </div>
               </CardContent>
             </Card>
@@ -200,13 +200,13 @@ const Dashboard = () => {
             <Card>
               <CardContent className="flex items-center justify-between p-6">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">My Tasks</p>
-                  <p className="text-3xl font-bold text-gray-900 mt-2">
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 dark:text-gray-400">My Tasks</p>
+                  <p className="text-3xl font-bold text-gray-900 dark:text-white dark:text-white mt-2">
                     {stats?.openTasks || 0}
                   </p>
                 </div>
-                <div className="h-12 w-12 bg-primary-100 rounded-lg flex items-center justify-center">
-                  <CheckSquare className="h-6 w-6 text-primary-600" />
+                <div className="h-12 w-12 bg-primary-100 dark:bg-primary-900 rounded-lg flex items-center justify-center">
+                  <CheckSquare className="h-6 w-6 text-primary-600 dark:text-primary-400" />
                 </div>
               </CardContent>
             </Card>
@@ -214,13 +214,13 @@ const Dashboard = () => {
             <Card>
               <CardContent className="flex items-center justify-between p-6">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Hours (Week)</p>
-                  <p className="text-3xl font-bold text-gray-900 mt-2">
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 dark:text-gray-400">Hours (Week)</p>
+                  <p className="text-3xl font-bold text-gray-900 dark:text-white dark:text-white mt-2">
                     {stats?.hoursLoggedWeek || 0}
                   </p>
                 </div>
-                <div className="h-12 w-12 bg-success-100 rounded-lg flex items-center justify-center">
-                  <Clock className="h-6 w-6 text-success-600" />
+                <div className="h-12 w-12 bg-success-100 dark:bg-success-900 rounded-lg flex items-center justify-center">
+                  <Clock className="h-6 w-6 text-success-600 dark:text-success-400" />
                 </div>
               </CardContent>
             </Card>
@@ -228,13 +228,13 @@ const Dashboard = () => {
             <Card>
               <CardContent className="flex items-center justify-between p-6">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Overdue Tasks</p>
-                  <p className="text-3xl font-bold text-gray-900 mt-2">
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 dark:text-gray-400">Overdue Tasks</p>
+                  <p className="text-3xl font-bold text-gray-900 dark:text-white dark:text-white mt-2">
                     {stats?.overdueTasks || 0}
                   </p>
                 </div>
-                <div className="h-12 w-12 bg-error-100 rounded-lg flex items-center justify-center">
-                  <AlertCircle className="h-6 w-6 text-error-600" />
+                <div className="h-12 w-12 bg-error-100 dark:bg-error-900 rounded-lg flex items-center justify-center">
+                  <AlertCircle className="h-6 w-6 text-error-600 dark:text-error-400" />
                 </div>
               </CardContent>
             </Card>
@@ -242,13 +242,13 @@ const Dashboard = () => {
             <Card>
               <CardContent className="flex items-center justify-between p-6">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Pending Expenses</p>
-                  <p className="text-3xl font-bold text-gray-900 mt-2">
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 dark:text-gray-400">Pending Expenses</p>
+                  <p className="text-3xl font-bold text-gray-900 dark:text-white dark:text-white mt-2">
                     {stats?.pendingExpenses || 0}
                   </p>
                 </div>
-                <div className="h-12 w-12 bg-warning-100 rounded-lg flex items-center justify-center">
-                  <DollarSign className="h-6 w-6 text-warning-600" />
+                <div className="h-12 w-12 bg-warning-100 dark:bg-warning-900 rounded-lg flex items-center justify-center">
+                  <DollarSign className="h-6 w-6 text-warning-600 dark:text-warning-400" />
                 </div>
               </CardContent>
             </Card>
@@ -263,7 +263,7 @@ const Dashboard = () => {
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>Recent Projects</CardTitle>
-              <Link to="/projects" className="text-sm text-primary-600 hover:text-primary-700">
+              <Link to="/projects" className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
                 View all
               </Link>
             </div>
@@ -272,12 +272,12 @@ const Dashboard = () => {
             {recentProjects.length > 0 ? (
               <div className="space-y-4">
                 {recentProjects.map((project) => (
-                  <div key={project.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div key={project.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 dark:bg-gray-700 rounded-lg">
                     <div className="flex-1">
-                      <Link to={`/projects/${project.id}`} className="font-medium text-gray-900 hover:text-primary-600">
+                      <Link to={`/projects/${project.id}`} className="font-medium text-gray-900 dark:text-white dark:text-white hover:text-primary-600 dark:hover:text-primary-400">
                         {project.name}
                       </Link>
-                      <p className="text-sm text-gray-500 mt-1">
+                      <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-400 mt-1">
                         {project.projectManager?.name}
                       </p>
                     </div>
@@ -288,7 +288,7 @@ const Dashboard = () => {
                 ))}
               </div>
             ) : (
-              <p className="text-center text-gray-500 py-8">No recent projects</p>
+              <p className="text-center text-gray-500 dark:text-gray-400 dark:text-gray-400 py-8">No recent projects</p>
             )}
           </CardContent>
         </Card>
@@ -298,7 +298,7 @@ const Dashboard = () => {
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>Recent Tasks</CardTitle>
-              <Link to="/tasks" className="text-sm text-primary-600 hover:text-primary-700">
+              <Link to="/tasks" className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
                 View all
               </Link>
             </div>
@@ -307,10 +307,10 @@ const Dashboard = () => {
             {recentTasks.length > 0 ? (
               <div className="space-y-4">
                 {recentTasks.map((task) => (
-                  <div key={task.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div key={task.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 dark:bg-gray-700 rounded-lg">
                     <div className="flex-1">
-                      <p className="font-medium text-gray-900">{task.title}</p>
-                      <p className="text-sm text-gray-500 mt-1">
+                      <p className="font-medium text-gray-900 dark:text-white dark:text-white">{task.title}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-400 mt-1">
                         {task.project?.name}
                       </p>
                     </div>
@@ -321,7 +321,7 @@ const Dashboard = () => {
                 ))}
               </div>
             ) : (
-              <p className="text-center text-gray-500 py-8">No recent tasks</p>
+              <p className="text-center text-gray-500 dark:text-gray-400 dark:text-gray-400 py-8">No recent tasks</p>
             )}
           </CardContent>
         </Card>

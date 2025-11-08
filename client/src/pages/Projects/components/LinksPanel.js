@@ -188,8 +188,8 @@ const LinksPanel = ({ projectId }) => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-xl font-semibold text-gray-900">Linked Financial Documents</h3>
-        <p className="text-sm text-gray-500">
+        <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Linked Financial Documents</h3>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
           Financial documents linked to this project
         </p>
       </div>
@@ -206,7 +206,7 @@ const LinksPanel = ({ projectId }) => {
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-2">
                     <Icon className={`h-5 w-5 text-${linkType.color}-500`} />
-                    <h4 className="font-semibold text-gray-900">{linkType.title}</h4>
+                    <h4 className="font-semibold text-gray-900 dark:text-white">{linkType.title}</h4>
                     <Badge variant="outline" className="ml-2">
                       {items.length}
                     </Badge>
@@ -240,9 +240,9 @@ const LinksPanel = ({ projectId }) => {
                 </div>
 
                 {/* Summary */}
-                <div className="bg-gray-50 p-3 rounded-lg mb-4">
+                <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg mb-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Total Amount:</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">Total Amount:</span>
                     <span className={`font-semibold text-${linkType.color}-600`}>
                       {formatAmount(totalAmount)}
                     </span>
@@ -252,14 +252,14 @@ const LinksPanel = ({ projectId }) => {
                 {/* Document List */}
                 <div className="space-y-2 max-h-48 overflow-y-auto">
                   {items.length === 0 ? (
-                    <p className="text-sm text-gray-500 text-center py-4">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
                       No {linkType.title.toLowerCase()} linked to this project
                     </p>
                   ) : (
                     items.map((item) => (
                       <div
                         key={item.id}
-                        className="flex items-center justify-between p-2 bg-white border border-gray-200 rounded hover:shadow-sm transition-shadow cursor-pointer"
+                        className="flex items-center justify-between p-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded hover:shadow-sm transition-shadow cursor-pointer"
                         onClick={() => {
                           // Navigate to document detail
                           window.location.href = `${linkType.viewRoute}/${item.id}`;
@@ -275,10 +275,10 @@ const LinksPanel = ({ projectId }) => {
                             </Badge>
                           </div>
                           <div className="flex items-center justify-between mt-1">
-                            <span className="text-xs text-gray-500">
+                            <span className="text-xs text-gray-500 dark:text-gray-400">
                               {item.partner_name || item.vendor_name || item.customer_name || 'N/A'}
                             </span>
-                            <span className="text-xs font-medium text-gray-700">
+                            <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
                               {formatAmount(item.total_amount || item.amount)}
                             </span>
                           </div>
@@ -295,16 +295,16 @@ const LinksPanel = ({ projectId }) => {
 
                 {/* Quick Actions */}
                 {items.length > 0 && (
-                  <div className="mt-4 pt-3 border-t border-gray-200">
+                  <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-700">
                     <div className="grid grid-cols-2 gap-2 text-xs">
                       <div className="text-center">
-                        <span className="text-gray-500">Draft: </span>
+                        <span className="text-gray-500 dark:text-gray-400">Draft: </span>
                         <span className="font-medium">
                           {items.filter(item => item.status === 'Draft').length}
                         </span>
                       </div>
                       <div className="text-center">
-                        <span className="text-gray-500">Paid/Approved: </span>
+                        <span className="text-gray-500 dark:text-gray-400">Paid/Approved: </span>
                         <span className="font-medium">
                           {items.filter(item => ['Paid', 'Approved'].includes(item.status)).length}
                         </span>
@@ -321,28 +321,28 @@ const LinksPanel = ({ projectId }) => {
       {/* Financial Summary */}
       <Card>
         <CardContent>
-          <h4 className="font-semibold text-gray-900 mb-4">Project Financial Summary</h4>
+          <h4 className="font-semibold text-gray-900 dark:text-white mb-4">Project Financial Summary</h4>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="text-center p-3 bg-green-50 rounded-lg">
-              <p className="text-sm text-gray-600">Sales Orders</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Sales Orders</p>
               <p className="font-bold text-green-600">
                 {formatAmount(links.salesOrders?.reduce((sum, item) => sum + Number(item.total_amount || 0), 0))}
               </p>
             </div>
             <div className="text-center p-3 bg-blue-50 rounded-lg">
-              <p className="text-sm text-gray-600">Purchase Orders</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Purchase Orders</p>
               <p className="font-bold text-blue-600">
                 {formatAmount(links.purchaseOrders?.reduce((sum, item) => sum + Number(item.total_amount || 0), 0))}
               </p>
             </div>
             <div className="text-center p-3 bg-purple-50 rounded-lg">
-              <p className="text-sm text-gray-600">Invoices</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Invoices</p>
               <p className="font-bold text-purple-600">
                 {formatAmount(links.customerInvoices?.reduce((sum, item) => sum + Number(item.total_amount || 0), 0))}
               </p>
             </div>
             <div className="text-center p-3 bg-red-50 rounded-lg">
-              <p className="text-sm text-gray-600">Expenses</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Expenses</p>
               <p className="font-bold text-red-600">
                 {formatAmount(links.expenses?.reduce((sum, item) => sum + Number(item.amount || 0), 0))}
               </p>

@@ -46,10 +46,10 @@ const PasswordStrengthIndicator = ({ password }) => {
 
   const getStrengthTextColor = () => {
     switch (strength) {
-      case 'weak': return 'text-red-600';
-      case 'medium': return 'text-yellow-600';
-      case 'strong': return 'text-green-600';
-      default: return 'text-gray-500';
+      case 'weak': return 'text-red-600 dark:text-red-400';
+      case 'medium': return 'text-yellow-600 dark:text-yellow-400';
+      case 'strong': return 'text-green-600 dark:text-green-400';
+      default: return 'text-gray-500 dark:text-gray-400';
     }
   };
 
@@ -60,7 +60,7 @@ const PasswordStrengthIndicator = ({ password }) => {
           <div
             key={level}
             className={`h-2 w-full rounded ${
-              level <= score ? getStrengthColor() : 'bg-gray-200'
+              level <= score ? getStrengthColor() : 'bg-gray-200 dark:bg-gray-700'
             }`}
           />
         ))}

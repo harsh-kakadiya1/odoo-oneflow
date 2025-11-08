@@ -20,7 +20,7 @@ import LoadingSpinner from '../../components/UI/LoadingSpinner';
 
 const ChartCard = ({ title, children, className = "" }) => (
   <Card className={`p-6 ${className}`}>
-    <h3 className="text-lg font-semibold text-gray-900 mb-4">{title}</h3>
+    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{title}</h3>
     <div style={{ width: '100%', height: 300 }}>
       {children}
     </div>
@@ -29,7 +29,7 @@ const ChartCard = ({ title, children, className = "" }) => (
 
 const ProjectProgressChart = ({ data }) => {
   if (!data || !data.length) {
-    return <div className="flex items-center justify-center h-full text-gray-500">No data available</div>;
+    return <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">No data available</div>;
   }
 
   return (
@@ -65,7 +65,7 @@ const ProjectProgressChart = ({ data }) => {
 
 const ResourceUtilizationChart = ({ data }) => {
   if (!data || !data.length) {
-    return <div className="flex items-center justify-center h-full text-gray-500">No data available</div>;
+    return <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">No data available</div>;
   }
 
   return (
@@ -103,7 +103,7 @@ const ResourceUtilizationChart = ({ data }) => {
 
 const ProjectCostRevenueChart = ({ data }) => {
   if (!data || !data.length) {
-    return <div className="flex items-center justify-center h-full text-gray-500">No data available</div>;
+    return <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">No data available</div>;
   }
 
   return (
@@ -144,7 +144,7 @@ const ProjectCostRevenueChart = ({ data }) => {
 
 const TaskStatusDistribution = ({ data }) => {
   if (!data || !data.length) {
-    return <div className="flex items-center justify-center h-full text-gray-500">No data available</div>;
+    return <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">No data available</div>;
   }
 
   const COLORS = {
@@ -179,7 +179,7 @@ const TaskStatusDistribution = ({ data }) => {
 
 const ProjectStatusOverview = ({ data }) => {
   if (!data) {
-    return <div className="flex items-center justify-center h-full text-gray-500">No data available</div>;
+    return <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">No data available</div>;
   }
 
   const statusData = [
@@ -197,17 +197,17 @@ const ProjectStatusOverview = ({ data }) => {
         <div key={index} className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className={`w-3 h-3 rounded-full ${item.color}`}></div>
-            <span className="text-sm font-medium text-gray-700">{item.status}</span>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{item.status}</span>
           </div>
           <div className="flex items-center space-x-3">
-            <span className="text-sm text-gray-600">{item.count}</span>
+            <span className="text-sm text-gray-600 dark:text-gray-400">{item.count}</span>
             <div className="w-24 bg-gray-200 rounded-full h-2">
               <div
                 className={`h-2 rounded-full ${item.color}`}
                 style={{ width: `${total > 0 ? (item.count / total) * 100 : 0}%` }}
               ></div>
             </div>
-            <span className="text-xs text-gray-500 w-8 text-right">
+            <span className="text-xs text-gray-500 dark:text-gray-400 w-8 text-right">
               {total > 0 ? Math.round((item.count / total) * 100) : 0}%
             </span>
           </div>
@@ -234,7 +234,7 @@ const AnalyticsCharts = ({ data }) => {
 
   return (
     <div>
-      <h2 className="text-xl font-semibold text-gray-900 mb-6">Analytics Charts</h2>
+      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Analytics Charts</h2>
       
       {/* Project Progress and Resource Utilization */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">

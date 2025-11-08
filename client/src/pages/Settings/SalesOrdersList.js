@@ -83,7 +83,7 @@ const SalesOrdersList = () => {
   ];
 
   const renderRow = (order) => (
-    <tr key={order.id} className="hover:bg-gray-50">
+    <tr key={order.id} className="hover:bg-gray-50 dark:bg-gray-700">
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="flex items-center">
           <Link
@@ -95,13 +95,13 @@ const SalesOrdersList = () => {
         </div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
-        <div className="text-sm text-gray-900">{order.partner_name}</div>
-        <div className="text-sm text-gray-500">{order.partner_email}</div>
+        <div className="text-sm text-gray-900 dark:text-white">{order.partner_name}</div>
+        <div className="text-sm text-gray-500 dark:text-gray-400">{order.partner_email}</div>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
         {order.order_date ? format(new Date(order.order_date), 'MMM dd, yyyy') : '-'}
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
         ₹{order.total_amount?.toLocaleString('en-IN') || '0'}
       </td>
       <td className="px-6 py-4 whitespace-nowrap">

@@ -217,8 +217,8 @@ const Profile = () => {
   return (
     <div className="space-y-6 max-w-5xl">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Profile Settings</h1>
-        <p className="text-gray-600 mt-1">Manage your account and company information</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Profile Settings</h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-1">Manage your account and company information</p>
       </div>
 
       {/* User Info Card */}
@@ -229,16 +229,16 @@ const Profile = () => {
               <User className="h-10 w-10 text-primary-600" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                 {user?.firstName} {user?.lastName}
               </h2>
-              <p className="text-gray-600">{user?.email}</p>
+              <p className="text-gray-600 dark:text-gray-400">{user?.email}</p>
               <div className="flex items-center gap-2 mt-1">
                 <Badge variant={getRoleBadgeVariant(user?.role)}>
                   {user?.role}
                 </Badge>
                 {user?.company && (
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
                     at {user.company.name}
                   </span>
                 )}
@@ -249,14 +249,14 @@ const Profile = () => {
       </Card>
 
       {/* Tabs */}
-      <div className="border-b border-gray-200">
+      <div className="border-b border-gray-200 dark:border-gray-700">
         <nav className="-mb-px flex space-x-8">
           <button
             onClick={() => setActiveTab('profile')}
             className={`${
               activeTab === 'profile'
                 ? 'border-primary-500 text-primary-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:border-gray-600'
             } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
           >
             Personal Information
@@ -266,7 +266,7 @@ const Profile = () => {
             className={`${
               activeTab === 'password'
                 ? 'border-primary-500 text-primary-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:border-gray-600'
             } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
           >
             Change Password
@@ -276,7 +276,7 @@ const Profile = () => {
             className={`${
               activeTab === 'company'
                 ? 'border-primary-500 text-primary-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:border-gray-600'
             } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
           >
             Company Profile
@@ -329,18 +329,18 @@ const Profile = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Role
                   </label>
-                  <div className="px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-700">
+                  <div className="px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300">
                     {user?.role}
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Hourly Rate
                   </label>
-                  <div className="px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-700">
+                  <div className="px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300">
                     ₹{parseFloat(user?.hourly_rate || 0).toFixed(2)}/hour
                   </div>
                 </div>
@@ -413,9 +413,9 @@ const Profile = () => {
                   type="checkbox"
                   checked={showPassword}
                   onChange={(e) => setShowPassword(e.target.checked)}
-                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded"
                 />
-                <label className="ml-2 block text-sm text-gray-900">
+                <label className="ml-2 block text-sm text-gray-900 dark:text-white">
                   Show passwords
                 </label>
               </div>
@@ -445,7 +445,7 @@ const Profile = () => {
               <Building2 className="h-5 w-5 mr-2" />
               Company Profile
               {user?.role !== 'Admin' && (
-                <span className="ml-2 text-sm font-normal text-gray-500">(View Only)</span>
+                <span className="ml-2 text-sm font-normal text-gray-500 dark:text-gray-400">(View Only)</span>
               )}
             </CardTitle>
           </CardHeader>
@@ -453,11 +453,11 @@ const Profile = () => {
             <form onSubmit={handleCompanySubmit} className="space-y-6">
               {/* Company Logo */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Company Logo
                 </label>
                 <div className="flex items-center space-x-4">
-                  <div className="h-24 w-24 bg-gray-100 rounded-lg flex items-center justify-center border-2 border-gray-300 overflow-hidden">
+                  <div className="h-24 w-24 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center border-2 border-gray-300 dark:border-gray-600 overflow-hidden">
                     {logoPreview ? (
                       <img src={logoPreview} alt="Company Logo" className="h-full w-full object-contain" />
                     ) : (
@@ -479,7 +479,7 @@ const Profile = () => {
                           Upload Logo
                         </Button>
                       </label>
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                         PNG, JPG, GIF up to 5MB
                       </p>
                     </div>
@@ -497,7 +497,7 @@ const Profile = () => {
                   required
                   placeholder="Company name"
                   readOnly={user?.role !== 'Admin'}
-                  className={user?.role !== 'Admin' ? 'bg-gray-50' : ''}
+                  className={user?.role !== 'Admin' ? 'bg-gray-50 dark:bg-gray-700' : ''}
                 />
                 <Input
                   label="Country"
@@ -507,12 +507,12 @@ const Profile = () => {
                   required
                   placeholder="Country"
                   readOnly={user?.role !== 'Admin'}
-                  className={user?.role !== 'Admin' ? 'bg-gray-50' : ''}
+                  className={user?.role !== 'Admin' ? 'bg-gray-50 dark:bg-gray-700' : ''}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Company Address
                 </label>
                 <textarea
@@ -522,8 +522,8 @@ const Profile = () => {
                   placeholder="Enter company address"
                   readOnly={user?.role !== 'Admin'}
                   rows={3}
-                  className={`mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 ${
-                    user?.role !== 'Admin' ? 'bg-gray-50' : ''
+                  className={`mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 ${
+                    user?.role !== 'Admin' ? 'bg-gray-50 dark:bg-gray-700' : ''
                   }`}
                 />
               </div>

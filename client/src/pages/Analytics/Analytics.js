@@ -47,8 +47,8 @@ const Analytics = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Error Loading Analytics</h2>
-          <p className="text-gray-600 mb-4">{error}</p>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Error Loading Analytics</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
           <button
             onClick={fetchAnalyticsData}
             className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors"
@@ -63,8 +63,8 @@ const Analytics = () => {
   return (
     <div className="container mx-auto px-6 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Analytics Dashboard</h1>
-        <p className="text-gray-600 mt-2">Monitor project performance, resource utilization, and key metrics</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Analytics Dashboard</h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-2">Monitor project performance, resource utilization, and key metrics</p>
       </div>
 
       {/* KPI Cards */}

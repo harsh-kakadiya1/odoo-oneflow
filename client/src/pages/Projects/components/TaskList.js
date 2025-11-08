@@ -172,7 +172,7 @@ const TaskList = ({ projectId }) => {
       {/* Header and Controls */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
         <div className="flex items-center space-x-4">
-          <h3 className="text-xl font-semibold text-gray-900">Tasks</h3>
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Tasks</h3>
           <Badge variant="outline">
             {filteredTasks.length} of {tasks.length}
           </Badge>
@@ -180,13 +180,13 @@ const TaskList = ({ projectId }) => {
 
         <div className="flex items-center space-x-2">
           {/* View Toggle */}
-          <div className="flex bg-gray-100 rounded-lg p-1">
+          <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
             <button
               onClick={() => setViewMode('all')}
               className={`px-3 py-1 text-sm rounded-md transition-colors ${
                 viewMode === 'all'
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-white dark:bg-gray-800 text-blue-600 shadow-sm'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-white'
               }`}
             >
               All Tasks
@@ -195,8 +195,8 @@ const TaskList = ({ projectId }) => {
               onClick={() => setViewMode('my')}
               className={`px-3 py-1 text-sm rounded-md transition-colors ${
                 viewMode === 'my'
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-white dark:bg-gray-800 text-blue-600 shadow-sm'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-white'
               }`}
             >
               My Tasks
@@ -228,7 +228,7 @@ const TaskList = ({ projectId }) => {
               <select
                 value={filters.status}
                 onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="">All Status</option>
                 <option value="New">New</option>
@@ -241,7 +241,7 @@ const TaskList = ({ projectId }) => {
               <select
                 value={filters.priority}
                 onChange={(e) => setFilters({ ...filters, priority: e.target.value })}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="">All Priority</option>
                 <option value="Low">Low</option>
@@ -266,7 +266,7 @@ const TaskList = ({ projectId }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredTasks.length === 0 ? (
           <div className="col-span-full text-center py-12">
-            <p className="text-gray-500">
+            <p className="text-gray-500 dark:text-gray-400">
               {viewMode === 'my' ? 'No tasks assigned to you' : 'No tasks found'}
             </p>
             {hasRole(['Admin', 'Project Manager']) && (
@@ -298,7 +298,7 @@ const TaskList = ({ projectId }) => {
                 <CardContent>
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
-                      <h4 className="font-semibold text-gray-900 mb-1">{task.title}</h4>
+                      <h4 className="font-semibold text-gray-900 dark:text-white mb-1">{task.title}</h4>
                       <div className="flex items-center space-x-2 mb-2">
                         <Badge variant={getStatusColor(task.status)} size="sm">
                           {task.status}
@@ -339,7 +339,7 @@ const TaskList = ({ projectId }) => {
                   </div>
 
                   {task.description && (
-                    <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
                       {task.description}
                     </p>
                   )}
@@ -348,7 +348,7 @@ const TaskList = ({ projectId }) => {
                     {/* Assignee */}
                     <div className="flex items-center space-x-2 text-sm">
                       <User className="h-4 w-4 text-gray-400" />
-                      <span className="text-gray-600">
+                      <span className="text-gray-600 dark:text-gray-400">
                         {task.assignee?.name || 'Unassigned'}
                       </span>
                     </div>
@@ -358,7 +358,7 @@ const TaskList = ({ projectId }) => {
                       <Calendar className="h-4 w-4 text-gray-400" />
                       <span className={`${
                         isOverdue ? 'text-red-600 font-medium' :
-                        isDueSoon ? 'text-yellow-600 font-medium' : 'text-gray-600'
+                        isDueSoon ? 'text-yellow-600 font-medium' : 'text-gray-600 dark:text-gray-400'
                       }`}>
                         {formatDate(task.due_date)}
                         {isOverdue && (
@@ -376,8 +376,8 @@ const TaskList = ({ projectId }) => {
                     </div>
 
                     {/* Task Meta */}
-                    <div className="flex items-center justify-between pt-2 border-t border-gray-200">
-                      <div className="flex items-center space-x-3 text-xs text-gray-500">
+                    <div className="flex items-center justify-between pt-2 border-t border-gray-200 dark:border-gray-700">
+                      <div className="flex items-center space-x-3 text-xs text-gray-500 dark:text-gray-400">
                         {task.comments_count > 0 && (
                           <div className="flex items-center space-x-1">
                             <MessageSquare className="h-3 w-3" />
@@ -462,7 +462,7 @@ const TaskList = ({ projectId }) => {
                                 e.stopPropagation();
                                 handleStatusChange(task.id, 'In Progress');
                               }}
-                              className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded hover:bg-gray-200 transition-colors"
+                              className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-2 py-1 rounded hover:bg-gray-200 transition-colors"
                             >
                               Reopen
                             </button>
