@@ -186,7 +186,7 @@ const Users = () => {
   return (
     <div className="space-y-6">
       {/* Search, Filters, and Add User */}
-      <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mb-4">
           {/* Search Field - Left Side */}
           <div className="md:col-span-6">
@@ -203,7 +203,7 @@ const Users = () => {
             <select
               value={roleFilter}
               onChange={(e) => setRoleFilter(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
             >
               <option value="">All Roles</option>
               <option value="Admin">Admin</option>
@@ -218,7 +218,7 @@ const Users = () => {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
             >
               <option value="all">All Users</option>
               <option value="newest">Newest First</option>
@@ -239,20 +239,20 @@ const Users = () => {
               className="w-full"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Add User
+              {user?.role === 'Project Manager' ? 'Add Team Member' : 'Add User'}
             </Button>
           </div>
         </div>
 
         {/* Status Info */}
-        <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-          <div className="text-sm text-gray-600">
+        <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-700">
+          <div className="text-sm text-gray-600 dark:text-gray-400">
             Showing <span className="font-semibold">{filteredUsers.length}</span> of <span className="font-semibold">{users.length}</span> users
             {roleFilter && ` • ${roleFilter}`}
           </div>
           <button
             onClick={fetchUsers}
-            className="text-sm text-primary-600 hover:text-primary-700 font-medium flex items-center"
+            className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium flex items-center"
           >
             <Search className="h-4 w-4 mr-1" />
             Refresh
@@ -261,9 +261,9 @@ const Users = () => {
       </div>
 
       {/* Users Table */}
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-100">
-        <div className="p-6 border-b border-gray-100">
-          <h3 className="text-lg font-bold text-gray-900">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700">
+        <div className="p-6 border-b border-gray-100 dark:border-gray-700">
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white">
             {user?.role === 'Project Manager' ? 'Your Team Members' : 'All Users'} ({filteredUsers.length})
           </h3>
         </div>
@@ -302,10 +302,10 @@ const Users = () => {
                   </tr>
                 ) : (
                   filteredUsers.map((userItem) => (
-                  <tr key={userItem.id} className="hover:bg-gray-50 dark:bg-gray-700">
+                  <tr key={userItem.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div className="h-10 w-10 bg-primary-100 rounded-full flex items-center justify-center">
+                        <div className="h-10 w-10 bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center">
                           <span className="text-primary-600 font-medium">
                             {userItem.firstName?.charAt(0).toUpperCase() || userItem.name?.charAt(0).toUpperCase()}
                           </span>

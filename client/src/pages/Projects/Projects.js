@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Search, Filter, FolderKanban } from 'lucide-react';
+import { Plus, Search, Filter, FolderKanban, Users } from 'lucide-react';
 import { Card, CardContent } from '../../components/UI/Card';
 import Button from '../../components/UI/Button';
 import Input from '../../components/UI/Input';
@@ -110,75 +110,107 @@ const Projects = () => {
       {/* Projects Grid */}
       {projects.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {projects.map((project) => (
-            <Link key={project.id} to={`/projects/${project.id}`}>
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+          {projects.map((project) => {
+            // Calculate project progress
+            const totalTasks = project.tasks?.length || 0;
+            const completedTasks = project.tasks?.filter(t => t.status === 'Done').length || 0;
+            const progressPercentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
+            return (
+              <Link key={project.id} to={`/projects/${project.id}`}>
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-200 cursor-pointer h-full">
+                  <div className="p-6">
+                    {/* Project Name and Status - Same Line */}
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-lg font-bold text-gray-900 dark:text-white">
                         {project.name}
                       </h3>
                       <Badge variant={getStatusColor(project.status)}>
                         {project.status}
                       </Badge>
                     </div>
-                    <div className="h-10 w-10 bg-primary-100 rounded-lg flex items-center justify-center">
-                      <FolderKanban className="h-5 w-5 text-primary-600" />
+
+                    {/* Separator Line */}
+                    <div className="border-t border-gray-200 dark:border-gray-700 mb-4"></div>
+
+                    {/* Progress Bar */}
+                    <div className="mb-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Project Progress</span>
+                        <span className="text-xs font-semibold text-gray-900 dark:text-white">
+                          {progressPercentage}%
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                        <div
+                          className="bg-gradient-to-r from-purple-500 to-purple-600 h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${progressPercentage}%` }}
+                        ></div>
+                      </div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        {completedTasks}/{totalTasks} tasks completed
+                      </p>
                     </div>
+
+                    {/* Manager and Team */}
+                    <div className="space-y-2 mb-4">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-500 dark:text-gray-400">Manager:</span>
+                        <span className="font-medium text-gray-900 dark:text-white">
+                          {project.projectManager ? 
+                            `${project.projectManager.firstName || ''} ${project.projectManager.lastName || ''}`.trim() || 
+                            project.projectManager.name || 
+                            'Not assigned'
+                            : 'Not assigned'}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-500 dark:text-gray-400 flex items-center">
+                          <Users className="h-3 w-3 mr-1" />
+                          Team:
+                        </span>
+                        <span className="font-medium text-gray-900 dark:text-white">
+                          {project.members?.length || 0} members
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Financial Details */}
+                    {project.financials && (
+                      <div className="border-t border-gray-200 dark:border-gray-700 pt-4 space-y-2">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-500 dark:text-gray-400">Revenue:</span>
+                          <span className="font-medium text-success-600 dark:text-success-400">
+                            {formatCurrency(project.financials.revenue)}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-500 dark:text-gray-400">Cost:</span>
+                          <span className="font-medium text-error-600 dark:text-error-400">
+                            {formatCurrency(project.financials.cost)}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-500 dark:text-gray-400">Profit:</span>
+                          <span className={`font-semibold ${project.financials.profit >= 0 ? 'text-success-600 dark:text-success-400' : 'text-error-600 dark:text-error-400'}`}>
+                            {formatCurrency(project.financials.profit)}
+                          </span>
+                        </div>
+                      </div>
+                    )}
                   </div>
-
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">
-                    {project.description || 'No description'}
-                  </p>
-
-                  <div className="space-y-2 mb-4">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-500 dark:text-gray-400">Manager:</span>
-                      <span className="font-medium text-gray-900 dark:text-white">
-                        {project.projectManager?.name}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-500 dark:text-gray-400">Team:</span>
-                      <span className="font-medium text-gray-900 dark:text-white">
-                        {project.members?.length || 0} members
-                      </span>
-                    </div>
-                  </div>
-
-                  {project.financials && (
-                    <div className="border-t border-gray-200 dark:border-gray-700 pt-4 space-y-2">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-500 dark:text-gray-400">Revenue:</span>
-                        <span className="font-medium text-success-600">
-                          {formatCurrency(project.financials.revenue)}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-500 dark:text-gray-400">Cost:</span>
-                        <span className="font-medium text-error-600">
-                          {formatCurrency(project.financials.cost)}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-500 dark:text-gray-400">Profit:</span>
-                        <span className={`font-semibold ${project.financials.profit >= 0 ? 'text-success-600' : 'text-error-600'}`}>
-                          {formatCurrency(project.financials.profit)}
-                        </span>
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
+                </div>
+              </Link>
+            );
+          })}
         </div>
       ) : (
-        <Card>
-          <CardContent className="p-12 text-center">
-            <FolderKanban className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No projects found</h3>
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700">
+          <div className="p-12 text-center">
+            <div className="h-16 w-16 bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center mx-auto mb-4">
+              <FolderKanban className="h-8 w-8 text-primary-600 dark:text-primary-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No projects found</h3>
             <p className="text-gray-600 dark:text-gray-400 mb-6">
               {hasRole(['Admin', 'Project Manager'])
                 ? 'Get started by creating your first project'
@@ -190,8 +222,8 @@ const Projects = () => {
                 Create Project
               </Button>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
 
       {/* Create Project Modal */}

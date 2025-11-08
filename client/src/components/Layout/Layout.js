@@ -14,7 +14,7 @@ const Layout = ({ children }) => {
           className="fixed inset-0 bg-gray-600 bg-opacity-75 transition-opacity" 
           onClick={() => setSidebarOpen(false)} 
         />
-        <div className="relative flex-1 flex flex-col max-w-xs w-full">
+        <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white dark:bg-gray-800">
           <Sidebar 
             onClose={() => setSidebarOpen(false)}
             isExpanded={true}

@@ -103,7 +103,7 @@ const Analytics = () => {
 
   if (error) {
     return (
-      <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 text-center">
           <div className="text-red-500 mb-4">
           <AlertCircle className="w-16 h-16 mx-auto" />
           </div>
@@ -122,21 +122,17 @@ const Analytics = () => {
   return (
     <div className="space-y-6">
       {/* Filters */}
-      <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-        {/* <div className="flex items-center space-x-2 mb-4">
-          <Filter className="h-5 w-5 text-gray-500" />
-          <h3 className="text-lg font-bold text-gray-900">Filter Analytics</h3>
-        </div> */}
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Manager Filter */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Filter by Manager
             </label>
             <select
               value={selectedManager}
               onChange={(e) => setSelectedManager(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
             >
               <option value="all">All Managers</option>
               {managers.map(manager => (
@@ -149,13 +145,13 @@ const Analytics = () => {
 
           {/* Member Filter */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Filter by Team Member
             </label>
             <select
               value={selectedMember}
               onChange={(e) => setSelectedMember(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
             >
               <option value="all">All Members</option>
               {members.map(member => (
@@ -171,14 +167,14 @@ const Analytics = () => {
       {/* KPI Widgets */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Total Projects */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-200">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-shadow duration-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">Total Projects</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Total Projects</p>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
                 {kpiData.totalProjects || 0}
               </p>
-              <p className="text-sm text-gray-600 mt-2">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
                 {kpiData.activeProjects || 0} active, {kpiData.completedProjects || 0} completed
               </p>
             </div>
@@ -189,14 +185,14 @@ const Analytics = () => {
         </div>
 
         {/* Tasks Completed */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-200">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-shadow duration-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">Tasks Completed</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Tasks Completed</p>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
                 {kpiData.tasksCompleted || 0}
               </p>
-              <p className="text-sm text-gray-600 mt-2">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
                 {kpiData.totalTasks || 0} total tasks
               </p>
             </div>
@@ -207,14 +203,14 @@ const Analytics = () => {
         </div>
 
         {/* Hours Logged */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-200">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-shadow duration-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">Hours Logged</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Hours Logged</p>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
                 {kpiData.totalHoursLogged || 0}h
               </p>
-              <p className="text-sm text-gray-600 mt-2">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
                 {kpiData.avgHoursPerDay || 0}h avg/day
               </p>
             </div>
@@ -225,14 +221,14 @@ const Analytics = () => {
         </div>
 
         {/* Billable Percentage */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-200">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-shadow duration-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">Billable</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Billable</p>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
                 {kpiData.billablePercentage || 0}%
               </p>
-              <p className="text-sm text-gray-600 mt-2">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
                 {kpiData.billableHours || 0}h billable
               </p>
             </div>
@@ -246,10 +242,10 @@ const Analytics = () => {
       {/* Charts Row 1 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Project Progress */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
           <div className="mb-4">
-            <h3 className="text-lg font-bold text-gray-900">Project Progress</h3>
-            <p className="text-sm text-gray-500 mt-1">Completion percentage by project</p>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Project Progress</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Completion percentage by project</p>
           </div>
           <div style={{ height: '280px' }}>
             {chartsData.projectProgress && chartsData.projectProgress.length > 0 ? (
@@ -263,16 +259,16 @@ const Analytics = () => {
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <div className="flex items-center justify-center h-full text-gray-500">No data available</div>
+              <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">No data available</div>
             )}
           </div>
         </div>
 
         {/* Resource Utilization */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
           <div className="mb-4">
-            <h3 className="text-lg font-bold text-gray-900">Resource Utilization</h3>
-            <p className="text-sm text-gray-500 mt-1">Team member utilization percentage</p>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Resource Utilization</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Team member utilization percentage</p>
           </div>
           <div style={{ height: '280px' }}>
             {chartsData.resourceUtilization && chartsData.resourceUtilization.length > 0 ? (
@@ -286,7 +282,7 @@ const Analytics = () => {
                 </LineChart>
               </ResponsiveContainer>
             ) : (
-              <div className="flex items-center justify-center h-full text-gray-500">No data available</div>
+              <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">No data available</div>
             )}
           </div>
         </div>
@@ -295,10 +291,10 @@ const Analytics = () => {
       {/* Charts Row 2 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Project Cost vs Revenue */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
           <div className="mb-4">
-            <h3 className="text-lg font-bold text-gray-900">Project Cost vs Revenue</h3>
-            <p className="text-sm text-gray-500 mt-1">Financial overview by project</p>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Project Cost vs Revenue</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Financial overview by project</p>
           </div>
           <div style={{ height: '280px' }}>
             {chartsData.costRevenue && chartsData.costRevenue.length > 0 ? (
@@ -314,16 +310,16 @@ const Analytics = () => {
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <div className="flex items-center justify-center h-full text-gray-500">No data available</div>
+              <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">No data available</div>
             )}
           </div>
         </div>
 
         {/* Task Status Distribution */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
           <div className="mb-4">
-            <h3 className="text-lg font-bold text-gray-900">Task Status Distribution</h3>
-            <p className="text-sm text-gray-500 mt-1">Breakdown of task statuses</p>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Task Status Distribution</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Breakdown of task statuses</p>
           </div>
           <div style={{ height: '280px' }}>
             {chartsData.taskDistribution && chartsData.taskDistribution.length > 0 ? (
@@ -347,7 +343,7 @@ const Analytics = () => {
                 </PieChart>
               </ResponsiveContainer>
             ) : (
-              <div className="flex items-center justify-center h-full text-gray-500">No data available</div>
+              <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">No data available</div>
             )}
           </div>
         </div>
@@ -356,10 +352,10 @@ const Analytics = () => {
       {/* Charts Row 3 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Project Status Overview */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
           <div className="mb-4">
-            <h3 className="text-lg font-bold text-gray-900">Project Status Overview</h3>
-            <p className="text-sm text-gray-500 mt-1">Distribution of project statuses</p>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Project Status Overview</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Distribution of project statuses</p>
           </div>
           <div className="space-y-4">
             {chartsData.projectStatus ? (
@@ -378,17 +374,17 @@ const Analytics = () => {
                     <div key={index} className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
                         <div className={`w-3 h-3 rounded-full ${item.color}`}></div>
-                        <span className="text-sm font-medium text-gray-700">{item.status}</span>
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{item.status}</span>
                       </div>
                       <div className="flex items-center space-x-3">
-                        <span className="text-sm text-gray-600">{item.count}</span>
-                        <div className="w-24 bg-gray-200 rounded-full h-2">
+                        <span className="text-sm text-gray-600 dark:text-gray-400">{item.count}</span>
+                        <div className="w-24 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                           <div
                             className={`h-2 rounded-full ${item.color}`}
                             style={{ width: `${total > 0 ? (item.count / total) * 100 : 0}%` }}
                           ></div>
                         </div>
-                        <span className="text-xs text-gray-500 w-8 text-right">
+                        <span className="text-xs text-gray-500 dark:text-gray-400 w-8 text-right">
                           {total > 0 ? Math.round((item.count / total) * 100) : 0}%
                         </span>
                       </div>
@@ -397,16 +393,16 @@ const Analytics = () => {
                 })}
               </>
             ) : (
-              <div className="flex items-center justify-center h-full text-gray-500">No data available</div>
+              <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">No data available</div>
             )}
           </div>
         </div>
 
         {/* Monthly Hours Trend */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
           <div className="mb-4">
-            <h3 className="text-lg font-bold text-gray-900">Monthly Hours Trend</h3>
-            <p className="text-sm text-gray-500 mt-1">Billable vs non-billable hours</p>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Monthly Hours Trend</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Billable vs non-billable hours</p>
           </div>
           <div style={{ height: '280px' }}>
             {chartsData.monthlyHours && chartsData.monthlyHours.length > 0 ? (
@@ -422,7 +418,7 @@ const Analytics = () => {
                 </LineChart>
               </ResponsiveContainer>
             ) : (
-              <div className="flex items-center justify-center h-full text-gray-500">No data available</div>
+              <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">No data available</div>
             )}
           </div>
         </div>

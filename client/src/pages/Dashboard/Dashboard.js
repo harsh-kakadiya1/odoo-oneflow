@@ -5,9 +5,9 @@ import {
   Clock, 
   DollarSign,
   AlertCircle,
-  TrendingUp,
   Calendar,
-  CheckCircle2
+  CheckCircle2,
+  CheckSquare
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/UI/Card';
 import Badge from '../../components/UI/Badge';
@@ -218,8 +218,6 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-6">
-      
-
       {/* Filter Buttons */}
       <div className="flex items-center space-x-3">
         {filterButtons.map((filter) => (
@@ -229,7 +227,7 @@ const Dashboard = () => {
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
               activeFilter === filter.value
                 ? 'bg-primary-600 text-white shadow-md'
-                : 'bg-white text-gray-700 border border-gray-200 hover:border-primary-300 hover:shadow-sm'
+                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-primary-300 hover:shadow-sm'
             }`}
           >
             {filter.label}
@@ -240,16 +238,12 @@ const Dashboard = () => {
       {/* KPI Widgets */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Active Projects */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-200">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-shadow duration-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">Active Projects</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Active Projects</p>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
                 {stats?.activeProjects || 0}
-              </p>
-              <p className="text-sm text-green-600 mt-2 flex items-center">
-                <TrendingUp className="h-4 w-4 mr-1" />
-                +{stats?.totalProjects || 0} total
               </p>
             </div>
             <div className="h-14 w-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
@@ -259,16 +253,12 @@ const Dashboard = () => {
         </div>
 
         {/* Delayed Tasks */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-200">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-shadow duration-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">Delayed Tasks</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Delayed Tasks</p>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
                 {stats?.overdueTasks || 0}
-              </p>
-              <p className="text-sm text-red-600 mt-2 flex items-center">
-                <AlertCircle className="h-4 w-4 mr-1" />
-                Needs attention
               </p>
             </div>
             <div className="h-14 w-14 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center shadow-lg">
@@ -278,16 +268,12 @@ const Dashboard = () => {
         </div>
 
         {/* Hours Logged */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-200">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-shadow duration-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">Hours Logged</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Hours Logged</p>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
                 {stats?.hoursLoggedWeek || 0}
-              </p>
-              <p className="text-sm text-gray-600 mt-2 flex items-center">
-                <Clock className="h-4 w-4 mr-1" />
-                This week
               </p>
             </div>
             <div className="h-14 w-14 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
@@ -297,16 +283,12 @@ const Dashboard = () => {
         </div>
 
         {/* Revenue Earned */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-200">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-shadow duration-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">Revenue Earned</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Revenue Earned</p>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
                 ₹{(stats?.revenueBilledMonth || 0).toLocaleString()}
-              </p>
-              <p className="text-sm text-green-600 mt-2 flex items-center">
-                <TrendingUp className="h-4 w-4 mr-1" />
-                This month
               </p>
             </div>
             <div className="h-14 w-14 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center shadow-lg">
@@ -319,16 +301,16 @@ const Dashboard = () => {
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Project Status Distribution */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
           <div className="mb-4">
-            <h3 className="text-lg font-bold text-gray-900">Project Status Distribution</h3>
-            <p className="text-sm text-gray-500 mt-1">Overview of all project statuses</p>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Project Status Distribution</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Overview of all project statuses</p>
           </div>
           <div style={{ height: '280px' }}>
             <Bar data={projectStatusData} options={chartOptions} />
           </div>
-          <div className="mt-4 pt-4 border-t border-gray-100">
-            <p className="text-xs text-gray-500 flex items-center">
+          <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+            <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
               <CheckCircle2 className="h-3 w-3 mr-1" />
               Updated just now
             </p>
@@ -336,18 +318,18 @@ const Dashboard = () => {
         </div>
 
         {/* Task Progress Over Time */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
           <div className="mb-4">
-            <h3 className="text-lg font-bold text-gray-900">Task Completion Trend</h3>
-            <p className="text-sm text-gray-500 mt-1">
-              <span className="text-green-600 font-semibold">+15%</span> increase in task completion
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Task Completion Trend</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              <span className="text-green-600 dark:text-green-400 font-semibold">+15%</span> increase in task completion
             </p>
           </div>
           <div style={{ height: '280px' }}>
             <Line data={taskProgressData} options={chartOptions} />
           </div>
-          <div className="mt-4 pt-4 border-t border-gray-100">
-            <p className="text-xs text-gray-500 flex items-center">
+          <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+            <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
               <CheckCircle2 className="h-3 w-3 mr-1" />
               Updated 4 min ago
             </p>
@@ -358,18 +340,18 @@ const Dashboard = () => {
       {/* Recent Projects and Tasks */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Projects */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-100">
-          <div className="p-6 border-b border-gray-100">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700">
+          <div className="p-6 border-b border-gray-100 dark:border-gray-700">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-bold text-gray-900">Recent Projects</h3>
-                <p className="text-sm text-gray-500 mt-1">
-                  <span className="text-green-600 font-semibold">✓ {recentProjects.filter(p => p.status === 'Completed').length}</span> completed this month
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white">Recent Projects</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  <span className="text-green-600 dark:text-green-400 font-semibold">✓ {recentProjects.filter(p => p.status === 'Completed').length}</span> completed this month
                 </p>
               </div>
               <Link 
                 to="/projects" 
-                className="text-sm text-primary-600 hover:text-primary-700 font-medium"
+                className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium"
               >
                 View all →
               </Link>
@@ -379,24 +361,24 @@ const Dashboard = () => {
             {filteredProjects.length > 0 ? (
               <div className="space-y-4">
                 {filteredProjects.slice(0, 5).map((project) => (
-                  <div key={project.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-200">
+                  <div key={project.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200">
                     <div className="flex-1">
                       <Link 
                         to={`/projects/${project.id}`} 
-                        className="font-semibold text-gray-900 hover:text-primary-600 transition-colors"
+                        className="font-semibold text-gray-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
                       >
                         {project.name}
                       </Link>
                       <div className="flex items-center space-x-3 mt-2">
                         {project.projectManager && (
-                          <p className="text-sm text-gray-500">
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
                             {project.projectManager.firstName} {project.projectManager.lastName}
                           </p>
                         )}
                         {project.start_date && (
                           <>
-                            <span className="text-gray-300">•</span>
-                            <p className="text-sm text-gray-500 flex items-center">
+                            <span className="text-gray-300 dark:text-gray-600">•</span>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center">
                               <Calendar className="h-3 w-3 mr-1" />
                               {new Date(project.start_date).toLocaleDateString()}
                             </p>
@@ -404,8 +386,8 @@ const Dashboard = () => {
                         )}
                         {project.budget && (
                           <>
-                            <span className="text-gray-300">•</span>
-                            <p className="text-sm text-gray-500">
+                            <span className="text-gray-300 dark:text-gray-600">•</span>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
                               ₹{parseFloat(project.budget).toLocaleString()}
                             </p>
                           </>
@@ -419,22 +401,22 @@ const Dashboard = () => {
                 ))}
               </div>
             ) : (
-              <p className="text-center text-gray-500 py-8">No projects found</p>
+              <p className="text-center text-gray-500 dark:text-gray-400 py-8">No projects found</p>
             )}
           </div>
         </div>
 
         {/* Recent Tasks */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-100">
-          <div className="p-6 border-b border-gray-100">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700">
+          <div className="p-6 border-b border-gray-100 dark:border-gray-700">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-bold text-gray-900">Recent Tasks</h3>
-                <p className="text-sm text-gray-500 mt-1">Latest task activities</p>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white">Recent Tasks</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Latest task activities</p>
               </div>
               <Link 
                 to="/tasks" 
-                className="text-sm text-primary-600 hover:text-primary-700 font-medium"
+                className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium"
               >
                 View all →
               </Link>
@@ -444,25 +426,25 @@ const Dashboard = () => {
             {recentTasks.length > 0 ? (
               <div className="space-y-3">
                 {recentTasks.slice(0, 5).map((task) => (
-                  <div key={task.id} className="flex items-start space-x-3 p-3 rounded-xl hover:bg-gray-50 transition-colors duration-200">
+                  <div key={task.id} className="flex items-start space-x-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
                     <div className={`h-2 w-2 rounded-full mt-2 flex-shrink-0 ${
-                      task.status === 'Completed' ? 'bg-green-500' :
+                      task.status === 'Done' || task.status === 'Completed' ? 'bg-green-500' :
                       task.status === 'In Progress' ? 'bg-purple-500' :
                       task.status === 'Blocked' ? 'bg-red-500' :
                       'bg-gray-400'
                     }`}></div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-gray-900 text-sm">
+                      <p className="font-medium text-gray-900 dark:text-white text-sm">
                         {task.title}
                       </p>
                       <div className="flex items-center space-x-2 mt-1">
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
                           {task.project?.name || 'No project'}
                         </p>
                         {task.due_date && (
                           <>
-                            <span className="text-gray-300">•</span>
-                            <p className="text-xs text-gray-500">
+                            <span className="text-gray-300 dark:text-gray-600">•</span>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
                               {new Date(task.due_date).toLocaleDateString()}
                             </p>
                           </>

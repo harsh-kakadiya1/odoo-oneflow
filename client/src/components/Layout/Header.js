@@ -12,6 +12,20 @@ const Header = ({ onMenuClick }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Close user menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+        setShowUserMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   // Get page title based on current route
   const getPageTitle = () => {
     const path = location.pathname;
@@ -47,7 +61,7 @@ const Header = ({ onMenuClick }) => {
   };
 
   return (
-    <header className="bg-gray-50 shadow-sm sticky top-0 z-20">
+    <header className="bg-gray-50 dark:bg-gray-900 sticky top-0 z-30">
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Mobile menu button */}
@@ -59,11 +73,11 @@ const Header = ({ onMenuClick }) => {
             <Menu className="h-6 w-6" />
           </button>
 
-          {/* Breadcrumb navigation */}
+          {/* Breadcrumb navigation (desktop) */}
           <div className="hidden md:flex items-center space-x-2 text-sm">
-            <Home className="h-4 w-4 text-gray-400" />
-            <ChevronRight className="h-4 w-4 text-gray-400" />
-            <span className="font-semibold text-gray-900">{getPageTitle()}</span>
+            <Home className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+            <ChevronRight className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+            <span className="font-semibold text-gray-900 dark:text-white">{getPageTitle()}</span>
           </div>
 
           {/* Right side */}
@@ -78,4 +92,3 @@ const Header = ({ onMenuClick }) => {
 };
 
 export default Header;
-

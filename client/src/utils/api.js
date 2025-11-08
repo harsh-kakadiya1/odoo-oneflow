@@ -75,6 +75,7 @@ export const taskAPI = {
   getByProject: (projectId, params) => api.get(`/projects/${projectId}/tasks`, { params }),
   create: (data) => api.post('/tasks', data),
   update: (id, data) => api.put(`/tasks/${id}`, data),
+  updateStatus: (id, status) => api.put(`/tasks/${id}`, { status }), // Helper for status updates
   delete: (id) => api.delete(`/tasks/${id}`),
   logTime: (id, data) => api.post(`/tasks/${id}/time`, data),
   getTimeEntries: (id) => api.get(`/tasks/${id}/time`),
