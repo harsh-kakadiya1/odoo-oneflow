@@ -127,7 +127,7 @@ const ExpensesList = () => {
         {expense.expense_date ? format(new Date(expense.expense_date), 'MMM dd, yyyy') : '-'}
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-        ${expense.amount?.toLocaleString() || '0.00'}
+        ₹{expense.amount?.toLocaleString('en-IN') || '0'}
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         <Badge color={getStatusColor(expense.status)}>

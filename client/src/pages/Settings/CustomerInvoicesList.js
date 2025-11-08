@@ -107,7 +107,7 @@ const CustomerInvoicesList = () => {
         {invoice.due_date ? format(new Date(invoice.due_date), 'MMM dd, yyyy') : '-'}
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-        ${invoice.amount?.toLocaleString() || '0.00'}
+        ₹{invoice.amount?.toLocaleString('en-IN') || '0'}
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         <Badge color={getStatusColor(invoice.status)}>

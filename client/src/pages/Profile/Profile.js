@@ -26,7 +26,6 @@ const Profile = () => {
   const [companyData, setCompanyData] = useState({
     name: '',
     country: '',
-    currency: '',
     address: ''
   });
   const [logoFile, setLogoFile] = useState(null);
@@ -47,7 +46,6 @@ const Profile = () => {
         setCompanyData({
           name: user.company.name || '',
           country: user.company.country || '',
-          currency: user.company.currency || '',
           address: user.company.address || ''
         });
         
@@ -513,33 +511,21 @@ const Profile = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Input
-                  label="Currency"
-                  name="currency"
-                  value={companyData.currency}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Company Address
+                </label>
+                <textarea
+                  name="address"
+                  value={companyData.address}
                   onChange={handleCompanyChange}
-                  required
-                  placeholder="Currency"
+                  placeholder="Enter company address"
                   readOnly={user?.role !== 'Admin'}
-                  className={user?.role !== 'Admin' ? 'bg-gray-50' : ''}
+                  rows={3}
+                  className={`mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 ${
+                    user?.role !== 'Admin' ? 'bg-gray-50' : ''
+                  }`}
                 />
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Company Address
-                  </label>
-                  <textarea
-                    name="address"
-                    value={companyData.address}
-                    onChange={handleCompanyChange}
-                    placeholder="Enter company address"
-                    readOnly={user?.role !== 'Admin'}
-                    rows={3}
-                    className={`mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 ${
-                      user?.role !== 'Admin' ? 'bg-gray-50' : ''
-                    }`}
-                  />
-                </div>
               </div>
 
               {user?.role === 'Admin' && (

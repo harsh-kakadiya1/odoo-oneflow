@@ -118,10 +118,10 @@ const ProjectCostRevenueChart = ({ data }) => {
           fontSize={12}
         />
         <YAxis 
-          tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+          tickFormatter={(value) => `₹${(value / 1000).toFixed(0)}k`}
         />
         <Tooltip 
-          formatter={(value, name) => [`$${value.toLocaleString()}`, name]}
+          formatter={(value, name) => [`₹${value.toLocaleString('en-IN')}`, name]}
           labelStyle={{ color: '#374151' }}
         />
         <Legend />

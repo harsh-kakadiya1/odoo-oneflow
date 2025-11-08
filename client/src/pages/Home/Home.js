@@ -73,8 +73,8 @@ const Home = () => {
     },
     {
       icon: Globe,
-      title: 'Multi-Currency',
-      description: 'Support for multiple currencies and international clients.'
+      title: 'Financial Management',
+      description: 'Complete financial tracking and reporting in Indian Rupees.'
     }
   ];
 

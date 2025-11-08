@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Button from '../../components/UI/Button';
 import Input from '../../components/UI/Input';
@@ -7,7 +7,6 @@ import { FileText, Eye, EyeOff } from 'lucide-react';
 import { authAPI } from '../../utils/api';
 import toast from 'react-hot-toast';
 import { validateEmail, validatePassword, validateName } from '../../utils/validation';
-import { fetchCountries } from '../../services/currencyService';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -16,34 +15,13 @@ const Register = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    companyName: '',
-    country: '',
-    currency: 'USD'
+    companyName: ''
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [countries, setCountries] = useState([]);
-  const [loadingCountries, setLoadingCountries] = useState(false);
   const navigate = useNavigate();
-
-  // Load countries on mount
-  useEffect(() => {
-    const loadCountries = async () => {
-      setLoadingCountries(true);
-      try {
-        const data = await fetchCountries();
-        setCountries(data);
-      } catch (error) {
-        console.error('Error loading countries:', error);
-        toast.error('Failed to load countries list');
-      } finally {
-        setLoadingCountries(false);
-      }
-    };
-    loadCountries();
-  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -57,18 +35,6 @@ const Register = () => {
         ...errors,
         [name]: ''
       });
-    }
-
-    // Auto-update currency when country changes
-    if (name === 'country') {
-      const countryData = countries.find(c => c.code === value);
-      if (countryData) {
-        setFormData(prev => ({
-          ...prev,
-          [name]: value,
-          currency: countryData.currency || 'USD'
-        }));
-      }
     }
   };
 
@@ -99,11 +65,6 @@ const Register = () => {
       newErrors.companyName = 'Company name must be at least 2 characters long';
     } else if (formData.companyName.trim().length > 50) {
       newErrors.companyName = 'Company name must be less than 50 characters';
-    }
-
-    // Country validation
-    if (!formData.country) {
-      newErrors.country = 'Please select a country';
     }
 
     // Password validation
@@ -146,8 +107,8 @@ const Register = () => {
         email: formData.email,
         password: formData.password,
         companyName: formData.companyName,
-        country: formData.country,
-        currency: formData.currency
+        country: 'IN',
+        currency: 'INR'
       });
 
       // Store token and user
@@ -230,50 +191,6 @@ const Register = () => {
               placeholder="Enter your company name"
             />
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="country" className="block text-sm font-medium text-gray-700">
-                  Country <span className="text-red-500">*</span>
-                </label>
-                <select
-                  id="country"
-                  name="country"
-                  required
-                  value={formData.country}
-                  onChange={handleChange}
-                  disabled={loadingCountries}
-                  className={`mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 ${
-                    errors.country ? 'border-red-500 focus:border-red-500' : ''
-                  } ${loadingCountries ? 'bg-gray-100' : ''}`}
-                >
-                  <option value="">Select country</option>
-                  {countries.map((country) => (
-                    <option key={country.code} value={country.code}>
-                      {country.name}
-                    </option>
-                  ))}
-                </select>
-                {errors.country && (
-                  <p className="mt-1 text-sm text-red-600">{errors.country}</p>
-                )}
-                {loadingCountries && (
-                  <p className="mt-1 text-sm text-gray-500">Loading countries...</p>
-                )}
-              </div>
-
-              <Input
-                label="Currency"
-                name="currency"
-                type="text"
-                required
-                value={formData.currency}
-                onChange={handleChange}
-                placeholder="Currency"
-                readOnly
-                className="bg-gray-50"
-              />
-            </div>
-
             <div>
               <div className="relative">
                 <Input
@@ -341,7 +258,7 @@ const Register = () => {
               type="submit"
               className="w-full"
               loading={isSubmitting}
-              disabled={isSubmitting || loadingCountries}
+              disabled={isSubmitting}
             >
               Create Account
             </Button>

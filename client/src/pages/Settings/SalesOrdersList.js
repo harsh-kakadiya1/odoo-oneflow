@@ -102,7 +102,7 @@ const SalesOrdersList = () => {
         {order.order_date ? format(new Date(order.order_date), 'MMM dd, yyyy') : '-'}
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-        ${order.total_amount?.toLocaleString() || '0.00'}
+        ₹{order.total_amount?.toLocaleString('en-IN') || '0'}
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         <Badge color={getStatusColor(order.status)}>

@@ -164,23 +164,6 @@ const Sidebar = ({ onClose }) => {
           );
         })}
       </nav>
-
-      {/* User info */}
-      <div className="p-4 border-t border-gray-200">
-        <div className="flex items-center space-x-3">
-          <div className="h-8 w-8 bg-gray-200 rounded-full flex items-center justify-center">
-            <User className="h-4 w-4 text-gray-600" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-900 truncate">
-              {user?.name}
-            </p>
-            <p className="text-xs text-gray-500">
-              {user?.role}
-            </p>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };

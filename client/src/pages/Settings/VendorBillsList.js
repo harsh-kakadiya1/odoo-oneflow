@@ -106,7 +106,7 @@ const VendorBillsList = () => {
         {bill.due_date ? format(new Date(bill.due_date), 'MMM dd, yyyy') : '-'}
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-        ${bill.amount?.toLocaleString() || '0.00'}
+        ₹{bill.amount?.toLocaleString('en-IN') || '0'}
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         <Badge color={getStatusColor(bill.status)}>

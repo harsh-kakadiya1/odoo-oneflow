@@ -294,19 +294,19 @@ const ProjectDetail = () => {
                     <div className="text-center p-4 bg-green-50 rounded-lg">
                       <p className="text-sm text-gray-600">Revenue</p>
                       <p className="text-2xl font-bold text-green-600">
-                        ${project.financials.totalRevenue?.toLocaleString() || '0'}
+                        ₹{project.financials.totalRevenue?.toLocaleString('en-IN') || '0'}
                       </p>
                     </div>
                     <div className="text-center p-4 bg-red-50 rounded-lg">
                       <p className="text-sm text-gray-600">Cost</p>
                       <p className="text-2xl font-bold text-red-600">
-                        ${project.financials.totalCost?.toLocaleString() || '0'}
+                        ₹{project.financials.totalCost?.toLocaleString('en-IN') || '0'}
                       </p>
                     </div>
                     <div className="text-center p-4 bg-blue-50 rounded-lg">
                       <p className="text-sm text-gray-600">Profit</p>
                       <p className="text-2xl font-bold text-blue-600">
-                        ${project.financials.profit?.toLocaleString() || '0'}
+                        ₹{project.financials.profit?.toLocaleString('en-IN') || '0'}
                       </p>
                     </div>
                   </div>

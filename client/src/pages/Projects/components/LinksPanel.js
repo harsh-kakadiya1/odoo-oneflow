@@ -170,7 +170,7 @@ const LinksPanel = ({ projectId }) => {
   };
 
   const formatAmount = (amount) => {
-    return `$${Number(amount || 0).toLocaleString()}`;
+    return `₹${Number(amount || 0).toLocaleString('en-IN')}`;
   };
 
   const formatDate = (date) => {
