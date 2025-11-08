@@ -7,10 +7,12 @@ import Badge from '../../components/UI/Badge';
 import LoadingSpinner from '../../components/UI/LoadingSpinner';
 import Modal from '../../components/UI/Modal';
 import UserForm from './UserForm';
+import { useAuth } from '../../contexts/AuthContext';
 import { userAPI } from '../../utils/api';
 import toast from 'react-hot-toast';
 
 const Users = () => {
+  const { user } = useAuth();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -67,12 +69,18 @@ const Users = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Users</h1>
-          <p className="text-gray-600 mt-1">Manage user accounts and permissions</p>
+          <h1 className="text-2xl font-bold text-gray-900">
+            {user?.role === 'Project Manager' ? 'Team Members' : 'Users'}
+          </h1>
+          <p className="text-gray-600 mt-1">
+            {user?.role === 'Project Manager' 
+              ? 'Manage your team members'
+              : 'Manage user accounts and permissions'}
+          </p>
         </div>
         <Button onClick={() => setShowCreateModal(true)}>
           <Plus className="h-4 w-4 mr-2" />
-          Add User
+          {user?.role === 'Project Manager' ? 'Add Team Member' : 'Add User'}
         </Button>
       </div>
 
@@ -99,7 +107,9 @@ const Users = () => {
       {/* Users Table */}
       <Card>
         <CardHeader>
-          <CardTitle>All Users ({users.length})</CardTitle>
+          <CardTitle>
+            {user?.role === 'Project Manager' ? 'Your Team Members' : 'All Users'} ({users.length})
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
@@ -174,7 +184,7 @@ const Users = () => {
         <Modal
           isOpen={showCreateModal}
           onClose={() => setShowCreateModal(false)}
-          title="Add New User"
+          title={user?.role === 'Project Manager' ? 'Add New Team Member' : 'Add New User'}
           size="md"
         >
           <UserForm

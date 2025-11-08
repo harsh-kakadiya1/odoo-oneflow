@@ -7,12 +7,18 @@ const { notifyProjectAssigned } = require('../services/notificationService');
 const { Op } = require('sequelize');
 
 // @route   GET /api/projects
-// @desc    Get all projects (filtered by role)
+// @desc    Get projects from same company (filtered by role)
 // @access  Private
 router.get('/', protect, async (req, res) => {
   try {
     const { status, search } = req.query;
-    let where = {};
+    
+    // Get current user's company_id for multi-tenancy
+    const currentUser = await User.findByPk(req.user.id);
+    
+    let where = {
+      company_id: currentUser.company_id // Only show projects from user's company
+    };
 
     if (status) {
       where.status = status;
@@ -187,6 +193,18 @@ router.get('/:id', protect, isProjectMember, async (req, res) => {
           as: 'members',
           attributes: ['id', 'name', 'email', 'role'],
           through: { attributes: [] }
+        },
+        {
+          model: Task,
+          as: 'tasks',
+          attributes: ['id', 'title', 'status', 'priority', 'due_date', 'assignee_id'],
+          include: [
+            {
+              model: User,
+              as: 'assignee',
+              attributes: ['id', 'name', 'email']
+            }
+          ]
         }
       ]
     });
@@ -253,7 +271,10 @@ router.post('/', protect, authorize('Admin', 'Project Manager'), async (req, res
       });
     }
 
-    // Create project
+    // Get current user's company for multi-tenancy
+    const currentUser = await User.findByPk(req.user.id);
+
+    // Create project associated with user's company
     const project = await Project.create({
       name,
       description,
@@ -261,6 +282,7 @@ router.post('/', protect, authorize('Admin', 'Project Manager'), async (req, res
       end_date,
       status: status || 'Planned',
       project_manager_id: pmId,
+      company_id: currentUser.company_id, // Associate with company
       budget
     });
 
@@ -430,6 +452,81 @@ router.delete('/:id', protect, isProjectManager, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Server error deleting project'
+    });
+  }
+});
+
+// @route   GET /api/projects/:id/tasks
+// @desc    Get tasks for a specific project
+// @access  Private
+router.get('/:id/tasks', protect, async (req, res) => {
+  try {
+    const { assigneeId, status, priority } = req.query;
+    let where = { project_id: req.params.id };
+
+    if (assigneeId) {
+      where.assignee_id = assigneeId;
+    }
+    if (status) {
+      where.status = status;
+    }
+    if (priority) {
+      where.priority = priority;
+    }
+
+    const tasks = await Task.findAll({
+      where,
+      include: [
+        {
+          model: User,
+          as: 'assignee',
+          attributes: ['id', 'name', 'email']
+        },
+        {
+          model: Project,
+          as: 'project',
+          attributes: ['id', 'name']
+        }
+      ],
+      order: [['created_at', 'DESC']]
+    });
+
+    res.status(200).json({
+      success: true,
+      tasks
+    });
+  } catch (error) {
+    console.error('Get project tasks error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error fetching project tasks'
+    });
+  }
+});
+
+// @route   GET /api/projects/:id/links
+// @desc    Get linked financial documents for a project
+// @access  Private
+router.get('/:id/links', protect, async (req, res) => {
+  try {
+    // For now, return mock data - would query actual financial documents in real app
+    const links = {
+      salesOrders: [],
+      purchaseOrders: [],
+      customerInvoices: [],
+      vendorBills: [],
+      expenses: []
+    };
+
+    res.status(200).json({
+      success: true,
+      data: links
+    });
+  } catch (error) {
+    console.error('Get project links error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error fetching project links'
     });
   }
 });

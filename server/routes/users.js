@@ -1,26 +1,40 @@
 const express = require('express');
 const router = express.Router();
-const { User } = require('../models');
+const { User, Company } = require('../models');
 const { protect, authorize } = require('../middleware/auth');
 const { generatePassword } = require('../utils/generatePassword');
 const { sendWelcomeEmail } = require('../services/emailService');
 
 // @route   GET /api/users
-// @desc    Get all users
+// @desc    Get users from same company (Admin sees all company users, PM sees only users they created)
 // @access  Private (Admin, Project Manager, Sales/Finance)
 router.get('/', protect, authorize('Admin', 'Project Manager', 'Sales/Finance'), async (req, res) => {
   try {
     const { role, search } = req.query;
-    let where = { is_active: true };
+    const { Op } = require('sequelize');
+    
+    // Get current user's company_id
+    const currentUser = await User.findByPk(req.user.id);
+    
+    let where = { 
+      is_active: true,
+      company_id: currentUser.company_id // Only show users from same company
+    };
+
+    // Project Managers can only see users they created (within their company)
+    if (req.user.role === 'Project Manager') {
+      where.created_by = req.user.id;
+    }
 
     if (role) {
       where.role = role;
     }
 
     if (search) {
-      const { Op } = require('sequelize');
+      // Build search condition for first_name, last_name, and email
       where[Op.or] = [
-        { name: { [Op.like]: `%${search}%` } },
+        { first_name: { [Op.like]: `%${search}%` } },
+        { last_name: { [Op.like]: `%${search}%` } },
         { email: { [Op.like]: `%${search}%` } }
       ];
     }
@@ -28,6 +42,18 @@ router.get('/', protect, authorize('Admin', 'Project Manager', 'Sales/Finance'),
     const users = await User.findAll({
       where,
       attributes: { exclude: ['password_hash', 'reset_password_token', 'reset_password_expire'] },
+      include: [
+        {
+          model: Company,
+          as: 'company',
+          attributes: ['id', 'name', 'country', 'currency']
+        },
+        {
+          model: User,
+          as: 'creator',
+          attributes: ['id', 'firstName', 'lastName', 'email']
+        }
+      ],
       order: [['created_at', 'DESC']]
     });
 
@@ -75,17 +101,25 @@ router.get('/:id', protect, async (req, res) => {
 });
 
 // @route   POST /api/users
-// @desc    Create new user (Admin only)
-// @access  Private (Admin)
-router.post('/', protect, authorize('Admin'), async (req, res) => {
+// @desc    Create new user (Admin creates any role, PM creates Team Members only)
+// @access  Private (Admin, Project Manager)
+router.post('/', protect, authorize('Admin', 'Project Manager'), async (req, res) => {
   try {
-    const { name, email, role, hourly_rate } = req.body;
+    const { firstName, lastName, email, role, hourly_rate } = req.body;
 
     // Validate input
-    if (!name || !email || !role) {
+    if (!firstName || !lastName || !email || !role) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide name, email, and role'
+        message: 'Please provide first name, last name, email, and role'
+      });
+    }
+
+    // Project Managers can only create Team Members
+    if (req.user.role === 'Project Manager' && role !== 'Team Member') {
+      return res.status(403).json({
+        success: false,
+        message: 'Project Managers can only create Team Member accounts'
       });
     }
 
@@ -102,12 +136,18 @@ router.post('/', protect, authorize('Admin'), async (req, res) => {
     // Generate temporary password
     const temporaryPassword = generatePassword();
 
+    // Get current user's company_id to associate new user with same company
+    const currentUser = await User.findByPk(req.user.id);
+    
     // Create user
     const user = await User.create({
-      name,
+      firstName,
+      lastName,
       email,
       password_hash: temporaryPassword,
       role,
+      company_id: currentUser.company_id,
+      created_by: req.user.id, // Track who created this user
       hourly_rate: hourly_rate || 0,
       is_active: true
     });
@@ -124,6 +164,8 @@ router.post('/', protect, authorize('Admin'), async (req, res) => {
       message: 'User created successfully. Credentials sent via email.',
       user: {
         id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
         name: user.name,
         email: user.email,
         role: user.role,
@@ -161,7 +203,7 @@ router.put('/:id', protect, async (req, res) => {
       });
     }
 
-    const { name, email, role, hourly_rate } = req.body;
+    const { firstName, lastName, email, role, hourly_rate } = req.body;
 
     // Only admin can change role and hourly_rate
     if ((role || hourly_rate !== undefined) && req.user.role !== 'Admin') {
@@ -172,7 +214,8 @@ router.put('/:id', protect, async (req, res) => {
     }
 
     // Update fields
-    if (name) user.name = name;
+    if (firstName) user.firstName = firstName;
+    if (lastName) user.lastName = lastName;
     if (email) user.email = email;
     if (role && req.user.role === 'Admin') user.role = role;
     if (hourly_rate !== undefined && req.user.role === 'Admin') user.hourly_rate = hourly_rate;
@@ -184,6 +227,8 @@ router.put('/:id', protect, async (req, res) => {
       message: 'User updated successfully',
       user: {
         id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
         name: user.name,
         email: user.email,
         role: user.role,

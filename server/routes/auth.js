@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-const { User } = require('../models');
+const { User, Company } = require('../models');
 const { protect } = require('../middleware/auth');
 const { sendPasswordResetEmail } = require('../services/emailService');
 
@@ -14,24 +14,44 @@ const generateToken = (id) => {
 };
 
 // @route   POST /api/auth/signup
-// @desc    Register first user (becomes admin) or regular user
+// @desc    Register first user (becomes admin) and create company
 // @access  Public
 router.post('/signup', async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { firstName, lastName, email, password, companyName, country, currency } = req.body;
 
     // Validate input
-    if (!name || !email || !password) {
+    if (!firstName || !lastName || !email || !password) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide name, email, and password'
+        message: 'Please provide first name, last name, email, and password'
       });
     }
 
-    if (password.length < 6) {
+    if (!companyName || !country || !currency) {
       return res.status(400).json({
         success: false,
-        message: 'Password must be at least 6 characters long'
+        message: 'Please provide company name, country, and currency'
+      });
+    }
+
+    // Validate password strength
+    if (password.length < 8) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must be at least 8 characters long'
+      });
+    }
+
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumber = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+    if (!hasUpperCase || !hasLowerCase || !hasNumber || !hasSpecialChar) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must contain uppercase, lowercase, number, and special character'
       });
     }
 
@@ -45,16 +65,36 @@ router.post('/signup', async (req, res) => {
       });
     }
 
-    // Check if this is the first user (make them admin)
-    const userCount = await User.count();
-    const role = userCount === 0 ? 'Admin' : 'Team Member';
+    // Check if company name already exists
+    const existingCompany = await Company.findOne({ where: { name: companyName.trim() } });
 
-    // Create user
+    if (existingCompany) {
+      return res.status(400).json({
+        success: false,
+        message: 'Company name is already taken. Please choose a different name.'
+      });
+    }
+
+    // Create company first
+    const company = await Company.create({
+      name: companyName.trim(),
+      country,
+      currency: currency.toUpperCase(),
+      is_active: true
+    });
+
+    // The first user to register with a company becomes Admin of that company
+    // Since we just created a new company, this user is the first and becomes Admin
+    const role = 'Admin';
+
+    // Create user with company association
     const user = await User.create({
-      name,
+      firstName,
+      lastName,
       email,
       password_hash: password,
       role,
+      company_id: company.id,
       hourly_rate: 0,
       is_active: true
     });
@@ -62,17 +102,21 @@ router.post('/signup', async (req, res) => {
     // Generate token
     const token = generateToken(user.id);
 
+    // Fetch user with company data
+    const userWithCompany = await User.findByPk(user.id, {
+      include: [{
+        model: Company,
+        as: 'company',
+        attributes: ['id', 'name', 'country', 'currency']
+      }],
+      attributes: { exclude: ['password_hash', 'reset_password_token', 'reset_password_expire'] }
+    });
+
     res.status(201).json({
       success: true,
-      message: userCount === 0 ? 'Admin account created successfully' : 'Account created successfully',
+      message: 'Admin account created successfully! You are the company owner.',
       token,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        hourly_rate: user.hourly_rate
-      }
+      user: userWithCompany
     });
   } catch (error) {
     console.error('Signup error:', error);
@@ -129,16 +173,20 @@ router.post('/login', async (req, res) => {
     // Generate token
     const token = generateToken(user.id);
 
+    // Fetch user with company data
+    const userWithCompany = await User.findByPk(user.id, {
+      include: [{
+        model: Company,
+        as: 'company',
+        attributes: ['id', 'name', 'country', 'currency']
+      }],
+      attributes: { exclude: ['password_hash', 'reset_password_token', 'reset_password_expire'] }
+    });
+
     res.status(200).json({
       success: true,
       token,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        hourly_rate: user.hourly_rate
-      }
+      user: userWithCompany
     });
   } catch (error) {
     console.error('Login error:', error);
@@ -287,8 +335,13 @@ router.post('/reset-password/:token', async (req, res) => {
       token,
       user: {
         id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
         name: user.name,
         email: user.email,
+        phone: user.phone,
+        department: user.department,
+        employeeId: user.employeeId,
         role: user.role
       }
     });

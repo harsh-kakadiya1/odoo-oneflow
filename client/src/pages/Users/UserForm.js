@@ -2,11 +2,15 @@ import React, { useState } from 'react';
 import Button from '../../components/UI/Button';
 import Input from '../../components/UI/Input';
 import { userAPI } from '../../utils/api';
+import { useAuth } from '../../contexts/AuthContext';
 import toast from 'react-hot-toast';
+import { validateEmail, validateName } from '../../utils/validation';
 
 const UserForm = ({ onSuccess, onCancel }) => {
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
     role: 'Team Member',
     hourly_rate: '0'
@@ -24,10 +28,28 @@ const UserForm = ({ onSuccess, onCancel }) => {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.name.trim()) newErrors.name = 'Name is required';
-    if (!formData.email.trim()) newErrors.email = 'Email is required';
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email is invalid';
+    
+    // First name validation
+    const firstNameValidation = validateName(formData.firstName, 'First name');
+    if (!firstNameValidation.isValid) {
+      newErrors.firstName = firstNameValidation.message;
+    }
+
+    // Last name validation
+    const lastNameValidation = validateName(formData.lastName, 'Last name');
+    if (!lastNameValidation.isValid) {
+      newErrors.lastName = lastNameValidation.message;
+    }
+
+    // Email validation
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!validateEmail(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+
     if (!formData.role) newErrors.role = 'Role is required';
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -50,15 +72,27 @@ const UserForm = ({ onSuccess, onCancel }) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <Input
-        label="Full Name"
-        name="name"
-        value={formData.name}
-        onChange={handleChange}
-        error={errors.name}
-        required
-        placeholder="Enter full name"
-      />
+      <div className="grid grid-cols-2 gap-4">
+        <Input
+          label="First Name"
+          name="firstName"
+          value={formData.firstName}
+          onChange={handleChange}
+          error={errors.firstName}
+          required
+          placeholder="First name"
+        />
+        
+        <Input
+          label="Last Name"
+          name="lastName"
+          value={formData.lastName}
+          onChange={handleChange}
+          error={errors.lastName}
+          required
+          placeholder="Last name"
+        />
+      </div>
 
       <Input
         label="Email Address"
@@ -75,17 +109,30 @@ const UserForm = ({ onSuccess, onCancel }) => {
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Role <span className="text-error-500">*</span>
         </label>
-        <select
-          name="role"
-          value={formData.role}
-          onChange={handleChange}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-        >
-          <option value="Team Member">Team Member</option>
-          <option value="Project Manager">Project Manager</option>
-          <option value="Sales/Finance">Sales/Finance</option>
-          <option value="Admin">Admin</option>
-        </select>
+        {user?.role === 'Project Manager' ? (
+          // Project Managers can only create Team Members
+          <>
+            <div className="px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-700">
+              Team Member
+            </div>
+            <p className="mt-1 text-sm text-gray-500">
+              Project Managers can only create Team Member accounts
+            </p>
+          </>
+        ) : (
+          // Admins can create any role
+          <select
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+          >
+            <option value="Team Member">Team Member</option>
+            <option value="Project Manager">Project Manager</option>
+            <option value="Sales/Finance">Sales/Finance</option>
+            <option value="Admin">Admin</option>
+          </select>
+        )}
         {errors.role && (
           <p className="mt-1 text-sm text-error-600">{errors.role}</p>
         )}
@@ -121,4 +168,3 @@ const UserForm = ({ onSuccess, onCancel }) => {
 };
 
 export default UserForm;
-

@@ -1,4 +1,5 @@
 const User = require('./User');
+const Company = require('./Company');
 const Project = require('./Project');
 const ProjectMember = require('./ProjectMember');
 const Task = require('./Task');
@@ -9,6 +10,18 @@ const CustomerInvoice = require('./CustomerInvoice');
 const VendorBill = require('./VendorBill');
 const Expense = require('./Expense');
 const Notification = require('./Notification');
+
+// User-Company Relationships
+User.belongsTo(Company, { foreignKey: 'company_id', as: 'company' });
+Company.hasMany(User, { foreignKey: 'company_id', as: 'users' });
+
+// Project-Company Relationships
+Project.belongsTo(Company, { foreignKey: 'company_id', as: 'company' });
+Company.hasMany(Project, { foreignKey: 'company_id', as: 'projects' });
+
+// User-Creator Relationships (who created this user)
+User.belongsTo(User, { foreignKey: 'created_by', as: 'creator' });
+User.hasMany(User, { foreignKey: 'created_by', as: 'createdUsers' });
 
 // User-Project Relationships
 User.hasMany(Project, { foreignKey: 'project_manager_id', as: 'managedProjects' });
@@ -82,6 +95,7 @@ Notification.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
 
 module.exports = {
   User,
+  Company,
   Project,
   ProjectMember,
   Task,
