@@ -54,7 +54,7 @@ const seedTestData = async () => {
       {
         name: 'John Smith',
         email: 'john.smith@oneflow.com',
-        password_hash: 'password123',
+        password_hash: await bcrypt.hash('password123', 10),
         role: 'Admin',
         hourly_rate: 75.00,
         company_id: companies[0].id,
@@ -63,7 +63,7 @@ const seedTestData = async () => {
       {
         name: 'Sarah Johnson',
         email: 'sarah.johnson@oneflow.com',
-        password_hash: 'password123',
+        password_hash: await bcrypt.hash('password123', 10),
         role: 'Admin',
         hourly_rate: 80.00,
         company_id: companies[0].id,
@@ -74,7 +74,7 @@ const seedTestData = async () => {
       {
         name: 'Mike Chen',
         email: 'mike.chen@oneflow.com',
-        password_hash: 'password123',
+        password_hash: await bcrypt.hash('password123', 10),
         role: 'Project Manager',
         hourly_rate: 65.00,
         company_id: companies[0].id,
@@ -83,7 +83,7 @@ const seedTestData = async () => {
       {
         name: 'Emma Davis',
         email: 'emma.davis@oneflow.com',
-        password_hash: 'password123',
+        password_hash: await bcrypt.hash('password123', 10),
         role: 'Project Manager',
         hourly_rate: 60.00,
         company_id: companies[0].id,
@@ -92,7 +92,7 @@ const seedTestData = async () => {
       {
         name: 'David Wilson',
         email: 'david.wilson@oneflow.com',
-        password_hash: 'password123',
+        password_hash: await bcrypt.hash('password123', 10),
         role: 'Project Manager',
         hourly_rate: 70.00,
         company_id: companies[0].id,
@@ -103,7 +103,7 @@ const seedTestData = async () => {
       {
         name: 'Lisa Brown',
         email: 'lisa.brown@oneflow.com',
-        password_hash: 'password123',
+        password_hash: await bcrypt.hash('password123', 10),
         role: 'Sales/Finance',
         hourly_rate: 55.00,
         company_id: companies[0].id,
@@ -114,7 +114,7 @@ const seedTestData = async () => {
       {
         name: 'Alex Rodriguez',
         email: 'alex.rodriguez@oneflow.com',
-        password_hash: 'password123',
+        password_hash: await bcrypt.hash('password123', 10),
         role: 'Team Member',
         hourly_rate: 45.00,
         company_id: companies[0].id,
@@ -123,7 +123,7 @@ const seedTestData = async () => {
       {
         name: 'Rachel Green',
         email: 'rachel.green@oneflow.com',
-        password_hash: 'password123',
+        password_hash: await bcrypt.hash('password123', 10),
         role: 'Team Member',
         hourly_rate: 50.00,
         company_id: companies[0].id,
@@ -132,7 +132,7 @@ const seedTestData = async () => {
       {
         name: 'Tom Anderson',
         email: 'tom.anderson@oneflow.com',
-        password_hash: 'password123',
+        password_hash: await bcrypt.hash('password123', 10),
         role: 'Team Member',
         hourly_rate: 42.00,
         company_id: companies[0].id,
@@ -141,7 +141,7 @@ const seedTestData = async () => {
       {
         name: 'Jessica Taylor',
         email: 'jessica.taylor@oneflow.com',
-        password_hash: 'password123',
+        password_hash: await bcrypt.hash('password123', 10),
         role: 'Team Member',
         hourly_rate: 48.00,
         company_id: companies[0].id,
@@ -152,14 +152,14 @@ const seedTestData = async () => {
       {
         name: 'Juli Kyada',
         email: 'julikyada293@gmail.com',
-        password_hash: 'password123',
+        password_hash: await bcrypt.hash('password123', 10),
         role: 'Admin',
         hourly_rate: 90.00,
         company_id: companies[0].id,
         is_active: true
       }
     ], {
-      individualHooks: true // This ensures beforeSave hooks are called for each record
+      individualHooks: false // Disable hooks since we're pre-hashing passwords
     });
 
     // Create Projects - all in same company
@@ -379,7 +379,8 @@ const seedTestData = async () => {
         status: 'Confirmed',
         total_amount: 150000.00,
         description: 'E-commerce platform development services',
-        project_id: projects[0].id
+        project_id: projects[0].id,
+        company_id: companies[0].id
       },
       {
         so_number: 'SO-2024-0002',
@@ -391,7 +392,8 @@ const seedTestData = async () => {
         status: 'Confirmed',
         total_amount: 75000.00,
         description: 'Mobile app UI/UX design services',
-        project_id: projects[1].id
+        project_id: projects[1].id,
+        company_id: companies[0].id
       },
       {
         so_number: 'SO-2024-0003',
@@ -402,7 +404,8 @@ const seedTestData = async () => {
         status: 'Billed',
         total_amount: 95000.00,
         description: 'Analytics dashboard development',
-        project_id: projects[2].id
+        project_id: projects[2].id,
+        company_id: companies[0].id
       }
     ]);
 
@@ -419,6 +422,7 @@ const seedTestData = async () => {
         status: 'Paid',
         description: 'Phase 1 - Project setup and initial development',
         project_id: projects[0].id,
+        company_id: companies[0].id,
         sales_order_id: 1
       },
       {
@@ -431,6 +435,7 @@ const seedTestData = async () => {
         status: 'Sent',
         description: 'Final payment - Analytics dashboard completion',
         project_id: projects[2].id,
+        company_id: companies[0].id,
         sales_order_id: 3
       },
       {
@@ -443,6 +448,7 @@ const seedTestData = async () => {
         status: 'Draft',
         description: 'Phase 1 - User research and wireframes',
         project_id: projects[1].id,
+        company_id: companies[0].id,
         sales_order_id: 2
       }
     ]);

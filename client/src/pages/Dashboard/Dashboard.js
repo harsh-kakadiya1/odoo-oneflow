@@ -26,6 +26,27 @@ const Dashboard = () => {
     fetchDashboardData();
   }, []);
 
+  useEffect(() => {
+    const handleDataUpdated = () => {
+      fetchDashboardData(); // Refresh dashboard data
+    };
+    
+    // Listen for various events that should trigger dashboard refresh
+    window.addEventListener('projectsUpdated', handleDataUpdated);
+    window.addEventListener('expensesUpdated', handleDataUpdated);
+    window.addEventListener('tasksUpdated', handleDataUpdated);
+    window.addEventListener('invoicesUpdated', handleDataUpdated);
+    window.addEventListener('dashboardUpdate', handleDataUpdated);
+    
+    return () => {
+      window.removeEventListener('projectsUpdated', handleDataUpdated);
+      window.removeEventListener('expensesUpdated', handleDataUpdated);
+      window.removeEventListener('tasksUpdated', handleDataUpdated);
+      window.removeEventListener('invoicesUpdated', handleDataUpdated);
+      window.removeEventListener('dashboardUpdate', handleDataUpdated);
+    };
+  }, []);
+
   const fetchDashboardData = async () => {
     try {
       const [statsRes, projectsRes, tasksRes] = await Promise.all([

@@ -62,6 +62,76 @@ export const NotificationProvider = ({ children }) => {
 
       setSocket(newSocket);
 
+      // Project events -> dispatch to window so pages can refresh
+      newSocket.on('project:created', (payload) => {
+        window.dispatchEvent(new CustomEvent('projectsUpdated', { detail: { action: 'created', payload } }));
+        window.dispatchEvent(new CustomEvent('dashboardUpdate', { detail: { source: 'project:created' } }));
+      });
+      newSocket.on('project:updated', (payload) => {
+        window.dispatchEvent(new CustomEvent('projectsUpdated', { detail: { action: 'updated', payload } }));
+        window.dispatchEvent(new CustomEvent('dashboardUpdate', { detail: { source: 'project:updated' } }));
+      });
+      newSocket.on('project:deleted', (payload) => {
+        window.dispatchEvent(new CustomEvent('projectsUpdated', { detail: { action: 'deleted', payload } }));
+        window.dispatchEvent(new CustomEvent('dashboardUpdate', { detail: { source: 'project:deleted' } }));
+      });
+
+      // Task events -> dispatch so dashboard and task lists refresh
+      newSocket.on('task:created', (payload) => {
+        window.dispatchEvent(new CustomEvent('tasksUpdated', { detail: { action: 'created', payload } }));
+        window.dispatchEvent(new CustomEvent('dashboardUpdate', { detail: { source: 'task:created' } }));
+      });
+      newSocket.on('task:updated', (payload) => {
+        window.dispatchEvent(new CustomEvent('tasksUpdated', { detail: { action: 'updated', payload } }));
+        window.dispatchEvent(new CustomEvent('dashboardUpdate', { detail: { source: 'task:updated' } }));
+      });
+      newSocket.on('task:deleted', (payload) => {
+        window.dispatchEvent(new CustomEvent('tasksUpdated', { detail: { action: 'deleted', payload } }));
+        window.dispatchEvent(new CustomEvent('dashboardUpdate', { detail: { source: 'task:deleted' } }));
+      });
+
+      // Expense events -> dispatch so expenses lists refresh
+      newSocket.on('expense:created', (payload) => {
+        window.dispatchEvent(new CustomEvent('expensesUpdated', { detail: { action: 'created', payload } }));
+        window.dispatchEvent(new CustomEvent('dashboardUpdate', { detail: { source: 'expense:created' } }));
+      });
+      newSocket.on('expense:updated', (payload) => {
+        window.dispatchEvent(new CustomEvent('expensesUpdated', { detail: { action: 'updated', payload } }));
+        window.dispatchEvent(new CustomEvent('dashboardUpdate', { detail: { source: 'expense:updated' } }));
+      });
+      newSocket.on('expense:deleted', (payload) => {
+        window.dispatchEvent(new CustomEvent('expensesUpdated', { detail: { action: 'deleted', payload } }));
+        window.dispatchEvent(new CustomEvent('dashboardUpdate', { detail: { source: 'expense:deleted' } }));
+      });
+
+      // Invoice events -> dispatch so invoice lists and project financials refresh
+      newSocket.on('invoice:created', (payload) => {
+        window.dispatchEvent(new CustomEvent('invoicesUpdated', { detail: { action: 'created', payload } }));
+        window.dispatchEvent(new CustomEvent('dashboardUpdate', { detail: { source: 'invoice:created' } }));
+      });
+      newSocket.on('invoice:updated', (payload) => {
+        window.dispatchEvent(new CustomEvent('invoicesUpdated', { detail: { action: 'updated', payload } }));
+        window.dispatchEvent(new CustomEvent('dashboardUpdate', { detail: { source: 'invoice:updated' } }));
+      });
+      newSocket.on('invoice:deleted', (payload) => {
+        window.dispatchEvent(new CustomEvent('invoicesUpdated', { detail: { action: 'deleted', payload } }));
+        window.dispatchEvent(new CustomEvent('dashboardUpdate', { detail: { source: 'invoice:deleted' } }));
+      });
+
+      // Timesheet events -> dispatch for project financial updates
+      newSocket.on('timesheet:created', (payload) => {
+        window.dispatchEvent(new CustomEvent('timesheetsUpdated', { detail: { action: 'created', payload } }));
+        window.dispatchEvent(new CustomEvent('dashboardUpdate', { detail: { source: 'timesheet:created' } }));
+      });
+      newSocket.on('timesheet:updated', (payload) => {
+        window.dispatchEvent(new CustomEvent('timesheetsUpdated', { detail: { action: 'updated', payload } }));
+        window.dispatchEvent(new CustomEvent('dashboardUpdate', { detail: { source: 'timesheet:updated' } }));
+      });
+      newSocket.on('timesheet:deleted', (payload) => {
+        window.dispatchEvent(new CustomEvent('timesheetsUpdated', { detail: { action: 'deleted', payload } }));
+        window.dispatchEvent(new CustomEvent('dashboardUpdate', { detail: { source: 'timesheet:deleted' } }));
+      });
+
       return () => {
         newSocket.close();
       };

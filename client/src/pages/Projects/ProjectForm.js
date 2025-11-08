@@ -40,10 +40,17 @@ const ProjectForm = ({ project, onSuccess, onCancel }) => {
     try {
       const response = await userAPI.getAll();
       const allUsers = response.data.users;
-      setUsers(allUsers.filter(u => u.role === 'Team Member' || u.role === 'Project Manager'));
-      setManagers(allUsers.filter(u => u.role === 'Project Manager' || u.role === 'Admin'));
+      
+      // For team members: show all active users (they can all be team members)
+      setUsers(allUsers.filter(u => u.is_active));
+      
+      // For project managers: show Admin, Project Manager, and Sales/Finance users
+      setManagers(allUsers.filter(u => 
+        u.is_active && (u.role === 'Admin' || u.role === 'Project Manager' || u.role === 'Sales/Finance')
+      ));
     } catch (error) {
       console.error('Error fetching users:', error);
+      toast.error('Failed to load users');
     }
   };
 

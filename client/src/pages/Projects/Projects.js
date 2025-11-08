@@ -26,6 +26,18 @@ const Projects = () => {
     fetchProjects();
   }, []);
 
+  useEffect(() => {
+    const handleProjectsUpdated = () => {
+      fetchProjects(); // Refresh the projects list
+    };
+    
+    window.addEventListener('projectsUpdated', handleProjectsUpdated);
+    
+    return () => {
+      window.removeEventListener('projectsUpdated', handleProjectsUpdated);
+    };
+  }, []);
+
   const fetchProjects = async () => {
     try {
       const response = await projectAPI.getAll(filters);

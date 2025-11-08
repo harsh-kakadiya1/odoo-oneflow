@@ -29,6 +29,19 @@ const SalesOrder = sequelize.define('SalesOrder', {
     type: DataTypes.STRING(100),
     allowNull: true
   },
+  customer_phone: {
+    type: DataTypes.STRING(20),
+    allowNull: true
+  },
+  company_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'companies',
+      key: 'id'
+    },
+    onDelete: 'CASCADE'
+  },
   amount: {
     type: DataTypes.DECIMAL(12, 2),
     allowNull: false,
