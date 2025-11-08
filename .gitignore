@@ -49,8 +49,7 @@ tmp/
 *.seed
 *.pid.lock
 
-# MySQL
-*.sql
+
 mysql-data/
 
 # Package manager
