@@ -251,7 +251,7 @@ router.get('/recent-projects', protect, async (req, res) => {
         {
           model: User,
           as: 'projectManager',
-          attributes: ['id', 'name']
+          attributes: ['id', 'firstName', 'lastName']
         }
       ],
       order: [['updated_at', 'DESC']],
@@ -289,11 +289,23 @@ router.get('/recent-projects', protect, async (req, res) => {
 });
 
 // @route   GET /api/dashboard/recent-tasks
-// @desc    Get recent tasks for dashboard
+// @desc    Get recent tasks for dashboard (scoped to company)
 // @access  Private
 router.get('/recent-tasks', protect, async (req, res) => {
   try {
-    let where = {};
+    // Get current user's company for multi-tenancy
+    const currentUser = await User.findByPk(req.user.id);
+    
+    // Get all projects from user's company
+    const companyProjects = await Project.findAll({
+      where: { company_id: currentUser.company_id },
+      attributes: ['id']
+    });
+    const projectIds = companyProjects.map(p => p.id);
+
+    let where = {
+      project_id: { [Op.in]: projectIds } // Filter by company projects
+    };
 
     if (req.user.role === 'Team Member') {
       where.assignee_id = req.user.id;
@@ -310,7 +322,7 @@ router.get('/recent-tasks', protect, async (req, res) => {
         {
           model: User,
           as: 'assignee',
-          attributes: ['id', 'name']
+          attributes: ['id', 'firstName', 'lastName']
         }
       ],
       order: [['updated_at', 'DESC']],
@@ -331,7 +343,7 @@ router.get('/recent-tasks', protect, async (req, res) => {
 });
 
 // @route   GET /api/dashboard/analytics
-// @desc    Get comprehensive analytics data
+// @desc    Get comprehensive analytics data with filtering
 // @access  Private
 router.get('/analytics', protect, async (req, res) => {
   try {
@@ -340,26 +352,51 @@ router.get('/analytics', protect, async (req, res) => {
       charts: {}
     };
 
+    // Get current user for company filtering
+    const currentUser = await User.findByPk(req.user.id);
+    
+    // Get filters from query params
+    const { managerId, memberId } = req.query;
+
     // Date ranges for analysis
     const today = new Date();
     const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
     const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
     const threeMonthsAgo = new Date(today.getTime() - 90 * 24 * 60 * 60 * 1000);
 
+    // Build project filter with company_id
+    let projectWhere = { company_id: currentUser.company_id };
+    if (managerId && managerId !== 'all') {
+      projectWhere.project_manager_id = parseInt(managerId);
+    }
+
+    // Get filtered projects
+    const filteredProjects = await Project.findAll({
+      where: projectWhere,
+      attributes: ['id']
+    });
+    const projectIds = filteredProjects.map(p => p.id);
+
+    // Build task filter
+    let taskWhere = { project_id: { [Op.in]: projectIds } };
+    if (memberId && memberId !== 'all') {
+      taskWhere.assignee_id = parseInt(memberId);
+    }
+
     // KPI Calculations
     // Total Projects
-    const totalProjects = await Project.count();
+    const totalProjects = await Project.count({ where: projectWhere });
     const activeProjects = await Project.count({
-      where: { status: { [Op.in]: ['In Progress'] } }
+      where: { ...projectWhere, status: { [Op.in]: ['In Progress'] } }
     });
     const completedProjects = await Project.count({
-      where: { status: 'Completed' }
+      where: { ...projectWhere, status: 'Completed' }
     });
 
     // Tasks
-    const totalTasks = await Task.count();
+    const totalTasks = await Task.count({ where: taskWhere });
     const tasksCompleted = await Task.count({
-      where: { status: 'Done' }
+      where: { ...taskWhere, status: 'Done' }
     });
 
     // Hours
@@ -392,12 +429,15 @@ router.get('/analytics', protect, async (req, res) => {
     };
 
     // Charts Data
-    // Project Progress
+    // Project Progress - use filtered projects
     const projectsWithTasks = await Project.findAll({
+      where: projectWhere,
       include: [{
         model: Task,
         as: 'tasks',
-        attributes: ['id', 'status']
+        attributes: ['id', 'status'],
+        where: memberId && memberId !== 'all' ? { assignee_id: parseInt(memberId) } : {},
+        required: false
       }],
       attributes: ['id', 'name']
     });
@@ -414,6 +454,11 @@ router.get('/analytics', protect, async (req, res) => {
     }).slice(0, 10);
 
     // Resource Utilization
+    let userWhere = { is_active: true, company_id: currentUser.company_id };
+    if (memberId && memberId !== 'all') {
+      userWhere.id = parseInt(memberId);
+    }
+    
     const usersWithHours = await User.findAll({
       include: [{
         model: Timesheet,
@@ -421,8 +466,8 @@ router.get('/analytics', protect, async (req, res) => {
         where: { log_date: { [Op.gte]: threeMonthsAgo } },
         required: false
       }],
-      where: { is_active: true },
-      attributes: ['id', 'name', 'hourly_rate']
+      where: userWhere,
+      attributes: ['id', 'firstName', 'lastName', 'hourly_rate']
     });
 
     analytics.charts.resourceUtilization = usersWithHours.map(user => {
@@ -432,8 +477,9 @@ router.get('/analytics', protect, async (req, res) => {
       const expectedHours = 480;
       const utilization = expectedHours > 0 ? Math.round((totalHours / expectedHours) * 100) : 0;
       
+      const fullName = `${user.firstName} ${user.lastName}`;
       return {
-        userName: user.name.substring(0, 15) + (user.name.length > 15 ? '...' : ''),
+        userName: fullName.substring(0, 15) + (fullName.length > 15 ? '...' : ''),
         utilization: Math.min(utilization, 100) // Cap at 100%
       };
     }).slice(0, 10);
@@ -449,8 +495,9 @@ router.get('/analytics', protect, async (req, res) => {
       });
     }
 
-    // Task Status Distribution
+    // Task Status Distribution - use filtered tasks
     const taskStatusCounts = await Task.findAll({
+      where: taskWhere,
       attributes: [
         'status',
         [sequelize.fn('COUNT', sequelize.col('id')), 'count']
@@ -464,8 +511,9 @@ router.get('/analytics', protect, async (req, res) => {
       value: parseInt(item.count)
     }));
 
-    // Project Status Overview
+    // Project Status Overview - use filtered projects
     const projectStatusCounts = await Project.findAll({
+      where: projectWhere,
       attributes: [
         'status',
         [sequelize.fn('COUNT', sequelize.col('id')), 'count']

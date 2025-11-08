@@ -21,7 +21,7 @@ const Users = () => {
   const [editingUser, setEditingUser] = useState(null);
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
-  const [sortBy, setSortBy] = useState('newest');
+  const [sortBy, setSortBy] = useState('all');
   const [hasPermission, setHasPermission] = useState(true);
 
   useEffect(() => {
@@ -67,6 +67,10 @@ const Users = () => {
 
     // Apply sorting
     switch (sortBy) {
+      case 'all':
+        // Show all users in default order (by ID)
+        result.sort((a, b) => a.id - b.id);
+        break;
       case 'newest':
         result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         break;
@@ -181,92 +185,89 @@ const Users = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">
-            {user?.role === 'Project Manager' ? 'Team Members' : 'Users'}
-          </h1>
-          <p className="text-gray-600 mt-1">
-            {user?.role === 'Project Manager' 
-              ? 'Manage your team members'
-              : 'Manage user accounts and permissions'}
-          </p>
-        </div>
-        <Button onClick={() => setShowCreateModal(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          {user?.role === 'Project Manager' ? 'Add Team Member' : 'Add User'}
-        </Button>
-      </div>
-
-      {/* Search and Filters */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="md:col-span-2">
-              <Input
-                placeholder="Search users by name or email..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && fetchUsers()}
-              />
-            </div>
-            
-            <div>
-              <select
-                value={roleFilter}
-                onChange={(e) => setRoleFilter(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-              >
-                <option value="">All Roles</option>
-                <option value="Admin">Admin</option>
-                <option value="Project Manager">Project Manager</option>
-                <option value="Team Member">Team Member</option>
-                <option value="Sales/Finance">Sales/Finance</option>
-              </select>
-            </div>
-
-            <div>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-              >
-                <option value="newest">Newest First</option>
-                <option value="oldest">Oldest First</option>
-                <option value="name-asc">Name (A-Z)</option>
-                <option value="name-desc">Name (Z-A)</option>
-                <option value="manager-first">Managers First</option>
-                <option value="member-first">Members First</option>
-                <option value="hourly-rate-high">Hourly Rate (High-Low)</option>
-                <option value="hourly-rate-low">Hourly Rate (Low-High)</option>
-              </select>
-            </div>
+      {/* Search, Filters, and Add User */}
+      <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mb-4">
+          {/* Search Field - Left Side */}
+          <div className="md:col-span-6">
+            <Input
+              placeholder="Search users by name or email..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && fetchUsers()}
+            />
+          </div>
+          
+          {/* Filter Dropdown */}
+          <div className="md:col-span-2">
+            <select
+              value={roleFilter}
+              onChange={(e) => setRoleFilter(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+            >
+              <option value="">All Roles</option>
+              <option value="Admin">Admin</option>
+              <option value="Project Manager">Project Manager</option>
+              <option value="Team Member">Team Member</option>
+              <option value="Sales/Finance">Sales/Finance</option>
+            </select>
+          </div>
+          
+          {/* Sort Dropdown */}
+          <div className="md:col-span-2">
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+            >
+              <option value="all">All Users</option>
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+              <option value="name-asc">Name (A-Z)</option>
+              <option value="name-desc">Name (Z-A)</option>
+              <option value="manager-first">Managers First</option>
+              <option value="member-first">Members First</option>
+              <option value="hourly-rate-high">Rate (High-Low)</option>
+              <option value="hourly-rate-low">Rate (Low-High)</option>
+            </select>
           </div>
 
-          <div className="mt-3 flex items-center justify-between">
-            <div className="text-sm text-gray-600">
-              Showing {filteredUsers.length} of {users.length} users
-              {roleFilter && ` • Filtered by: ${roleFilter}`}
-              {sortBy && ` • Sorted by: ${sortBy.replace(/-/g, ' ')}`}
-            </div>
-            <Button variant="secondary" size="sm" onClick={fetchUsers}>
-              <Search className="h-4 w-4 mr-2" />
-              Refresh
+          {/* Add User Button - Right Side */}
+          <div className="md:col-span-2">
+            <Button 
+              onClick={() => setShowCreateModal(true)}
+              className="w-full"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add User
             </Button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+
+        {/* Status Info */}
+        <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+          <div className="text-sm text-gray-600">
+            Showing <span className="font-semibold">{filteredUsers.length}</span> of <span className="font-semibold">{users.length}</span> users
+            {roleFilter && ` • ${roleFilter}`}
+          </div>
+          <button
+            onClick={fetchUsers}
+            className="text-sm text-primary-600 hover:text-primary-700 font-medium flex items-center"
+          >
+            <Search className="h-4 w-4 mr-1" />
+            Refresh
+          </button>
+        </div>
+      </div>
 
       {/* Users Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>
+      <div className="bg-white rounded-2xl shadow-lg border border-gray-100">
+        <div className="p-6 border-b border-gray-100">
+          <h3 className="text-lg font-bold text-gray-900">
             {user?.role === 'Project Manager' ? 'Your Team Members' : 'All Users'} ({filteredUsers.length})
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
+          </h3>
+        </div>
+        <div className="overflow-x-auto p-6">
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
@@ -361,9 +362,8 @@ const Users = () => {
                 )}
               </tbody>
             </table>
-          </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Create User Modal */}
       {showCreateModal && (
