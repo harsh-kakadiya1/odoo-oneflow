@@ -101,3 +101,14 @@ code {
   animation: spin 1s linear infinite;
 }
 
+/* Toast dark mode support */
+:root {
+  --toast-bg: #fff;
+  --toast-color: #363636;
+}
+
+.dark {
+  --toast-bg: #374151;
+  --toast-color: #f9fafb;
+}
+
