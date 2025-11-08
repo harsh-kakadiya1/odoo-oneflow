@@ -16,6 +16,7 @@ import ResetPassword from './pages/Auth/ResetPassword';
 import Dashboard from './pages/Dashboard/Dashboard';
 import Projects from './pages/Projects/Projects';
 import Analytics from './pages/Analytics/Analytics';
+import ProjectDetail from './pages/Projects/ProjectDetail';
 import Users from './pages/Users/Users';
 import Profile from './pages/Profile/Profile';
 
@@ -138,10 +139,7 @@ function AppRoutes() {
         path="/projects/:id"
         element={
           <ProtectedRoute>
-            <div className="text-center py-12">
-              <h2 className="text-2xl font-bold text-gray-900">Project Details</h2>
-              <p className="text-gray-600 mt-2">Coming soon...</p>
-            </div>
+            <ProjectDetail />
           </ProtectedRoute>
         }
       />
