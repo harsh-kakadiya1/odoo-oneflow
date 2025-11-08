@@ -73,6 +73,11 @@ const User = sequelize.define('User', {
       key: 'id'
     }
   },
+  can_manage_users: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+    comment: 'Permission for Project Managers to manage (add/edit/delete) Team Members'
+  },
   is_active: {
     type: DataTypes.BOOLEAN,
     defaultValue: true

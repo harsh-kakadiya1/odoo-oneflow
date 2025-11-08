@@ -203,6 +203,11 @@ router.post('/login', async (req, res) => {
 router.get('/me', protect, async (req, res) => {
   try {
     const user = await User.findByPk(req.user.id, {
+      include: [{
+        model: Company,
+        as: 'company',
+        attributes: ['id', 'name', 'country', 'currency']
+      }],
       attributes: { exclude: ['password_hash', 'reset_password_token', 'reset_password_expire'] }
     });
 
