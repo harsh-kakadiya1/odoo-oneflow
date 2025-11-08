@@ -8,9 +8,24 @@ const User = sequelize.define('User', {
     primaryKey: true,
     autoIncrement: true
   },
+  firstName: {
+    type: DataTypes.STRING(50),
+    allowNull: false,
+    field: 'first_name'
+  },
+  lastName: {
+    type: DataTypes.STRING(50),
+    allowNull: false,
+    field: 'last_name'
+  },
   name: {
-    type: DataTypes.STRING(100),
-    allowNull: false
+    type: DataTypes.VIRTUAL,
+    get() {
+      return `${this.firstName} ${this.lastName}`;
+    },
+    set(value) {
+      throw new Error('Do not try to set the `name` value!');
+    }
   },
   email: {
     type: DataTypes.STRING(100),
@@ -23,6 +38,19 @@ const User = sequelize.define('User', {
   password_hash: {
     type: DataTypes.STRING(255),
     allowNull: false
+  },
+  phone: {
+    type: DataTypes.STRING(20),
+    allowNull: true
+  },
+  department: {
+    type: DataTypes.STRING(100),
+    allowNull: true
+  },
+  employeeId: {
+    type: DataTypes.STRING(50),
+    allowNull: true,
+    field: 'employee_id'
   },
   role: {
     type: DataTypes.ENUM('Admin', 'Project Manager', 'Team Member', 'Sales/Finance'),
@@ -41,6 +69,14 @@ const User = sequelize.define('User', {
   reset_password_expire: {
     type: DataTypes.DATE,
     allowNull: true
+  },
+  company_id: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references: {
+      model: 'companies',
+      key: 'id'
+    }
   },
   is_active: {
     type: DataTypes.BOOLEAN,

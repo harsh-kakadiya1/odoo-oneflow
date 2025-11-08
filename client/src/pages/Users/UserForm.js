@@ -3,10 +3,12 @@ import Button from '../../components/UI/Button';
 import Input from '../../components/UI/Input';
 import { userAPI } from '../../utils/api';
 import toast from 'react-hot-toast';
+import { validateEmail, validateName } from '../../utils/validation';
 
 const UserForm = ({ onSuccess, onCancel }) => {
   const [formData, setFormData] = useState({
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
     role: 'Team Member',
     hourly_rate: '0'
@@ -24,10 +26,28 @@ const UserForm = ({ onSuccess, onCancel }) => {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.name.trim()) newErrors.name = 'Name is required';
-    if (!formData.email.trim()) newErrors.email = 'Email is required';
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email is invalid';
+    
+    // First name validation
+    const firstNameValidation = validateName(formData.firstName, 'First name');
+    if (!firstNameValidation.isValid) {
+      newErrors.firstName = firstNameValidation.message;
+    }
+
+    // Last name validation
+    const lastNameValidation = validateName(formData.lastName, 'Last name');
+    if (!lastNameValidation.isValid) {
+      newErrors.lastName = lastNameValidation.message;
+    }
+
+    // Email validation
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!validateEmail(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+
     if (!formData.role) newErrors.role = 'Role is required';
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -50,15 +70,27 @@ const UserForm = ({ onSuccess, onCancel }) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <Input
-        label="Full Name"
-        name="name"
-        value={formData.name}
-        onChange={handleChange}
-        error={errors.name}
-        required
-        placeholder="Enter full name"
-      />
+      <div className="grid grid-cols-2 gap-4">
+        <Input
+          label="First Name"
+          name="firstName"
+          value={formData.firstName}
+          onChange={handleChange}
+          error={errors.firstName}
+          required
+          placeholder="First name"
+        />
+        
+        <Input
+          label="Last Name"
+          name="lastName"
+          value={formData.lastName}
+          onChange={handleChange}
+          error={errors.lastName}
+          required
+          placeholder="Last name"
+        />
+      </div>
 
       <Input
         label="Email Address"
@@ -121,4 +153,3 @@ const UserForm = ({ onSuccess, onCancel }) => {
 };
 
 export default UserForm;
-
