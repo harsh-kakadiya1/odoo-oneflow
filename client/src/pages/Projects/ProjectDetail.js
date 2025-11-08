@@ -128,9 +128,9 @@ const ProjectDetail = () => {
   const canDelete = hasRole(['Admin']) || 
     (project.project_manager_id && project.project_manager_id.toString() === user?.id?.toString());
 
-  // Calculate progress
+  // Calculate progress based on completed tasks
   const totalTasks = project.tasks?.length || 0;
-  const completedTasks = project.tasks?.filter(t => t.status === 'Done').length || 0;
+  const completedTasks = project.tasks?.filter(t => t.status === 'Done' || t.status === 'Completed').length || 0;
   const progressPercentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
   const isProjectComplete = progressPercentage === 100 && totalTasks > 0;
 
