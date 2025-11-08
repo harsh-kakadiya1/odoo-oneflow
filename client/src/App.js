@@ -3,12 +3,8 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { NotificationProvider } from './contexts/NotificationContext';
-import { ThemeProvider } from './contexts/ThemeContext';
 import LoadingSpinner from './components/UI/LoadingSpinner';
 import Layout from './components/Layout/Layout';
-
-// Public Pages
-import Home from './pages/Home/Home';
 
 // Auth Pages
 import Login from './pages/Auth/Login';
@@ -21,6 +17,7 @@ import Dashboard from './pages/Dashboard/Dashboard';
 import Projects from './pages/Projects/Projects';
 import Analytics from './pages/Analytics/Analytics';
 import ProjectDetail from './pages/Projects/ProjectDetail';
+import Tasks from './pages/Tasks/Tasks';
 import Users from './pages/Users/Users';
 import Profile from './pages/Profile/Profile';
 
@@ -86,9 +83,6 @@ const PublicRoute = ({ children }) => {
 function AppRoutes() {
   return (
     <Routes>
-      {/* Home Page */}
-      <Route path="/" element={<Home />} />
-
       {/* Public Routes */}
       <Route
         path="/login"
@@ -155,10 +149,7 @@ function AppRoutes() {
         path="/tasks"
         element={
           <ProtectedRoute>
-            <div className="text-center py-12">
-              <h2 className="text-2xl font-bold text-gray-900">Tasks</h2>
-              <p className="text-gray-600 mt-2">Coming soon...</p>
-            </div>
+            <Tasks />
           </ProtectedRoute>
         }
       />
@@ -281,8 +272,9 @@ function AppRoutes() {
         }
       />
 
-      {/* Default redirect for unknown routes */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      {/* Default redirect */}
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );
 }
@@ -290,35 +282,35 @@ function AppRoutes() {
 function App() {
   return (
     <BrowserRouter>
-      <ThemeProvider>
-        <AuthProvider>
-          <NotificationProvider>
-            <AppRoutes />
-            <Toaster
-              position="top-right"
-              toastOptions={{
+      <AuthProvider>
+        <NotificationProvider>
+          <AppRoutes />
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: '#fff',
+                color: '#363636',
+              },
+              success: {
+                duration: 3000,
+                iconTheme: {
+                  primary: '#22c55e',
+                  secondary: '#fff',
+                },
+              },
+              error: {
                 duration: 4000,
-                className: '',
-                style: {},
-                success: {
-                  duration: 3000,
-                  iconTheme: {
-                    primary: '#22c55e',
-                    secondary: '#fff',
-                  },
+                iconTheme: {
+                  primary: '#ef4444',
+                  secondary: '#fff',
                 },
-                error: {
-                  duration: 4000,
-                  iconTheme: {
-                    primary: '#ef4444',
-                    secondary: '#fff',
-                  },
-                },
-              }}
-            />
-          </NotificationProvider>
-        </AuthProvider>
-      </ThemeProvider>
+              },
+            }}
+          />
+        </NotificationProvider>
+      </AuthProvider>
     </BrowserRouter>
   );
 }

@@ -4,6 +4,7 @@
   "description": "Frontend React application for OneFlow Project Management System",
   "private": true,
   "dependencies": {
+    "@hello-pangea/dnd": "^18.0.1",
     "@reduxjs/toolkit": "^1.9.7",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
@@ -57,4 +58,3 @@
   },
   "proxy": "http://localhost:5000"
 }
-

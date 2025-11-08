@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Button from '../../../components/UI/Button';
 import Input from '../../../components/UI/Input';
-import { taskAPI, userAPI } from '../../../utils/api';
+import { taskAPI, userAPI, projectAPI } from '../../../utils/api';
 import { useAuth } from '../../../contexts/AuthContext';
 import toast from 'react-hot-toast';
 
@@ -13,9 +13,11 @@ const TaskForm = ({ projectId, task, onSuccess, onCancel }) => {
     assignee_id: '',
     due_date: '',
     priority: 'Medium',
-    status: 'New'
+    status: 'New',
+    project_id: projectId || ''
   });
   const [users, setUsers] = useState([]);
+  const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
@@ -25,6 +27,9 @@ const TaskForm = ({ projectId, task, onSuccess, onCancel }) => {
 
   useEffect(() => {
     fetchUsers();
+    if (!projectId) {
+      fetchProjects();
+    }
     if (task) {
       setFormData({
         title: task.title || '',
@@ -32,10 +37,11 @@ const TaskForm = ({ projectId, task, onSuccess, onCancel }) => {
         assignee_id: task.assignee_id || '',
         due_date: task.due_date || '',
         priority: task.priority || 'Medium',
-        status: task.status || 'New'
+        status: task.status || 'New',
+        project_id: task.project_id || projectId || ''
       });
     }
-  }, [task]);
+  }, [task, projectId]);
 
   const fetchUsers = async () => {
     try {
@@ -43,6 +49,15 @@ const TaskForm = ({ projectId, task, onSuccess, onCancel }) => {
       setUsers(response.data.users);
     } catch (error) {
       console.error('Error fetching users:', error);
+    }
+  };
+
+  const fetchProjects = async () => {
+    try {
+      const response = await projectAPI.getAll();
+      setProjects(response.data.projects);
+    } catch (error) {
+      console.error('Error fetching projects:', error);
     }
   };
 
@@ -57,6 +72,7 @@ const TaskForm = ({ projectId, task, onSuccess, onCancel }) => {
   const validateForm = () => {
     const newErrors = {};
     if (!formData.title.trim()) newErrors.title = 'Task title is required';
+    if (!formData.project_id && !projectId) newErrors.project_id = 'Project is required';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -69,7 +85,7 @@ const TaskForm = ({ projectId, task, onSuccess, onCancel }) => {
     try {
       const taskData = {
         ...formData,
-        project_id: projectId
+        project_id: formData.project_id || projectId
       };
 
       if (task) {
@@ -102,7 +118,7 @@ const TaskForm = ({ projectId, task, onSuccess, onCancel }) => {
 
       {/* Description - Only editable by admins/PMs */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+        <label className="block text-sm font-medium text-gray-700 mb-1">
           Description
         </label>
         <textarea
@@ -111,17 +127,46 @@ const TaskForm = ({ projectId, task, onSuccess, onCancel }) => {
           onChange={handleChange}
           rows={4}
           disabled={!canEditDetails}
-          className={`w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-            !canEditDetails ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed' : ''
+          className={`w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+            !canEditDetails ? 'bg-gray-100 cursor-not-allowed' : ''
           }`}
           placeholder="Task description (optional)"
         />
       </div>
 
+      {/* Project Selection - Only show when no projectId is provided */}
+      {!projectId && (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Project *
+          </label>
+          <select
+            name="project_id"
+            value={formData.project_id}
+            onChange={handleChange}
+            required
+            disabled={!canEditDetails}
+            className={`w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+              !canEditDetails ? 'bg-gray-100 cursor-not-allowed' : ''
+            }`}
+          >
+            <option value="">Select a project...</option>
+            {projects.map((project) => (
+              <option key={project.id} value={project.id}>
+                {project.name}
+              </option>
+            ))}
+          </select>
+          {errors.project_id && (
+            <p className="text-sm text-red-600 mt-1">{errors.project_id}</p>
+          )}
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Assignee - Only editable by admins/PMs */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
             Assignee
           </label>
           <select
@@ -129,8 +174,8 @@ const TaskForm = ({ projectId, task, onSuccess, onCancel }) => {
             value={formData.assignee_id}
             onChange={handleChange}
             disabled={!canEditDetails}
-            className={`w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-              !canEditDetails ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed' : ''
+            className={`w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+              !canEditDetails ? 'bg-gray-100 cursor-not-allowed' : ''
             }`}
           >
             <option value="">Select Assignee</option>
@@ -156,7 +201,7 @@ const TaskForm = ({ projectId, task, onSuccess, onCancel }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Priority - Only editable by admins/PMs */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
             Priority
           </label>
           <select
@@ -164,8 +209,8 @@ const TaskForm = ({ projectId, task, onSuccess, onCancel }) => {
             value={formData.priority}
             onChange={handleChange}
             disabled={!canEditDetails}
-            className={`w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-              !canEditDetails ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed' : ''
+            className={`w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+              !canEditDetails ? 'bg-gray-100 cursor-not-allowed' : ''
             }`}
           >
             <option value="Low">Low</option>
@@ -176,7 +221,7 @@ const TaskForm = ({ projectId, task, onSuccess, onCancel }) => {
 
         {/* Status - Editable by assignee and admins/PMs */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
             Status
           </label>
           <select
@@ -184,8 +229,8 @@ const TaskForm = ({ projectId, task, onSuccess, onCancel }) => {
             value={formData.status}
             onChange={handleChange}
             disabled={!canEditDetails && !isAssignee}
-            className={`w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-              (!canEditDetails && !isAssignee) ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed' : ''
+            className={`w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+              (!canEditDetails && !isAssignee) ? 'bg-gray-100 cursor-not-allowed' : ''
             }`}
           >
             <option value="New">New</option>
