@@ -605,13 +605,100 @@ router.get('/:id/tasks', protect, async (req, res) => {
 // @access  Private
 router.get('/:id/links', protect, async (req, res) => {
   try {
-    // For now, return mock data - would query actual financial documents in real app
+    const projectId = req.params.id;
+    
+    // Import models
+    const { SalesOrder, PurchaseOrder, CustomerInvoice, VendorBill, Expense } = require('../models');
+    
+    // Fetch all linked documents in parallel
+    const [salesOrders, purchaseOrders, customerInvoices, vendorBills, expenses] = await Promise.all([
+      SalesOrder.findAll({
+        where: { project_id: projectId },
+        attributes: ['id', 'so_number', 'customer_name', 'customer_email', 'amount', 'status', 'order_date'],
+        order: [['created_at', 'DESC']]
+      }),
+      PurchaseOrder.findAll({
+        where: { project_id: projectId },
+        attributes: ['id', 'po_number', 'vendor_name', 'vendor_email', 'amount', 'status', 'order_date'],
+        order: [['created_at', 'DESC']]
+      }),
+      CustomerInvoice.findAll({
+        where: { project_id: projectId },
+        attributes: ['id', 'invoice_number', 'customer_name', 'amount', 'status', 'invoice_date', 'due_date'],
+        order: [['created_at', 'DESC']]
+      }),
+      VendorBill.findAll({
+        where: { project_id: projectId },
+        attributes: ['id', 'bill_number', 'vendor_name', 'amount', 'status', 'bill_date', 'due_date'],
+        order: [['created_at', 'DESC']]
+      }),
+      Expense.findAll({
+        where: { project_id: projectId },
+        attributes: ['id', 'description', 'amount', 'status', 'expense_date', 'category', 'is_billable'],
+        include: [{
+          model: User,
+          as: 'user',
+          attributes: ['id', 'firstName', 'lastName', 'email']
+        }],
+        order: [['created_at', 'DESC']]
+      })
+    ]);
+
     const links = {
-      salesOrders: [],
-      purchaseOrders: [],
-      customerInvoices: [],
-      vendorBills: [],
-      expenses: []
+      salesOrders: salesOrders.map(so => ({
+        id: so.id,
+        number: so.so_number,
+        partner_name: so.customer_name,
+        customer_name: so.customer_name,
+        customer_email: so.customer_email,
+        total_amount: so.amount,
+        amount: so.amount,
+        status: so.status,
+        date: so.order_date
+      })),
+      purchaseOrders: purchaseOrders.map(po => ({
+        id: po.id,
+        number: po.po_number,
+        vendor_name: po.vendor_name,
+        vendor_email: po.vendor_email,
+        total_amount: po.amount,
+        amount: po.amount,
+        status: po.status,
+        date: po.order_date
+      })),
+      customerInvoices: customerInvoices.map(inv => ({
+        id: inv.id,
+        number: inv.invoice_number,
+        customer_name: inv.customer_name,
+        partner_name: inv.customer_name,
+        total_amount: inv.amount,
+        amount: inv.amount,
+        status: inv.status,
+        date: inv.invoice_date,
+        due_date: inv.due_date
+      })),
+      vendorBills: vendorBills.map(bill => ({
+        id: bill.id,
+        number: bill.bill_number,
+        vendor_name: bill.vendor_name,
+        partner_name: bill.vendor_name,
+        total_amount: bill.amount,
+        amount: bill.amount,
+        status: bill.status,
+        date: bill.bill_date,
+        due_date: bill.due_date
+      })),
+      expenses: expenses.map(exp => ({
+        id: exp.id,
+        reference: `EXP-${exp.id}`,
+        description: exp.description,
+        amount: exp.amount,
+        status: exp.status,
+        date: exp.expense_date,
+        category: exp.category,
+        is_billable: exp.is_billable,
+        user_name: exp.user ? `${exp.user.firstName} ${exp.user.lastName}` : 'Unknown'
+      }))
     };
 
     res.status(200).json({

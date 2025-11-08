@@ -27,7 +27,7 @@ const VendorBillsList = () => {
         ...filters
       };
       const response = await vendorBillAPI.getAll(params);
-      setBills(response.data.bills || []);
+      setBills(response.data.vendorBills || response.data.bills || []);
     } catch (error) {
       console.error('Error fetching vendor bills:', error);
       toast.error('Failed to load vendor bills');

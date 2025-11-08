@@ -27,7 +27,7 @@ const CustomerInvoicesList = () => {
         ...filters
       };
       const response = await customerInvoiceAPI.getAll(params);
-      setInvoices(response.data.invoices || []);
+      setInvoices(response.data.customerInvoices || response.data.invoices || []);
     } catch (error) {
       console.error('Error fetching customer invoices:', error);
       toast.error('Failed to load customer invoices');

@@ -22,7 +22,22 @@ const DocumentForm = ({
   const { id } = useParams();
   const isEdit = !!id;
 
-  const [formData, setFormData] = useState(initialData);
+  // Initialize formData with defaults for required fields
+  const getInitialFormData = () => {
+    const defaults = {};
+    fields.forEach(field => {
+      if (field.type === 'date' && field.required && !initialData[field.name]) {
+        defaults[field.name] = new Date().toISOString().split('T')[0];
+      } else if (field.type === 'select' && field.required && !initialData[field.name]) {
+        defaults[field.name] = field.options?.[0]?.value || '';
+      } else if (field.type === 'number' && !initialData[field.name]) {
+        defaults[field.name] = 0;
+      }
+    });
+    return { ...defaults, ...initialData };
+  };
+
+  const [formData, setFormData] = useState(getInitialFormData());
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -40,7 +55,11 @@ const DocumentForm = ({
     try {
       setLoading(true);
       const response = await documentApi.getById(id);
-      setFormData(response.data);
+      // Handle different response formats from backend
+      const docData = response.data.salesOrder || response.data.purchaseOrder || 
+                      response.data.customerInvoice || response.data.vendorBill || 
+                      response.data.expense || response.data;
+      setFormData(docData);
     } catch (error) {
       console.error('Error fetching document:', error);
       toast.error('Failed to load document');
@@ -71,22 +90,62 @@ const DocumentForm = ({
     try {
       setSaving(true);
       
+      // Clean up form data before sending
+      const cleanedData = { ...formData };
+      
+      // Remove auto-generated fields that shouldn't be sent
+      delete cleanedData.created_at;
+      delete cleanedData.updated_at;
+      delete cleanedData.createdAt;
+      delete cleanedData.updatedAt;
+      
+      // Convert empty strings to null for optional fields
+      Object.keys(cleanedData).forEach(key => {
+        if (cleanedData[key] === '') {
+          cleanedData[key] = null;
+        }
+        // Convert string booleans to actual booleans
+        if (cleanedData[key] === 'true') cleanedData[key] = true;
+        if (cleanedData[key] === 'false') cleanedData[key] = false;
+      });
+      
+      // Convert project_id to number or null
+      if (cleanedData.project_id) {
+        cleanedData.project_id = parseInt(cleanedData.project_id) || null;
+      } else if (cleanedData.project_id === '') {
+        cleanedData.project_id = null;
+      }
+      
+      // Remove disabled/auto-generated number fields if empty
+      if (!isEdit) {
+        ['order_number', 'so_number', 'po_number', 'invoice_number', 'bill_number'].forEach(field => {
+          if (cleanedData[field] === null || cleanedData[field] === '') {
+            delete cleanedData[field];
+          }
+        });
+      }
+      
+      console.log('Submitting form data:', cleanedData);
+      
       if (isEdit) {
-        await documentApi.update(id, formData);
-        toast.success('Document updated successfully');
+        await documentApi.update(id, cleanedData);
+        toast.success(`${title} updated successfully`);
       } else {
-        await documentApi.create(formData);
-        toast.success('Document created successfully');
+        const response = await documentApi.create(cleanedData);
+        console.log('Create response:', response.data);
+        toast.success(`${title} created successfully`);
       }
       
       if (onSave) {
-        onSave(formData);
+        onSave(cleanedData);
       }
       
       navigate(backPath);
     } catch (error) {
       console.error('Error saving document:', error);
-      toast.error('Failed to save document');
+      console.error('Error details:', error.response?.data);
+      const errorMessage = error.response?.data?.message || 'Failed to save document';
+      toast.error(errorMessage);
     } finally {
       setSaving(false);
     }

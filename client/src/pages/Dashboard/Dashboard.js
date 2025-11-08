@@ -7,13 +7,15 @@ import {
   AlertCircle,
   Calendar,
   CheckCircle2,
-  CheckSquare
+  CheckSquare,
+  TrendingUp
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/UI/Card';
 import Badge from '../../components/UI/Badge';
 import LoadingSpinner from '../../components/UI/LoadingSpinner';
 import { useAuth } from '../../contexts/AuthContext';
-import { dashboardAPI } from '../../utils/api';
+import { dashboardAPI, timesheetAPI } from '../../utils/api';
+import { startOfWeek, endOfWeek, format } from 'date-fns';
 import { Bar, Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -45,6 +47,7 @@ const Dashboard = () => {
   const [stats, setStats] = useState(null);
   const [recentProjects, setRecentProjects] = useState([]);
   const [recentTasks, setRecentTasks] = useState([]);
+  const [timesheetStats, setTimesheetStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState('All');
 
@@ -54,10 +57,17 @@ const Dashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
-      const [statsRes, projectsRes, tasksRes] = await Promise.all([
+      const weekStart = format(startOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd');
+      const weekEnd = format(endOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd');
+
+      const [statsRes, projectsRes, tasksRes, timesheetRes] = await Promise.all([
         dashboardAPI.getStats(),
         dashboardAPI.getRecentProjects(),
-        dashboardAPI.getRecentTasks()
+        dashboardAPI.getRecentTasks(),
+        timesheetAPI.getUserAnalytics(user.id, { startDate: weekStart, endDate: weekEnd }).catch(err => {
+          console.error('Error fetching timesheet stats:', err);
+          return { data: { analytics: null } };
+        })
       ]);
 
       console.log('✅ Dashboard API Response:', {
@@ -75,6 +85,7 @@ const Dashboard = () => {
       setStats(statsRes.data.stats || {});
       setRecentProjects(projectsRes.data.projects || []);
       setRecentTasks(tasksRes.data.tasks || []);
+      setTimesheetStats(timesheetRes.data.analytics || null);
     } catch (error) {
       console.error('❌ Error fetching dashboard data:', error);
       console.error('Error details:', error.response?.data);
@@ -267,20 +278,28 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Hours Logged */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-shadow duration-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Hours Logged</p>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
-                {stats?.hoursLoggedWeek || 0}
-              </p>
+        {/* Hours Logged This Week */}
+        <Link to="/timesheets" className="block">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-200 hover:scale-105">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Hours This Week</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
+                  {timesheetStats?.totalHours.toFixed(1) || '0.0'}
+                </p>
+              </div>
+              <div className="h-14 w-14 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
+                <Clock className="h-7 w-7 text-white" />
+              </div>
             </div>
-            <div className="h-14 w-14 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
-              <Clock className="h-7 w-7 text-white" />
-            </div>
+            {timesheetStats && (
+              <div className="flex items-center justify-between text-sm pt-3 border-t border-gray-100 dark:border-gray-700">
+                <span className="text-gray-500 dark:text-gray-400">Billable:</span>
+                <span className="font-semibold text-green-600 dark:text-green-400">{timesheetStats.billableHours.toFixed(1)} hrs</span>
+              </div>
+            )}
           </div>
-        </div>
+        </Link>
 
         {/* Revenue Earned */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-shadow duration-200">

@@ -21,6 +21,7 @@ import ProjectDetail from './pages/Projects/ProjectDetail';
 import Tasks from './pages/Tasks/Tasks';
 import Users from './pages/Users/Users';
 import Profile from './pages/Profile/Profile';
+import MyTimesheets from './pages/Timesheets/MyTimesheets';
 
 // Settings Pages
 import Settings from './pages/Settings/Settings';
@@ -30,6 +31,9 @@ import CustomerInvoicesList from './pages/Settings/CustomerInvoicesList';
 import VendorBillsList from './pages/Settings/VendorBillsList';
 import ExpensesList from './pages/Settings/ExpensesList';
 import SalesOrderForm from './pages/Settings/SalesOrderForm';
+import PurchaseOrderForm from './pages/Settings/PurchaseOrderForm';
+import CustomerInvoiceForm from './pages/Settings/CustomerInvoiceForm';
+import VendorBillForm from './pages/Settings/VendorBillForm';
 import ExpenseForm from './pages/Settings/ExpenseForm';
 
 // Protected Route Component
@@ -219,6 +223,7 @@ function AppRoutes() {
       />
 
       {/* Form Routes */}
+      {/* Sales Orders */}
       <Route
         path="/settings/sales-orders/new"
         element={
@@ -237,6 +242,64 @@ function AppRoutes() {
         }
       />
 
+      {/* Purchase Orders */}
+      <Route
+        path="/settings/purchase-orders/new"
+        element={
+          <ProtectedRoute allowedRoles={['Admin', 'Sales/Finance', 'Project Manager']}>
+            <PurchaseOrderForm />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/settings/purchase-orders/:id/edit"
+        element={
+          <ProtectedRoute allowedRoles={['Admin', 'Sales/Finance', 'Project Manager']}>
+            <PurchaseOrderForm />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Customer Invoices */}
+      <Route
+        path="/settings/customer-invoices/new"
+        element={
+          <ProtectedRoute allowedRoles={['Admin', 'Sales/Finance', 'Project Manager']}>
+            <CustomerInvoiceForm />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/settings/customer-invoices/:id/edit"
+        element={
+          <ProtectedRoute allowedRoles={['Admin', 'Sales/Finance', 'Project Manager']}>
+            <CustomerInvoiceForm />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Vendor Bills */}
+      <Route
+        path="/settings/vendor-bills/new"
+        element={
+          <ProtectedRoute allowedRoles={['Admin', 'Sales/Finance', 'Project Manager']}>
+            <VendorBillForm />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/settings/vendor-bills/:id/edit"
+        element={
+          <ProtectedRoute allowedRoles={['Admin', 'Sales/Finance', 'Project Manager']}>
+            <VendorBillForm />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Expenses */}
       <Route
         path="/settings/expenses/new"
         element={
@@ -269,6 +332,15 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <Profile />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/timesheets"
+        element={
+          <ProtectedRoute>
+            <MyTimesheets />
           </ProtectedRoute>
         }
       />

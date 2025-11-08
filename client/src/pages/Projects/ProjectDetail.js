@@ -23,6 +23,7 @@ import ProjectForm from './ProjectForm';
 import TaskList from './components/TaskList';
 import LinksPanel from './components/LinksPanel';
 import ProgressBar from './components/ProgressBar';
+import ProjectTimesheets from './components/ProjectTimesheets';
 import { projectAPI } from '../../utils/api';
 import { useAuth } from '../../contexts/AuthContext';
 import toast from 'react-hot-toast';
@@ -137,6 +138,7 @@ const ProjectDetail = () => {
   const tabs = [
     { id: 'overview', label: 'Overview', icon: BarChart3 },
     { id: 'tasks', label: 'Tasks', icon: FileText },
+    { id: 'timesheets', label: 'Timesheets', icon: Clock },
     { id: 'links', label: 'Links', icon: DollarSign }
   ];
 
@@ -485,6 +487,10 @@ const ProjectDetail = () => {
 
         {activeTab === 'tasks' && (
           <TaskList projectId={id} onTaskUpdate={fetchProject} />
+        )}
+
+        {activeTab === 'timesheets' && (
+          <ProjectTimesheets projectId={id} />
         )}
 
         {activeTab === 'links' && (

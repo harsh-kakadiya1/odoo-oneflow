@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Search, Filter, FolderKanban, Users } from 'lucide-react';
+import { Plus, Search, Filter, FolderKanban, Users, Settings as SettingsIcon } from 'lucide-react';
 import { Card, CardContent } from '../../components/UI/Card';
 import Button from '../../components/UI/Button';
 import Input from '../../components/UI/Input';
@@ -8,6 +8,7 @@ import Badge from '../../components/UI/Badge';
 import LoadingSpinner from '../../components/UI/LoadingSpinner';
 import Modal from '../../components/UI/Modal';
 import ProjectForm from './ProjectForm';
+import Settings from '../Settings/Settings';
 import { projectAPI } from '../../utils/api';
 import { useAuth } from '../../contexts/AuthContext';
 import toast from 'react-hot-toast';
@@ -17,6 +18,7 @@ const Projects = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showSettingsPanel, setShowSettingsPanel] = useState(false);
   const [filters, setFilters] = useState({
     search: '',
     status: ''
@@ -98,14 +100,46 @@ const Projects = () => {
           <option value="On Hold">On Hold</option>
         </select>
 
-        {/* New Project Button */}
-        {hasRole(['Admin', 'Project Manager']) && (
-          <Button onClick={() => setShowCreateModal(true)} className="w-full sm:w-auto whitespace-nowrap">
-            <Plus className="h-4 w-4 mr-2" />
-            New Project
-          </Button>
-        )}
+        {/* Action Buttons */}
+        <div className="flex gap-2 w-full sm:w-auto">
+          {/* Settings Button */}
+          {hasRole(['Admin', 'Project Manager', 'Sales/Finance']) && (
+            <Button 
+              variant={showSettingsPanel ? "primary" : "outline"}
+              onClick={() => setShowSettingsPanel(!showSettingsPanel)} 
+              className="flex-1 sm:flex-none whitespace-nowrap"
+            >
+              <SettingsIcon className="h-4 w-4 mr-2" />
+              {showSettingsPanel ? 'Hide Settings' : 'Settings'}
+            </Button>
+          )}
+          
+          {/* New Project Button */}
+          {hasRole(['Admin', 'Project Manager']) && (
+            <Button onClick={() => setShowCreateModal(true)} className="flex-1 sm:flex-none whitespace-nowrap">
+              <Plus className="h-4 w-4 mr-2" />
+              New Project
+            </Button>
+          )}
+        </div>
       </div>
+
+      {/* Settings Panel */}
+      {showSettingsPanel && (
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Financial Documents</h2>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => setShowSettingsPanel(false)}
+            >
+              Close
+            </Button>
+          </div>
+          <Settings />
+        </div>
+      )}
 
       {/* Projects Grid */}
       {projects.length > 0 ? (

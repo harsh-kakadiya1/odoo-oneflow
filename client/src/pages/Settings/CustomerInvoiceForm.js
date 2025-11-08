@@ -1,12 +1,12 @@
 import React from 'react';
 import DocumentForm from './DocumentForm';
-import { salesOrderAPI } from '../../utils/api';
+import { customerInvoiceAPI } from '../../utils/api';
 
-const SalesOrderForm = () => {
+const CustomerInvoiceForm = () => {
   const fields = [
     {
-      name: 'so_number',
-      label: 'SO Number',
+      name: 'invoice_number',
+      label: 'Invoice Number',
       type: 'text',
       placeholder: 'Auto-generated on save',
       disabled: true
@@ -19,20 +19,20 @@ const SalesOrderForm = () => {
       placeholder: 'Enter customer name'
     },
     {
-      name: 'customer_email',
-      label: 'Customer Email',
-      type: 'email',
-      placeholder: 'customer@example.com'
+      name: 'invoice_date',
+      label: 'Invoice Date',
+      type: 'date',
+      required: true
     },
     {
-      name: 'order_date',
-      label: 'Order Date',
+      name: 'due_date',
+      label: 'Due Date',
       type: 'date',
       required: true
     },
     {
       name: 'amount',
-      label: 'Total Amount',
+      label: 'Total Amount (including tax)',
       type: 'number',
       required: true,
       placeholder: '0.00'
@@ -44,27 +44,28 @@ const SalesOrderForm = () => {
       required: true,
       options: [
         { value: 'Draft', label: 'Draft' },
-        { value: 'Confirmed', label: 'Confirmed' },
-        { value: 'Billed', label: 'Billed' }
+        { value: 'Sent', label: 'Sent' },
+        { value: 'Paid', label: 'Paid' }
       ]
     },
     {
       name: 'description',
-      label: 'Description / Terms & Conditions',
+      label: 'Description / Notes',
       type: 'textarea',
-      placeholder: 'Order details, payment terms, delivery conditions...'
+      placeholder: 'Invoice items, services rendered, milestones completed, payment instructions...'
     }
   ];
 
   return (
     <DocumentForm
-      title="Sales Order"
-      documentApi={salesOrderAPI}
+      title="Customer Invoice"
+      documentApi={customerInvoiceAPI}
       fields={fields}
-      backPath="/settings/sales-orders"
+      backPath="/settings/customer-invoices"
       allowProjectLinking={true}
     />
   );
 };
 
-export default SalesOrderForm;
+export default CustomerInvoiceForm;
+

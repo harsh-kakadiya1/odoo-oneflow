@@ -6,31 +6,35 @@ import {
   MessageSquare, 
   Paperclip,
   Send,
-  Download
+  Download,
+  DollarSign,
+  CheckCircle
 } from 'lucide-react';
 import { Card, CardContent } from '../../../components/UI/Card';
 import Button from '../../../components/UI/Button';
 import Input from '../../../components/UI/Input';
 import Badge from '../../../components/UI/Badge';
 import LoadingSpinner from '../../../components/UI/LoadingSpinner';
+import LogHoursModal from '../../../components/UI/LogHoursModal';
 import { taskAPI } from '../../../utils/api';
 import { useAuth } from '../../../contexts/AuthContext';
+import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 
 const TaskDetail = ({ task, onUpdate }) => {
   const { user, hasRole } = useAuth();
   const [activeTab, setActiveTab] = useState('details');
-  const [timeLog, setTimeLog] = useState({ hours: '', description: '', is_billable: true });
   const [comment, setComment] = useState('');
   const [comments, setComments] = useState([]);
-  const [timeEntries, setTimeEntries] = useState([]);
+  const [timesheets, setTimesheets] = useState([]);
   const [attachments, setAttachments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [fileUploading, setFileUploading] = useState(false);
+  const [showLogHoursModal, setShowLogHoursModal] = useState(false);
 
   // Permission checks
   const canEditDetails = hasRole(['Admin', 'Project Manager']);
-  const canLogTime = hasRole(['Admin', 'Project Manager']) || task.assignee?.id === user?.id;
+  const canLogTime = true; // All users can log time on tasks they're assigned to
   const canComment = true; // Everyone can comment
   const canUploadFiles = hasRole(['Admin', 'Project Manager']) || task.assignee?.id === user?.id;
 
@@ -46,13 +50,14 @@ const TaskDetail = ({ task, onUpdate }) => {
     }
   }, [task.id]);
 
-  const fetchTimeEntries = useCallback(async () => {
+  const fetchTimesheets = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await taskAPI.getTimeEntries(task.id);
-      setTimeEntries(response.data.timeEntries);
+      const response = await taskAPI.getTimesheets(task.id);
+      setTimesheets(response.data.timesheets || []);
     } catch (error) {
-      console.error('Error fetching time entries:', error);
+      console.error('Error fetching timesheets:', error);
+      toast.error('Failed to load timesheets');
     } finally {
       setLoading(false);
     }
@@ -73,29 +78,16 @@ const TaskDetail = ({ task, onUpdate }) => {
   useEffect(() => {
     if (activeTab === 'comments') {
       fetchComments();
-    } else if (activeTab === 'time') {
-      fetchTimeEntries();
+    } else if (activeTab === 'timesheets') {
+      fetchTimesheets();
     } else if (activeTab === 'attachments') {
       fetchAttachments();
     }
-  }, [activeTab, fetchComments, fetchTimeEntries, fetchAttachments]);
+  }, [activeTab, fetchComments, fetchTimesheets, fetchAttachments]);
 
-  const handleLogTime = async (e) => {
-    e.preventDefault();
-    if (!timeLog.hours || !timeLog.description) {
-      toast.error('Please enter hours and description');
-      return;
-    }
-
-    try {
-      await taskAPI.logTime(task.id, timeLog);
-      toast.success('Time logged successfully');
-      setTimeLog({ hours: '', description: '', is_billable: true });
-      fetchTimeEntries();
-      onUpdate();
-    } catch (error) {
-      toast.error('Failed to log time');
-    }
+  const handleTimesheetSuccess = () => {
+    fetchTimesheets();
+    if (onUpdate) onUpdate();
   };
 
   const handleAddComment = async (e) => {
@@ -160,13 +152,14 @@ const TaskDetail = ({ task, onUpdate }) => {
 
   const tabs = [
     { id: 'details', label: 'Details', icon: Calendar },
-    { id: 'time', label: 'Time Logs', icon: Clock },
+    { id: 'timesheets', label: 'Time Logs', icon: Clock },
     { id: 'comments', label: 'Comments', icon: MessageSquare },
     { id: 'attachments', label: 'Attachments', icon: Paperclip }
   ];
 
-  const totalHours = timeEntries.reduce((sum, entry) => sum + Number(entry.hours), 0);
-  const billableHours = timeEntries.filter(entry => entry.is_billable).reduce((sum, entry) => sum + Number(entry.hours), 0);
+  const totalHours = timesheets.reduce((sum, entry) => sum + parseFloat(entry.hours_logged || 0), 0);
+  const billableHours = timesheets.filter(entry => entry.is_billable).reduce((sum, entry) => sum + parseFloat(entry.hours_logged || 0), 0);
+  const totalCost = timesheets.reduce((sum, entry) => sum + parseFloat(entry.cost || 0), 0);
 
   return (
     <div className="space-y-6">
@@ -242,8 +235,8 @@ const TaskDetail = ({ task, onUpdate }) => {
                 {tab.id === 'comments' && comments.length > 0 && (
                   <Badge variant="outline" size="sm">{comments.length}</Badge>
                 )}
-                {tab.id === 'time' && timeEntries.length > 0 && (
-                  <Badge variant="outline" size="sm">{timeEntries.length}</Badge>
+                {tab.id === 'timesheets' && timesheets.length > 0 && (
+                  <Badge variant="outline" size="sm">{timesheets.length}</Badge>
                 )}
                 {tab.id === 'attachments' && attachments.length > 0 && (
                   <Badge variant="outline" size="sm">{attachments.length}</Badge>
@@ -286,94 +279,84 @@ const TaskDetail = ({ task, onUpdate }) => {
           </Card>
         )}
 
-        {activeTab === 'time' && (
+        {activeTab === 'timesheets' && (
           <div className="space-y-4">
-            {/* Time Logging Form */}
-            {canLogTime ? (
+            {/* Summary Cards */}
+            <div className="grid grid-cols-3 gap-4">
               <Card>
-                <CardContent>
-                  <h4 className="font-semibold text-gray-900 dark:text-white mb-4">Log Time</h4>
-                  <form onSubmit={handleLogTime} className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <Input
-                        label="Hours"
-                        type="number"
-                        step="0.5"
-                        min="0"
-                        max="24"
-                        value={timeLog.hours}
-                        onChange={(e) => setTimeLog({ ...timeLog, hours: e.target.value })}
-                        required
-                      />
-                      <div className="flex items-center space-x-2 pt-6">
-                        <input
-                          type="checkbox"
-                          id="billable"
-                          checked={timeLog.is_billable}
-                          onChange={(e) => setTimeLog({ ...timeLog, is_billable: e.target.checked })}
-                          className="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500"
-                        />
-                        <label htmlFor="billable" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                          Billable
-                        </label>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Description
-                      </label>
-                      <textarea
-                        value={timeLog.description}
-                        onChange={(e) => setTimeLog({ ...timeLog, description: e.target.value })}
-                        rows={3}
-                        className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="Describe what you worked on..."
-                        required
-                      />
-                    </div>
+                <CardContent className="p-4 text-center">
+                  <Clock className="h-8 w-8 text-blue-600 dark:text-blue-400 mx-auto mb-2" />
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{totalHours.toFixed(1)}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Total Hours</p>
+                </CardContent>
+              </Card>
 
-                    <Button type="submit">
-                      <Clock className="h-4 w-4 mr-2" />
-                      Log Time
-                    </Button>
-                  </form>
-                </CardContent>
-              </Card>
-            ) : (
               <Card>
-                <CardContent>
-                  <div className="text-center py-4">
-                    <Clock className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                    <p className="text-gray-500 dark:text-gray-400">Time logging is restricted to task assignees and project managers</p>
-                  </div>
+                <CardContent className="p-4 text-center">
+                  <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400 mx-auto mb-2" />
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{billableHours.toFixed(1)}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Billable Hours</p>
                 </CardContent>
               </Card>
-            )}
+
+              <Card>
+                <CardContent className="p-4 text-center">
+                  <DollarSign className="h-8 w-8 text-purple-600 dark:text-purple-400 mx-auto mb-2" />
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">₹{totalCost.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Total Cost</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Log Hours Button */}
+            <Button onClick={() => setShowLogHoursModal(true)}>
+              <Clock className="h-4 w-4 mr-2" />
+              Log Hours
+            </Button>
 
             {/* Time Entries */}
             {loading ? (
               <LoadingSpinner />
             ) : (
               <div className="space-y-3">
-                {timeEntries.length === 0 ? (
-                  <p className="text-gray-500 dark:text-gray-400 text-center py-4">No time entries logged yet</p>
+                {timesheets.length === 0 ? (
+                  <Card>
+                    <CardContent className="text-center py-8">
+                      <Clock className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                      <p className="text-gray-500 dark:text-gray-400">No time logged yet</p>
+                      <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Click "Log Hours" to record your work time</p>
+                    </CardContent>
+                  </Card>
                 ) : (
-                  timeEntries.map((entry) => (
-                    <Card key={entry.id}>
-                      <CardContent className="py-4">
+                  timesheets.map((timesheet) => (
+                    <Card key={timesheet.id}>
+                      <CardContent className="p-4">
                         <div className="flex justify-between items-start">
                           <div className="flex-1">
-                            <div className="flex items-center space-x-2 mb-2">
-                              <span className="font-semibold">{entry.hours}h</span>
-                              <Badge variant={entry.is_billable ? 'success' : 'secondary'} size="sm">
-                                {entry.is_billable ? 'Billable' : 'Non-billable'}
+                            <div className="flex items-center gap-3 mb-2">
+                              <span className="text-lg font-bold text-gray-900 dark:text-white">{timesheet.hours_logged} hrs</span>
+                              <Badge variant={timesheet.is_billable ? 'success' : 'secondary'} size="sm">
+                                {timesheet.is_billable ? '✅ Billable' : '⚪ Internal'}
                               </Badge>
                               <span className="text-sm text-gray-500 dark:text-gray-400">
-                                by {entry.user?.name} on {formatDate(entry.date)}
+                                {format(new Date(timesheet.log_date), 'MMM dd, yyyy')}
                               </span>
                             </div>
-                            <p className="text-gray-700 dark:text-gray-300">{entry.description}</p>
+                            
+                            {timesheet.description && (
+                              <p className="text-gray-700 dark:text-gray-300 text-sm mb-2 italic">"{timesheet.description}"</p>
+                            )}
+                            
+                            <div className="flex items-center gap-4 text-sm">
+                              <span className="text-gray-600 dark:text-gray-400">
+                                <User className="h-4 w-4 inline mr-1" />
+                                {timesheet.user ? `${timesheet.user.firstName} ${timesheet.user.lastName}` : 'Unknown'}
+                              </span>
+                              <span className="text-gray-600 dark:text-gray-400">
+                                <DollarSign className="h-4 w-4 inline mr-1" />
+                                ₹{parseFloat(timesheet.cost).toLocaleString('en-IN')}
+                              </span>
+                            </div>
                           </div>
                         </div>
                       </CardContent>
@@ -514,6 +497,14 @@ const TaskDetail = ({ task, onUpdate }) => {
           </div>
         )}
       </div>
+
+      {/* Log Hours Modal */}
+      <LogHoursModal
+        isOpen={showLogHoursModal}
+        onClose={() => setShowLogHoursModal(false)}
+        task={task}
+        onSuccess={handleTimesheetSuccess}
+      />
     </div>
   );
 };

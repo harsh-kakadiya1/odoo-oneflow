@@ -11,7 +11,8 @@ import {
   FileText,
   X,
   DollarSign,
-  LogOut
+  LogOut,
+  Clock
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { clsx } from 'clsx';
@@ -56,16 +57,16 @@ const Sidebar = ({ onClose, isExpanded, setIsExpanded }) => {
       roles: ['Admin', 'Project Manager', 'Team Member']
     },
     {
+      name: 'Timesheets',
+      href: '/timesheets',
+      icon: Clock,
+      roles: ['Admin', 'Project Manager', 'Team Member', 'Sales/Finance']
+    },
+    {
       name: 'Analytics',
       href: '/analytics',
       icon: BarChart3,
       roles: ['Admin', 'Project Manager', 'Sales/Finance']
-    },
-    {
-      name: 'Settings',
-      href: '/settings',
-      icon: Settings,
-      roles: ['Admin', 'Sales/Finance', 'Project Manager']
     },
     {
       name: 'Users',

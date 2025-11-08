@@ -1,28 +1,28 @@
 import React from 'react';
 import DocumentForm from './DocumentForm';
-import { salesOrderAPI } from '../../utils/api';
+import { purchaseOrderAPI } from '../../utils/api';
 
-const SalesOrderForm = () => {
+const PurchaseOrderForm = () => {
   const fields = [
     {
-      name: 'so_number',
-      label: 'SO Number',
+      name: 'po_number',
+      label: 'PO Number',
       type: 'text',
       placeholder: 'Auto-generated on save',
       disabled: true
     },
     {
-      name: 'customer_name',
-      label: 'Customer Name',
+      name: 'vendor_name',
+      label: 'Vendor Name',
       type: 'text',
       required: true,
-      placeholder: 'Enter customer name'
+      placeholder: 'Enter vendor/supplier name'
     },
     {
-      name: 'customer_email',
-      label: 'Customer Email',
+      name: 'vendor_email',
+      label: 'Vendor Email',
       type: 'email',
-      placeholder: 'customer@example.com'
+      placeholder: 'vendor@example.com'
     },
     {
       name: 'order_date',
@@ -50,21 +50,22 @@ const SalesOrderForm = () => {
     },
     {
       name: 'description',
-      label: 'Description / Terms & Conditions',
+      label: 'Description',
       type: 'textarea',
-      placeholder: 'Order details, payment terms, delivery conditions...'
+      placeholder: 'Purchase order details, items, specifications, payment terms...'
     }
   ];
 
   return (
     <DocumentForm
-      title="Sales Order"
-      documentApi={salesOrderAPI}
+      title="Purchase Order"
+      documentApi={purchaseOrderAPI}
       fields={fields}
-      backPath="/settings/sales-orders"
+      backPath="/settings/purchase-orders"
       allowProjectLinking={true}
     />
   );
 };
 
-export default SalesOrderForm;
+export default PurchaseOrderForm;
+

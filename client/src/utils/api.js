@@ -89,6 +89,16 @@ export const taskAPI = {
   getTimesheets: (id) => api.get(`/tasks/${id}/timesheets`),
 };
 
+// Timesheet APIs
+export const timesheetAPI = {
+  getMy: (params) => api.get('/timesheets/my', { params }),
+  getByProject: (projectId) => api.get(`/timesheets/project/${projectId}`),
+  update: (id, data) => api.put(`/timesheets/${id}`, data),
+  delete: (id) => api.delete(`/timesheets/${id}`),
+  getUserAnalytics: (userId, params) => api.get(`/timesheets/analytics/user/${userId}`, { params }),
+  getProjectAnalytics: (projectId) => api.get(`/timesheets/analytics/project/${projectId}`),
+};
+
 // Sales Order APIs
 export const salesOrderAPI = {
   getAll: (params) => api.get('/sales-orders', { params }),
