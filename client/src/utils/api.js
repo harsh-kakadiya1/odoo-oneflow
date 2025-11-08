@@ -64,15 +64,26 @@ export const projectAPI = {
   create: (data) => api.post('/projects', data),
   update: (id, data) => api.put(`/projects/${id}`, data),
   delete: (id) => api.delete(`/projects/${id}`),
+  getProjectLinks: (id) => api.get(`/projects/${id}/links`),
+  getFinancials: (id) => api.get(`/projects/${id}/financials`),
 };
 
 // Task APIs
 export const taskAPI = {
   getAll: (params) => api.get('/tasks', { params }),
   getById: (id) => api.get(`/tasks/${id}`),
+  getByProject: (projectId, params) => api.get(`/projects/${projectId}/tasks`, { params }),
   create: (data) => api.post('/tasks', data),
   update: (id, data) => api.put(`/tasks/${id}`, data),
   delete: (id) => api.delete(`/tasks/${id}`),
+  logTime: (id, data) => api.post(`/tasks/${id}/time`, data),
+  getTimeEntries: (id) => api.get(`/tasks/${id}/time`),
+  addComment: (id, data) => api.post(`/tasks/${id}/comments`, data),
+  getComments: (id) => api.get(`/tasks/${id}/comments`),
+  uploadAttachment: (id, formData) => api.post(`/tasks/${id}/attachments`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }),
+  getAttachments: (id) => api.get(`/tasks/${id}/attachments`),
   logTimesheet: (id, data) => api.post(`/tasks/${id}/timesheets`, data),
   getTimesheets: (id) => api.get(`/tasks/${id}/timesheets`),
 };
