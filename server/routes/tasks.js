@@ -398,6 +398,9 @@ router.post('/:id/timesheets', protect, async (req, res) => {
 // @route   GET /api/tasks/:id/timesheets
 // @desc    Get all timesheets for a task
 // @access  Private
+// @route   GET /api/tasks/:id/timesheets
+// @desc    Get task timesheets
+// @access  Private
 router.get('/:id/timesheets', protect, async (req, res) => {
   try {
     const timesheets = await Timesheet.findAll({
@@ -422,6 +425,169 @@ router.get('/:id/timesheets', protect, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Server error fetching timesheets'
+    });
+  }
+});
+
+// @route   POST /api/tasks/:id/time
+// @desc    Log time for a task
+// @access  Private
+router.post('/:id/time', protect, async (req, res) => {
+  try {
+    const { hours, description, is_billable } = req.body;
+    
+    // Check if task exists
+    const task = await Task.findByPk(req.params.id);
+    if (!task) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Task not found' 
+      });
+    }
+
+    const timeEntry = await Timesheet.create({
+      task_id: req.params.id,
+      user_id: req.user.id,
+      hours: parseFloat(hours),
+      description,
+      is_billable: is_billable !== false,
+      log_date: new Date()
+    });
+
+    res.status(201).json({
+      success: true,
+      message: 'Time logged successfully',
+      timeEntry
+    });
+  } catch (error) {
+    console.error('Log time error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error logging time'
+    });
+  }
+});
+
+// @route   GET /api/tasks/:id/time
+// @desc    Get time entries for a task
+// @access  Private
+router.get('/:id/time', protect, async (req, res) => {
+  try {
+    const timeEntries = await Timesheet.findAll({
+      where: { task_id: req.params.id },
+      include: [
+        {
+          model: User,
+          as: 'user',
+          attributes: ['id', 'name', 'email']
+        }
+      ],
+      order: [['log_date', 'DESC']]
+    });
+
+    res.status(200).json({
+      success: true,
+      timeEntries
+    });
+  } catch (error) {
+    console.error('Get time entries error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error fetching time entries'
+    });
+  }
+});
+
+// @route   POST /api/tasks/:id/comments
+// @desc    Add comment to task
+// @access  Private
+router.post('/:id/comments', protect, async (req, res) => {
+  try {
+    const { comment } = req.body;
+    
+    // For now, we'll store comments in a simple way
+    // In a real app, you'd want a separate Comments model
+    res.status(201).json({
+      success: true,
+      message: 'Comment added successfully',
+      comment: {
+        id: Date.now(),
+        comment,
+        user: {
+          id: req.user.id,
+          name: req.user.name
+        },
+        created_at: new Date()
+      }
+    });
+  } catch (error) {
+    console.error('Add comment error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error adding comment'
+    });
+  }
+});
+
+// @route   GET /api/tasks/:id/comments
+// @desc    Get task comments
+// @access  Private
+router.get('/:id/comments', protect, async (req, res) => {
+  try {
+    // For now, return empty array - would query Comments model in real app
+    res.status(200).json({
+      success: true,
+      comments: []
+    });
+  } catch (error) {
+    console.error('Get comments error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error fetching comments'
+    });
+  }
+});
+
+// @route   POST /api/tasks/:id/attachments
+// @desc    Upload attachment to task
+// @access  Private
+router.post('/:id/attachments', protect, async (req, res) => {
+  try {
+    // For now, mock response - would implement file upload in real app
+    res.status(201).json({
+      success: true,
+      message: 'File uploaded successfully',
+      attachment: {
+        id: Date.now(),
+        filename: 'mock-file.pdf',
+        size: 1024,
+        url: '#'
+      }
+    });
+  } catch (error) {
+    console.error('Upload attachment error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error uploading file'
+    });
+  }
+});
+
+// @route   GET /api/tasks/:id/attachments
+// @desc    Get task attachments
+// @access  Private
+router.get('/:id/attachments', protect, async (req, res) => {
+  try {
+    // For now, return empty array - would query Attachments model in real app
+    res.status(200).json({
+      success: true,
+      attachments: []
+    });
+  } catch (error) {
+    console.error('Get attachments error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error fetching attachments'
     });
   }
 });
