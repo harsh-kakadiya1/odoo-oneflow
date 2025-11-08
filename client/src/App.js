@@ -15,6 +15,7 @@ import ResetPassword from './pages/Auth/ResetPassword';
 // Main Pages
 import Dashboard from './pages/Dashboard/Dashboard';
 import Projects from './pages/Projects/Projects';
+import Analytics from './pages/Analytics/Analytics';
 import Users from './pages/Users/Users';
 import Profile from './pages/Profile/Profile';
 
@@ -151,10 +152,7 @@ function AppRoutes() {
         path="/analytics"
         element={
           <ProtectedRoute allowedRoles={['Admin', 'Project Manager', 'Sales/Finance']}>
-            <div className="text-center py-12">
-              <h2 className="text-2xl font-bold text-gray-900">Analytics</h2>
-              <p className="text-gray-600 mt-2">Coming soon...</p>
-            </div>
+            <Analytics />
           </ProtectedRoute>
         }
       />
