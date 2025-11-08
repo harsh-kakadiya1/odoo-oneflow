@@ -17,6 +17,7 @@ import Dashboard from './pages/Dashboard/Dashboard';
 import Projects from './pages/Projects/Projects';
 import Analytics from './pages/Analytics/Analytics';
 import ProjectDetail from './pages/Projects/ProjectDetail';
+import Tasks from './pages/Tasks/Tasks';
 import Users from './pages/Users/Users';
 import Profile from './pages/Profile/Profile';
 
@@ -148,10 +149,7 @@ function AppRoutes() {
         path="/tasks"
         element={
           <ProtectedRoute>
-            <div className="text-center py-12">
-              <h2 className="text-2xl font-bold text-gray-900">Tasks</h2>
-              <p className="text-gray-600 mt-2">Coming soon...</p>
-            </div>
+            <Tasks />
           </ProtectedRoute>
         }
       />
