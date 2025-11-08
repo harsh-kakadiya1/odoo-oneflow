@@ -16,6 +16,8 @@ router.get('/', protect, async (req, res) => {
     // Get current user's company_id for multi-tenancy
     const currentUser = await User.findByPk(req.user.id);
     
+    console.log(`Projects request from user: ${currentUser.name} (${currentUser.role}) from company: ${currentUser.company_id}`);
+    
     let where = {
       company_id: currentUser.company_id // Only show projects from user's company
     };
@@ -325,6 +327,14 @@ router.post('/', protect, authorize('Admin', 'Project Manager'), async (req, res
       message: 'Project created successfully',
       project: completeProject
     });
+    // Emit real-time event for new project
+    try {
+      if (global.io) {
+        global.io.emit('project:created', completeProject);
+      }
+    } catch (err) {
+      console.error('Failed to emit project created event:', err);
+    }
   } catch (error) {
     console.error('Create project error:', error);
     res.status(500).json({
@@ -418,6 +428,14 @@ router.put('/:id', protect, async (req, res) => {
         financials
       }
     });
+    // Emit real-time event for updated project
+    try {
+      if (global.io) {
+        global.io.emit('project:updated', { project: updatedProject, financials });
+      }
+    } catch (err) {
+      console.error('Failed to emit project updated event:', err);
+    }
   } catch (error) {
     console.error('Update project error:', error);
     res.status(500).json({
@@ -447,6 +465,14 @@ router.delete('/:id', protect, isProjectManager, async (req, res) => {
       success: true,
       message: 'Project deleted successfully'
     });
+    // Emit real-time deletion event
+    try {
+      if (global.io) {
+        global.io.emit('project:deleted', { id: project.id });
+      }
+    } catch (err) {
+      console.error('Failed to emit project deleted event:', err);
+    }
   } catch (error) {
     console.error('Delete project error:', error);
     res.status(500).json({

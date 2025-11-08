@@ -22,6 +22,14 @@ const createNotification = async (userId, title, message, type = 'info', link = 
       });
     }
 
+    // Emit real-time notification to the specific user's socket room if socket server is available
+    try {
+      if (global.io) {
+        global.io.to(`user_${userId}`).emit('notification', notification);
+      }
+    } catch (emitErr) {
+      console.error('Failed to emit socket notification:', emitErr);
+    }
     return notification;
   } catch (error) {
     console.error('Error creating notification:', error);
@@ -45,6 +53,19 @@ const createBulkNotifications = async (userIds, title, message, type = 'info', l
   } catch (error) {
     console.error('Error creating bulk notifications:', error);
     throw error;
+  }
+};
+
+// Emit bulk notifications over sockets when possible
+const emitBulkNotifications = (userIds, notificationPayload) => {
+  try {
+    if (global.io) {
+      userIds.forEach(id => {
+        global.io.to(`user_${id}`).emit('notification', notificationPayload);
+      });
+    }
+  } catch (err) {
+    console.error('Failed to emit bulk notifications:', err);
   }
 };
 

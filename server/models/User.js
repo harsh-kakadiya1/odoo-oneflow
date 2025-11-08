@@ -8,24 +8,9 @@ const User = sequelize.define('User', {
     primaryKey: true,
     autoIncrement: true
   },
-  firstName: {
-    type: DataTypes.STRING(50),
-    allowNull: false,
-    field: 'first_name'
-  },
-  lastName: {
-    type: DataTypes.STRING(50),
-    allowNull: false,
-    field: 'last_name'
-  },
   name: {
-    type: DataTypes.VIRTUAL,
-    get() {
-      return `${this.firstName} ${this.lastName}`;
-    },
-    set(value) {
-      throw new Error('Do not try to set the `name` value!');
-    }
+    type: DataTypes.STRING(100),
+    allowNull: false
   },
   email: {
     type: DataTypes.STRING(100),

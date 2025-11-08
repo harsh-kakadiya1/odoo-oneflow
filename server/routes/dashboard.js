@@ -17,7 +17,11 @@ router.get('/stats', protect, async (req, res) => {
     const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
 
     // Get current user's company for multi-tenancy
-    const currentUser = await User.findByPk(req.user.id);
+    const currentUser = await User.findByPk(req.user.id, {
+      include: [{ model: require('../models').Company, as: 'company' }]
+    });
+
+    console.log(`Dashboard stats for user: ${currentUser.name} (${currentUser.role}) from company: ${currentUser.company_id}`);
 
     if (req.user.role === 'Admin' || req.user.role === 'Sales/Finance') {
       // Company-wide statistics for Admin and Sales/Finance
@@ -30,34 +34,54 @@ router.get('/stats', protect, async (req, res) => {
         }
       });
 
-      // Total hours logged this week
+      console.log(`Active projects found: ${stats.activeProjects} for company ${currentUser.company_id}`);
+
+      // Total hours logged this week - scoped to company projects
+      const companyProjects = await Project.findAll({
+        where: { company_id: currentUser.company_id },
+        attributes: ['id']
+      });
+      const projectIds = companyProjects.map(p => p.id);
+      
+      const companyTasks = await Task.findAll({
+        where: { project_id: { [Op.in]: projectIds } },
+        attributes: ['id']
+      });
+      const taskIds = companyTasks.map(t => t.id);
+
       const hoursResult = await Timesheet.sum('hours_logged', {
         where: {
+          task_id: { [Op.in]: taskIds },
           log_date: { [Op.gte]: weekAgo }
         }
       });
       stats.hoursLoggedWeek = parseFloat(hoursResult) || 0;
 
-      // Overdue tasks
+      // Overdue tasks - scoped to company projects  
       stats.overdueTasks = await Task.count({
         where: {
+          project_id: { [Op.in]: projectIds },
           due_date: { [Op.lt]: today },
           status: { [Op.notIn]: ['Done'] }
         }
       });
 
-      // Revenue billed this month
+      // Revenue billed this month - scoped to company
       const revenueResult = await CustomerInvoice.sum('amount', {
         where: {
+          company_id: currentUser.company_id,
           invoice_date: { [Op.gte]: monthAgo },
           status: { [Op.in]: ['Sent', 'Paid'] }
         }
       });
       stats.revenueBilledMonth = parseFloat(revenueResult) || 0;
 
-      // Pending expenses count
+      // Pending expenses count - scoped to company projects
       stats.pendingExpenses = await Expense.count({
-        where: { status: 'Pending' }
+        where: { 
+          project_id: { [Op.in]: projectIds },
+          status: 'Pending' 
+        }
       });
 
       // Total projects (only from user's company)
@@ -65,15 +89,23 @@ router.get('/stats', protect, async (req, res) => {
         where: { company_id: currentUser.company_id }
       });
 
-      // Open sales orders
+      // Open sales orders - scoped to company
       stats.openSalesOrders = await require('../models').SalesOrder.count({
-        where: { status: { [Op.in]: ['Draft', 'Confirmed'] } }
+        where: { 
+          company_id: currentUser.company_id,
+          status: { [Op.in]: ['Draft', 'Confirmed'] } 
+        }
       });
 
-      // Unpaid invoices
+      // Unpaid invoices - scoped to company
       stats.unpaidInvoices = await CustomerInvoice.count({
-        where: { status: { [Op.in]: ['Draft', 'Sent'] } }
+        where: { 
+          company_id: currentUser.company_id,
+          status: { [Op.in]: ['Draft', 'Sent'] } 
+        }
       });
+
+      console.log('Dashboard stats calculated:', stats);
 
     } else if (req.user.role === 'Project Manager') {
       // Statistics for Project Manager's projects (within their company)
@@ -327,10 +359,10 @@ router.get('/analytics', protect, async (req, res) => {
 
     // Billable vs Non-billable hours
     const billableHours = await Timesheet.sum('hours_logged', {
-      where: { billable: true }
+      where: { is_billable: true }
     }) || 0;
     const nonBillableHours = await Timesheet.sum('hours_logged', {
-      where: { billable: false }
+      where: { is_billable: false }
     }) || 0;
     const billablePercentage = totalHoursLogged > 0 ? Math.round((billableHours / totalHoursLogged) * 100) : 0;
 
@@ -446,14 +478,14 @@ router.get('/analytics', protect, async (req, res) => {
 
       const billableHours = await Timesheet.sum('hours_logged', {
         where: {
-          billable: true,
+          is_billable: true,
           log_date: { [Op.between]: [monthStart, monthEnd] }
         }
       }) || 0;
 
       const nonBillableHours = await Timesheet.sum('hours_logged', {
         where: {
-          billable: false,
+          is_billable: false,
           log_date: { [Op.between]: [monthStart, monthEnd] }
         }
       }) || 0;
