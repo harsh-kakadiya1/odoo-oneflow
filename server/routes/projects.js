@@ -282,6 +282,24 @@ router.post('/', protect, authorize('Admin', 'Project Manager'), async (req, res
     // Get current user's company for multi-tenancy
     const currentUser = await User.findByPk(req.user.id);
 
+    // Validate and format dates
+    let validStartDate = null;
+    let validEndDate = null;
+
+    if (start_date && start_date !== 'Invalid date') {
+      const parsedStart = new Date(start_date);
+      if (!isNaN(parsedStart.getTime())) {
+        validStartDate = parsedStart;
+      }
+    }
+
+    if (end_date && end_date !== 'Invalid date') {
+      const parsedEnd = new Date(end_date);
+      if (!isNaN(parsedEnd.getTime())) {
+        validEndDate = parsedEnd;
+      }
+    }
+
     // Sanitize budget - convert empty string/null/undefined to 0
     let sanitizedBudget = 0;
     if (budget !== '' && budget !== null && budget !== undefined) {
@@ -295,8 +313,8 @@ router.post('/', protect, authorize('Admin', 'Project Manager'), async (req, res
     const project = await Project.create({
       name,
       description,
-      start_date,
-      end_date,
+      start_date: validStartDate,
+      end_date: validEndDate,
       status: status || 'Planned',
       project_manager_id: pmId,
       company_id: currentUser.company_id, // Associate with company
@@ -392,8 +410,30 @@ router.put('/:id', protect, async (req, res) => {
     // Update fields
     if (name) project.name = name;
     if (description !== undefined) project.description = description;
-    if (start_date) project.start_date = start_date;
-    if (end_date) project.end_date = end_date;
+    
+    // Validate and update dates
+    if (start_date !== undefined) {
+      if (start_date === null || start_date === '') {
+        project.start_date = null;
+      } else if (start_date !== 'Invalid date') {
+        const parsedStart = new Date(start_date);
+        if (!isNaN(parsedStart.getTime())) {
+          project.start_date = parsedStart;
+        }
+      }
+    }
+    
+    if (end_date !== undefined) {
+      if (end_date === null || end_date === '') {
+        project.end_date = null;
+      } else if (end_date !== 'Invalid date') {
+        const parsedEnd = new Date(end_date);
+        if (!isNaN(parsedEnd.getTime())) {
+          project.end_date = parsedEnd;
+        }
+      }
+    }
+    
     if (status) project.status = status;
     
     // Sanitize budget before updating

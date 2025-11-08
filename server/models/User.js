@@ -9,19 +9,22 @@ const User = sequelize.define('User', {
     autoIncrement: true
   },
   firstName: {
-    type: DataTypes.STRING(50),
+    type: DataTypes.STRING(100),
     allowNull: false,
     field: 'first_name'
   },
   lastName: {
-    type: DataTypes.STRING(50),
+    type: DataTypes.STRING(100),
     allowNull: false,
     field: 'last_name'
   },
   name: {
     type: DataTypes.VIRTUAL,
     get() {
-      return `${this.firstName} ${this.lastName}`;
+      return `${this.firstName || ''} ${this.lastName || ''}`.trim();
+    },
+    set(value) {
+      throw new Error('Do not try to set the `name` value directly!');
     }
   },
   email: {

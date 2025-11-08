@@ -1,10 +1,15 @@
-import React from 'react';
-import { useLocation } from 'react-router-dom';
-import { Menu } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Menu, User, LogOut, Settings, Home, ChevronRight } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 import NotificationBell from '../UI/NotificationBell';
 import DarkModeToggle from '../UI/DarkModeToggle';
 
 const Header = ({ onMenuClick }) => {
+  const { user, logout } = useAuth();
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const userMenuRef = useRef(null);
+  const navigate = useNavigate();
   const location = useLocation();
 
   // Get page title based on current route
@@ -42,7 +47,7 @@ const Header = ({ onMenuClick }) => {
   };
 
   return (
-    <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-30">
+    <header className="bg-gray-50 shadow-sm sticky top-0 z-20">
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Mobile menu button */}
@@ -54,11 +59,11 @@ const Header = ({ onMenuClick }) => {
             <Menu className="h-6 w-6" />
           </button>
 
-          {/* Page title */}
-          <div className="hidden md:block">
-            <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
-              {getPageTitle()}
-            </h1>
+          {/* Breadcrumb navigation */}
+          <div className="hidden md:flex items-center space-x-2 text-sm">
+            <Home className="h-4 w-4 text-gray-400" />
+            <ChevronRight className="h-4 w-4 text-gray-400" />
+            <span className="font-semibold text-gray-900">{getPageTitle()}</span>
           </div>
 
           {/* Right side */}

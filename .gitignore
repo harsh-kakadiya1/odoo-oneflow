@@ -49,7 +49,6 @@ tmp/
 *.seed
 *.pid.lock
 
-
 mysql-data/
 
 # Package manager
