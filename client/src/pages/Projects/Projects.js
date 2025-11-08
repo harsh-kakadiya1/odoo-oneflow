@@ -145,10 +145,15 @@ const Projects = () => {
       {projects.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {projects.map((project) => {
-            // Calculate project progress
+            // Calculate project progress based on completed tasks
             const totalTasks = project.tasks?.length || 0;
-            const completedTasks = project.tasks?.filter(t => t.status === 'Done').length || 0;
+            const completedTasks = project.tasks?.filter(t => t.status === 'Done' || t.status === 'Completed').length || 0;
             const progressPercentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+            
+            // Debug logging (remove in production)
+            if (process.env.NODE_ENV === 'development' && totalTasks > 0) {
+              console.log(`Project "${project.name}": ${completedTasks}/${totalTasks} tasks completed (${progressPercentage}%)`);
+            }
 
             return (
               <Link key={project.id} to={`/projects/${project.id}`}>

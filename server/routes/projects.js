@@ -18,9 +18,10 @@ router.get('/', protect, async (req, res) => {
     
     console.log(`Projects request from user: ${currentUser.name} (${currentUser.role}) from company: ${currentUser.company_id}`);
     
-    let where = {
-      company_id: currentUser.company_id // Only show projects from user's company
-    };
+    // Build where clause - handle NULL company_id
+    let where = currentUser.company_id 
+      ? { company_id: currentUser.company_id }
+      : {}; // Show all if no company_id
 
     if (status) {
       where.status = status;
@@ -50,6 +51,12 @@ router.get('/', protect, async (req, res) => {
             attributes: ['id', 'name', 'email', 'role'],
             through: { attributes: [] },
             where: { id: req.user.id }
+          },
+          {
+            model: Task,
+            as: 'tasks',
+            attributes: ['id', 'status'],
+            required: false
           }
         ],
         order: [['created_at', 'DESC']]
@@ -89,6 +96,12 @@ router.get('/', protect, async (req, res) => {
             as: 'members',
             attributes: ['id', 'name', 'email', 'role'],
             through: { attributes: [] }
+          },
+          {
+            model: Task,
+            as: 'tasks',
+            attributes: ['id', 'status'],
+            required: false
           }
         ],
         order: [['created_at', 'DESC']]
@@ -111,6 +124,12 @@ router.get('/', protect, async (req, res) => {
             attributes: ['id', 'name', 'email', 'role'],
             through: { attributes: [] },
             where: { id: req.user.id }
+          },
+          {
+            model: Task,
+            as: 'tasks',
+            attributes: ['id', 'status'],
+            required: false
           }
         ],
         order: [['created_at', 'DESC']]
@@ -148,6 +167,12 @@ router.get('/', protect, async (req, res) => {
             as: 'members',
             attributes: ['id', 'name', 'email', 'role'],
             through: { attributes: [] }
+          },
+          {
+            model: Task,
+            as: 'tasks',
+            attributes: ['id', 'status'],
+            required: false
           }
         ],
         order: [['created_at', 'DESC']]

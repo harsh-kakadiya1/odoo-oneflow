@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Home, 
@@ -23,19 +23,6 @@ const Sidebar = ({ onClose, isExpanded, setIsExpanded }) => {
   const { user, hasRole, logout } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const userMenuRef = useRef(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
-        setShowUserMenu(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
 
   const navigation = [
     {
@@ -101,8 +88,8 @@ const Sidebar = ({ onClose, isExpanded, setIsExpanded }) => {
     >
       {/* Close button for mobile */}
       {onClose && (
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 md:hidden">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Menu</h2>
+        <div className="flex items-center justify-between p-4 border-b border-gray-200 md:hidden">
+          <h2 className="text-lg font-semibold text-gray-900">Menu</h2>
           <button
             onClick={onClose}
             className="p-2 rounded-md text-gray-400 dark:text-gray-300 hover:text-gray-500 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"

@@ -107,8 +107,8 @@ const Analytics = () => {
           <div className="text-red-500 mb-4">
           <AlertCircle className="w-16 h-16 mx-auto" />
           </div>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Error Loading Analytics</h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Error Loading Analytics</h2>
+          <p className="text-gray-600 mb-4">{error}</p>
           <button
             onClick={fetchAnalyticsData}
           className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-2 rounded-lg transition-colors shadow-md"

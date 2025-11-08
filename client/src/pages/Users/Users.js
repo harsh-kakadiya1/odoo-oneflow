@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, Mail, Edit, Trash2 } from 'lucide-react';
+import { Plus, Search, Edit, Trash2 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/UI/Card';
 import Button from '../../components/UI/Button';
 import Input from '../../components/UI/Input';
@@ -414,4 +414,3 @@ const Users = () => {
 };
 
 export default Users;
-

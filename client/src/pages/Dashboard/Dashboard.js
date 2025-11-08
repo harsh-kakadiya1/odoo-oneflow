@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { 
   FolderKanban, 
   Clock, 
@@ -44,26 +44,35 @@ ChartJS.register(
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const location = useLocation();
   const [stats, setStats] = useState(null);
   const [recentProjects, setRecentProjects] = useState([]);
   const [recentTasks, setRecentTasks] = useState([]);
   const [timesheetStats, setTimesheetStats] = useState(null);
+  const [projectStatusData, setProjectStatusData] = useState(null);
+  const [taskCompletionData, setTaskCompletionData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState('All');
 
   useEffect(() => {
-    fetchDashboardData();
-  }, []);
+    // Refresh data when dashboard route is accessed
+    if (location.pathname === '/dashboard') {
+      fetchDashboardData();
+    }
+  }, [location.pathname]); // Refresh when route changes
 
   const fetchDashboardData = async () => {
     try {
+      setLoading(true);
       const weekStart = format(startOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd');
       const weekEnd = format(endOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd');
 
-      const [statsRes, projectsRes, tasksRes, timesheetRes] = await Promise.all([
+      const [statsRes, projectsRes, tasksRes, projectStatusRes, taskCompletionRes, timesheetRes] = await Promise.all([
         dashboardAPI.getStats(),
         dashboardAPI.getRecentProjects(),
         dashboardAPI.getRecentTasks(),
+        dashboardAPI.getProjectStatusChart(),
+        dashboardAPI.getTaskCompletionChart(),
         timesheetAPI.getUserAnalytics(user.id, { startDate: weekStart, endDate: weekEnd }).catch(err => {
           console.error('Error fetching timesheet stats:', err);
           return { data: { analytics: null } };
@@ -73,7 +82,9 @@ const Dashboard = () => {
       console.log('✅ Dashboard API Response:', {
         stats: statsRes.data.stats,
         projectsCount: projectsRes.data.projects?.length || 0,
-        tasksCount: tasksRes.data.tasks?.length || 0
+        tasksCount: tasksRes.data.tasks?.length || 0,
+        projectStatus: projectStatusRes.data.data,
+        taskCompletion: taskCompletionRes.data.data
       });
 
       // Check if user has company_id
@@ -85,6 +96,8 @@ const Dashboard = () => {
       setStats(statsRes.data.stats || {});
       setRecentProjects(projectsRes.data.projects || []);
       setRecentTasks(tasksRes.data.tasks || []);
+      setProjectStatusData(projectStatusRes.data.data || {});
+      setTaskCompletionData(taskCompletionRes.data.data || { labels: [], values: [] });
       setTimesheetStats(timesheetRes.data.analytics || null);
     } catch (error) {
       console.error('❌ Error fetching dashboard data:', error);
@@ -93,6 +106,8 @@ const Dashboard = () => {
       setStats({});
       setRecentProjects([]);
       setRecentTasks([]);
+      setProjectStatusData({});
+      setTaskCompletionData({ labels: [], values: [] });
     } finally {
       setLoading(false);
     }
@@ -123,16 +138,16 @@ const Dashboard = () => {
     ? recentProjects 
     : recentProjects.filter(p => p.status === activeFilter);
 
-  // Chart data - Project Status Distribution
-  const projectStatusData = {
+  // Chart data - Project Status Distribution (using real data from API)
+  const projectStatusChartData = {
     labels: ['Planned', 'In Progress', 'Completed', 'On Hold'],
     datasets: [{
       label: 'Projects',
       data: [
-        recentProjects.filter(p => p.status === 'Planned').length,
-        recentProjects.filter(p => p.status === 'In Progress').length,
-        recentProjects.filter(p => p.status === 'Completed').length,
-        recentProjects.filter(p => p.status === 'On Hold').length
+        projectStatusData?.['Planned'] || 0,
+        projectStatusData?.['In Progress'] || 0,
+        projectStatusData?.['Completed'] || 0,
+        projectStatusData?.['On Hold'] || 0
       ],
       backgroundColor: [
         'rgba(107, 114, 128, 0.8)',
@@ -151,12 +166,12 @@ const Dashboard = () => {
     }]
   };
 
-  // Chart data - Task Progress Over Time
-  const taskProgressData = {
-    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+  // Chart data - Task Progress Over Time (using real data from API)
+  const taskProgressChartData = {
+    labels: taskCompletionData?.labels || ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
     datasets: [{
       label: 'Tasks Completed',
-      data: [12, 19, 15, 25, 22, 30, 28],
+      data: taskCompletionData?.values || [0, 0, 0, 0, 0, 0, 0],
       fill: true,
       borderColor: 'rgb(147, 51, 234)',  // Purple instead of blue
       backgroundColor: 'rgba(147, 51, 234, 0.1)',  // Purple instead of blue
@@ -326,7 +341,7 @@ const Dashboard = () => {
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Overview of all project statuses</p>
           </div>
           <div style={{ height: '280px' }}>
-            <Bar data={projectStatusData} options={chartOptions} />
+            {projectStatusChartData && <Bar data={projectStatusChartData} options={chartOptions} />}
           </div>
           <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
             <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
@@ -341,16 +356,16 @@ const Dashboard = () => {
           <div className="mb-4">
             <h3 className="text-lg font-bold text-gray-900 dark:text-white">Task Completion Trend</h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              <span className="text-green-600 dark:text-green-400 font-semibold">+15%</span> increase in task completion
+              Tasks completed over the last 7 days
             </p>
           </div>
           <div style={{ height: '280px' }}>
-            <Line data={taskProgressData} options={chartOptions} />
+            {taskProgressChartData && <Line data={taskProgressChartData} options={chartOptions} />}
           </div>
           <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
             <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
               <CheckCircle2 className="h-3 w-3 mr-1" />
-              Updated 4 min ago
+              Updated just now
             </p>
           </div>
         </div>
@@ -477,7 +492,7 @@ const Dashboard = () => {
                 ))}
               </div>
             ) : (
-              <p className="text-center text-gray-500 dark:text-gray-400 py-8">No recent tasks</p>
+              <p className="text-center text-gray-500 py-8">No recent tasks</p>
             )}
           </div>
         </div>
