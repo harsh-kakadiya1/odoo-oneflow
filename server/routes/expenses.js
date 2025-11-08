@@ -197,6 +197,14 @@ router.post('/', protect, upload.single('receipt'), async (req, res) => {
       message: 'Expense submitted successfully',
       expense: completeExpense
     });
+    // Emit real-time event for new expense
+    try {
+      if (global.io) {
+        global.io.emit('expense:created', completeExpense);
+      }
+    } catch (err) {
+      console.error('Failed to emit expense created event:', err);
+    }
   } catch (error) {
     console.error('Create expense error:', error);
     res.status(500).json({
@@ -289,6 +297,14 @@ router.put('/:id', protect, async (req, res) => {
       message: 'Expense updated successfully',
       expense: updatedExpense
     });
+    // Emit real-time event for updated expense
+    try {
+      if (global.io) {
+        global.io.emit('expense:updated', updatedExpense);
+      }
+    } catch (err) {
+      console.error('Failed to emit expense updated event:', err);
+    }
   } catch (error) {
     console.error('Update expense error:', error);
     res.status(500).json({
@@ -326,6 +342,14 @@ router.delete('/:id', protect, async (req, res) => {
       success: true,
       message: 'Expense deleted successfully'
     });
+    // Emit real-time event for deleted expense
+    try {
+      if (global.io) {
+        global.io.emit('expense:deleted', { id: expense.id });
+      }
+    } catch (err) {
+      console.error('Failed to emit expense deleted event:', err);
+    }
   } catch (error) {
     console.error('Delete expense error:', error);
     res.status(500).json({

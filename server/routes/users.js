@@ -16,14 +16,18 @@ router.get('/', protect, authorize('Admin', 'Project Manager', 'Sales/Finance'),
     // Get current user's company_id
     const currentUser = await User.findByPk(req.user.id);
     
+    console.log(`Users request from user: ${currentUser.name} (${currentUser.role}) from company: ${currentUser.company_id}`);
+    
     let where = { 
       is_active: true,
       company_id: currentUser.company_id // Only show users from same company
     };
 
-    // Project Managers can only see users they created (within their company)
-    if (req.user.role === 'Project Manager') {
-      where.created_by = req.user.id;
+    // For project creation, all users should be visible to Admins and Project Managers
+    // Only restrict for Team Members
+    if (req.user.role === 'Team Member') {
+      // Team members can only see themselves and their project team members
+      where.id = req.user.id;
     }
 
     if (role) {
@@ -31,10 +35,9 @@ router.get('/', protect, authorize('Admin', 'Project Manager', 'Sales/Finance'),
     }
 
     if (search) {
-      // Build search condition for first_name, last_name, and email
+      // Build search condition for name and email
       where[Op.or] = [
-        { first_name: { [Op.like]: `%${search}%` } },
-        { last_name: { [Op.like]: `%${search}%` } },
+        { name: { [Op.like]: `%${search}%` } },
         { email: { [Op.like]: `%${search}%` } }
       ];
     }
@@ -51,7 +54,7 @@ router.get('/', protect, authorize('Admin', 'Project Manager', 'Sales/Finance'),
         {
           model: User,
           as: 'creator',
-          attributes: ['id', 'firstName', 'lastName', 'email']
+          attributes: ['id', 'name', 'email']
         }
       ],
       order: [['created_at', 'DESC']]

@@ -89,8 +89,7 @@ router.post('/signup', async (req, res) => {
 
     // Create user with company association
     const user = await User.create({
-      firstName,
-      lastName,
+      name: `${firstName} ${lastName}`,
       email,
       password_hash: password,
       role,
@@ -346,13 +345,8 @@ router.post('/reset-password/:token', async (req, res) => {
       token,
       user: {
         id: user.id,
-        firstName: user.firstName,
-        lastName: user.lastName,
         name: user.name,
         email: user.email,
-        phone: user.phone,
-        department: user.department,
-        employeeId: user.employeeId,
         role: user.role
       }
     });

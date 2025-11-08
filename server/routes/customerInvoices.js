@@ -171,6 +171,11 @@ router.post('/', protect, authorize('Admin', 'Sales/Finance', 'Project Manager')
       ]
     });
 
+    // Emit socket event for real-time updates
+    if (global.io) {
+      global.io.emit('invoice:created', completeInvoice);
+    }
+
     res.status(201).json({
       success: true,
       message: 'Customer invoice created successfully',
@@ -228,6 +233,11 @@ router.put('/:id', protect, authorize('Admin', 'Sales/Finance', 'Project Manager
         }
       ]
     });
+
+    // Emit socket event for real-time updates
+    if (global.io) {
+      global.io.emit('invoice:updated', updatedInvoice);
+    }
 
     res.status(200).json({
       success: true,

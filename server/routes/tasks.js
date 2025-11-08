@@ -183,6 +183,11 @@ router.post('/', protect, async (req, res) => {
       ]
     });
 
+    // Emit socket event for real-time updates
+    if (global.io) {
+      global.io.emit('task:created', completeTask);
+    }
+
     res.status(201).json({
       success: true,
       message: 'Task created successfully',
@@ -272,6 +277,11 @@ router.put('/:id', protect, async (req, res) => {
       ]
     });
 
+    // Emit socket event for real-time updates
+    if (global.io) {
+      global.io.emit('task:updated', updatedTask);
+    }
+
     res.status(200).json({
       success: true,
       message: 'Task updated successfully',
@@ -314,6 +324,11 @@ router.delete('/:id', protect, async (req, res) => {
     }
 
     await task.destroy();
+
+    // Emit socket event for real-time updates
+    if (global.io) {
+      global.io.emit('task:deleted', { id: task.id });
+    }
 
     res.status(200).json({
       success: true,
@@ -380,6 +395,11 @@ router.post('/:id/timesheets', protect, async (req, res) => {
         }
       ]
     });
+
+    // Emit socket event for real-time updates
+    if (global.io) {
+      global.io.emit('timesheet:created', completeTimesheet);
+    }
 
     res.status(201).json({
       success: true,
