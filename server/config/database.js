@@ -31,10 +31,11 @@ const connectDB = async () => {
     console.log('✅ MySQL Database connected successfully');
     
     // Sync all models
-    if (process.env.NODE_ENV === 'development') {
-      await sequelize.sync({ alter: true });
-      console.log('✅ Database models synchronized');
-    }
+    // Temporarily disabled - use manual migrations instead
+    // if (process.env.NODE_ENV === 'development') {
+    //   await sequelize.sync({ alter: true });
+    //   console.log('✅ Database models synchronized');
+    // }
   } catch (error) {
     console.error('❌ Unable to connect to the database:', error.message);
     process.exit(1);

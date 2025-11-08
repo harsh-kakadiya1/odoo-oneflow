@@ -1,24 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
 import Button from '../../components/UI/Button';
 import Input from '../../components/UI/Input';
+import PasswordStrengthIndicator from '../../components/UI/PasswordStrengthIndicator';
 import { FileText, Eye, EyeOff } from 'lucide-react';
 import { authAPI } from '../../utils/api';
 import toast from 'react-hot-toast';
+import { validateEmail, validatePassword, validateName } from '../../utils/validation';
+import { fetchCountries } from '../../services/currencyService';
 
 const Register = () => {
   const [formData, setFormData] = useState({
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    companyName: '',
+    country: '',
+    currency: 'USD'
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [countries, setCountries] = useState([]);
+  const [loadingCountries, setLoadingCountries] = useState(false);
   const navigate = useNavigate();
+
+  // Load countries on mount
+  useEffect(() => {
+    const loadCountries = async () => {
+      setLoadingCountries(true);
+      try {
+        const data = await fetchCountries();
+        setCountries(data);
+      } catch (error) {
+        console.error('Error loading countries:', error);
+        toast.error('Failed to load countries list');
+      } finally {
+        setLoadingCountries(false);
+      }
+    };
+    loadCountries();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -33,27 +58,69 @@ const Register = () => {
         [name]: ''
       });
     }
+
+    // Auto-update currency when country changes
+    if (name === 'country') {
+      const countryData = countries.find(c => c.code === value);
+      if (countryData) {
+        setFormData(prev => ({
+          ...prev,
+          [name]: value,
+          currency: countryData.currency || 'USD'
+        }));
+      }
+    }
   };
 
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.name.trim()) {
-      newErrors.name = 'Full name is required';
+    // First name validation
+    const firstNameValidation = validateName(formData.firstName, 'First name');
+    if (!firstNameValidation.isValid) {
+      newErrors.firstName = firstNameValidation.message;
     }
 
+    // Last name validation
+    const lastNameValidation = validateName(formData.lastName, 'Last name');
+    if (!lastNameValidation.isValid) {
+      newErrors.lastName = lastNameValidation.message;
+    }
+
+    // Email validation
     if (!formData.email) {
       newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email is invalid';
+    } else if (!validateEmail(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
     }
 
+    // Company name validation
+    if (!formData.companyName || formData.companyName.trim().length < 2) {
+      newErrors.companyName = 'Company name must be at least 2 characters long';
+    } else if (formData.companyName.trim().length > 50) {
+      newErrors.companyName = 'Company name must be less than 50 characters';
+    }
+
+    // Country validation
+    if (!formData.country) {
+      newErrors.country = 'Please select a country';
+    }
+
+    // Password validation
+    const passwordValidation = validatePassword(formData.password);
     if (!formData.password) {
       newErrors.password = 'Password is required';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+    } else if (!passwordValidation.isValid) {
+      const missing = [];
+      if (!passwordValidation.hasMinLength) missing.push('at least 8 characters');
+      if (!passwordValidation.hasUpperCase) missing.push('one uppercase letter');
+      if (!passwordValidation.hasLowerCase) missing.push('one lowercase letter');
+      if (!passwordValidation.hasNumber) missing.push('one number');
+      if (!passwordValidation.hasSpecialChar) missing.push('one special character');
+      newErrors.password = `Password must contain ${missing.join(', ')}`;
     }
 
+    // Confirm password validation
     if (!formData.confirmPassword) {
       newErrors.confirmPassword = 'Please confirm your password';
     } else if (formData.password !== formData.confirmPassword) {
@@ -74,9 +141,13 @@ const Register = () => {
     setIsSubmitting(true);
     try {
       const response = await authAPI.signup({
-        name: formData.name,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
         email: formData.email,
-        password: formData.password
+        password: formData.password,
+        companyName: formData.companyName,
+        country: formData.country,
+        currency: formData.currency
       });
 
       // Store token and user
@@ -109,29 +180,41 @@ const Register = () => {
             Create your account
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Already have an account?{' '}
+            Or{' '}
             <Link
               to="/login"
               className="font-medium text-primary-600 hover:text-primary-500"
             >
-              Sign in
+              sign in to your existing account
             </Link>
           </p>
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit} noValidate>
           <div className="space-y-4">
-            <Input
-              label="Full Name"
-              name="name"
-              type="text"
-              autoComplete="name"
-              required
-              value={formData.name}
-              onChange={handleChange}
-              error={errors.name}
-              placeholder="Enter your full name"
-            />
+            <div className="grid grid-cols-2 gap-4">
+              <Input
+                label="First name"
+                name="firstName"
+                type="text"
+                required
+                value={formData.firstName}
+                onChange={handleChange}
+                error={errors.firstName}
+                placeholder="First name"
+              />
+              
+              <Input
+                label="Last name"
+                name="lastName"
+                type="text"
+                required
+                value={formData.lastName}
+                onChange={handleChange}
+                error={errors.lastName}
+                placeholder="Last name"
+              />
+            </div>
 
             <Input
               label="Email address"
@@ -145,6 +228,61 @@ const Register = () => {
               placeholder="Enter your email"
             />
 
+            <Input
+              label="Company name"
+              name="companyName"
+              type="text"
+              required
+              value={formData.companyName}
+              onChange={handleChange}
+              error={errors.companyName}
+              placeholder="Enter your company name"
+            />
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="country" className="block text-sm font-medium text-gray-700">
+                  Country <span className="text-red-500">*</span>
+                </label>
+                <select
+                  id="country"
+                  name="country"
+                  required
+                  value={formData.country}
+                  onChange={handleChange}
+                  disabled={loadingCountries}
+                  className={`mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 ${
+                    errors.country ? 'border-red-500 focus:border-red-500' : ''
+                  } ${loadingCountries ? 'bg-gray-100' : ''}`}
+                >
+                  <option value="">Select country</option>
+                  {countries.map((country) => (
+                    <option key={country.code} value={country.code}>
+                      {country.name}
+                    </option>
+                  ))}
+                </select>
+                {errors.country && (
+                  <p className="mt-1 text-sm text-red-600">{errors.country}</p>
+                )}
+                {loadingCountries && (
+                  <p className="mt-1 text-sm text-gray-500">Loading countries...</p>
+                )}
+              </div>
+
+              <Input
+                label="Currency"
+                name="currency"
+                type="text"
+                required
+                value={formData.currency}
+                onChange={handleChange}
+                placeholder="Currency"
+                readOnly
+                className="bg-gray-50"
+              />
+            </div>
+
             <div>
               <div className="relative">
                 <Input
@@ -156,7 +294,7 @@ const Register = () => {
                   value={formData.password}
                   onChange={handleChange}
                   error={errors.password}
-                  placeholder="Enter your password (min 6 characters)"
+                  placeholder="Create a password"
                 />
                 <button
                   type="button"
@@ -170,12 +308,13 @@ const Register = () => {
                   )}
                 </button>
               </div>
+              <PasswordStrengthIndicator password={formData.password} />
             </div>
 
             <div>
               <div className="relative">
                 <Input
-                  label="Confirm Password"
+                  label="Confirm password"
                   name="confirmPassword"
                   type={showConfirmPassword ? 'text' : 'password'}
                   autoComplete="new-password"
@@ -211,7 +350,7 @@ const Register = () => {
               type="submit"
               className="w-full"
               loading={isSubmitting}
-              disabled={isSubmitting}
+              disabled={isSubmitting || loadingCountries}
             >
               Create Account
             </Button>
@@ -223,4 +362,3 @@ const Register = () => {
 };
 
 export default Register;
-

@@ -79,13 +79,13 @@ router.get('/:id', protect, async (req, res) => {
 // @access  Private (Admin)
 router.post('/', protect, authorize('Admin'), async (req, res) => {
   try {
-    const { name, email, role, hourly_rate } = req.body;
+    const { firstName, lastName, email, role, hourly_rate } = req.body;
 
     // Validate input
-    if (!name || !email || !role) {
+    if (!firstName || !lastName || !email || !role) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide name, email, and role'
+        message: 'Please provide first name, last name, email, and role'
       });
     }
 
@@ -102,12 +102,17 @@ router.post('/', protect, authorize('Admin'), async (req, res) => {
     // Generate temporary password
     const temporaryPassword = generatePassword();
 
+    // Get admin's company_id to associate new user with same company
+    const adminUser = await User.findByPk(req.user.id);
+    
     // Create user
     const user = await User.create({
-      name,
+      firstName,
+      lastName,
       email,
       password_hash: temporaryPassword,
       role,
+      company_id: adminUser.company_id,
       hourly_rate: hourly_rate || 0,
       is_active: true
     });
@@ -124,6 +129,8 @@ router.post('/', protect, authorize('Admin'), async (req, res) => {
       message: 'User created successfully. Credentials sent via email.',
       user: {
         id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
         name: user.name,
         email: user.email,
         role: user.role,
@@ -161,7 +168,7 @@ router.put('/:id', protect, async (req, res) => {
       });
     }
 
-    const { name, email, role, hourly_rate } = req.body;
+    const { firstName, lastName, email, role, hourly_rate } = req.body;
 
     // Only admin can change role and hourly_rate
     if ((role || hourly_rate !== undefined) && req.user.role !== 'Admin') {
@@ -172,7 +179,8 @@ router.put('/:id', protect, async (req, res) => {
     }
 
     // Update fields
-    if (name) user.name = name;
+    if (firstName) user.firstName = firstName;
+    if (lastName) user.lastName = lastName;
     if (email) user.email = email;
     if (role && req.user.role === 'Admin') user.role = role;
     if (hourly_rate !== undefined && req.user.role === 'Admin') user.hourly_rate = hourly_rate;
@@ -184,6 +192,8 @@ router.put('/:id', protect, async (req, res) => {
       message: 'User updated successfully',
       user: {
         id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
         name: user.name,
         email: user.email,
         role: user.role,
