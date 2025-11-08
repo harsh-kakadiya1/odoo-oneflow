@@ -49,6 +49,14 @@ const Company = sequelize.define('Company', {
     allowNull: false,
     defaultValue: 'USD'
   },
+  address: {
+    type: DataTypes.TEXT,
+    allowNull: true
+  },
+  logo: {
+    type: DataTypes.STRING(255),
+    allowNull: true
+  },
   is_active: {
     type: DataTypes.BOOLEAN,
     defaultValue: true

@@ -10,8 +10,23 @@ const app = express();
 connectDB();
 
 // Middleware
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  'http://localhost:3000',
+  'http://localhost:3001'
+].filter(Boolean);
+
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 
@@ -31,6 +46,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Import routes
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
+const companyRoutes = require('./routes/companies');
 const projectRoutes = require('./routes/projects');
 const taskRoutes = require('./routes/tasks');
 const salesOrderRoutes = require('./routes/salesOrders');
@@ -44,6 +60,7 @@ const dashboardRoutes = require('./routes/dashboard');
 // Mount routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/companies', companyRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/sales-orders', salesOrderRoutes);
@@ -85,14 +102,14 @@ const PORT = process.env.PORT || 5000;
 const server = app.listen(PORT, () => {
   console.log(`🚀 OneFlow Server running on port ${PORT}`);
   console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🌐 Client URL: ${process.env.CLIENT_URL || 'http://localhost:3000'}`);
+  console.log(`🌐 Allowed origins: ${allowedOrigins.join(', ')}`);
 });
 
 // Socket.IO setup for real-time notifications
 const socketIO = require('socket.io');
 const io = socketIO(server, {
   cors: {
-    origin: process.env.CLIENT_URL || 'http://localhost:3000',
+    origin: allowedOrigins,
     credentials: true
   }
 });

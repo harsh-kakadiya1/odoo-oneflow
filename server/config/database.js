@@ -30,10 +30,10 @@ const connectDB = async () => {
     await sequelize.authenticate();
     console.log('✅ MySQL Database connected successfully');
     
-    // Sync all models
-    // Temporarily disabled - use manual migrations instead
+    // Sync all models - using force: false to avoid altering existing tables
+    // For fresh setup, manually run the SQL migration or use force: true once
     // if (process.env.NODE_ENV === 'development') {
-    //   await sequelize.sync({ alter: true });
+    //   await sequelize.sync({ force: true }); // WARNING: This drops all tables!
     //   console.log('✅ Database models synchronized');
     // }
   } catch (error) {

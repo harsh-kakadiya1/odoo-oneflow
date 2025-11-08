@@ -119,9 +119,15 @@ router.post('/signup', async (req, res) => {
     });
   } catch (error) {
     console.error('Signup error:', error);
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
     res.status(500).json({
       success: false,
-      message: 'Server error during signup'
+      message: 'Server error during signup',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
@@ -202,6 +208,11 @@ router.post('/login', async (req, res) => {
 router.get('/me', protect, async (req, res) => {
   try {
     const user = await User.findByPk(req.user.id, {
+      include: [{
+        model: Company,
+        as: 'company',
+        attributes: ['id', 'name', 'country', 'currency']
+      }],
       attributes: { exclude: ['password_hash', 'reset_password_token', 'reset_password_expire'] }
     });
 

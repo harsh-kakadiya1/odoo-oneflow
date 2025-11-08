@@ -6,14 +6,15 @@ import { useAuth } from '../../contexts/AuthContext';
 import toast from 'react-hot-toast';
 import { validateEmail, validateName } from '../../utils/validation';
 
-const UserForm = ({ onSuccess, onCancel }) => {
+const UserForm = ({ onSuccess, onCancel, editMode = false, existingUser = null }) => {
   const { user } = useAuth();
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    role: 'Team Member',
-    hourly_rate: '0'
+    firstName: existingUser?.firstName || '',
+    lastName: existingUser?.lastName || '',
+    email: existingUser?.email || '',
+    role: existingUser?.role || 'Team Member',
+    hourly_rate: existingUser?.hourly_rate || '0',
+    can_manage_users: existingUser?.can_manage_users || false
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -60,11 +61,18 @@ const UserForm = ({ onSuccess, onCancel }) => {
 
     setLoading(true);
     try {
-      await userAPI.create(formData);
-      toast.success('User created successfully! Credentials have been sent via email.');
+      if (editMode) {
+        // Update existing user
+        await userAPI.update(existingUser.id, formData);
+        toast.success('User updated successfully!');
+      } else {
+        // Create new user
+        await userAPI.create(formData);
+        toast.success('User created successfully! Credentials have been sent via email.');
+      }
       onSuccess();
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to create user');
+      toast.error(error.response?.data?.message || (editMode ? 'Failed to update user' : 'Failed to create user'));
     } finally {
       setLoading(false);
     }
@@ -149,18 +157,44 @@ const UserForm = ({ onSuccess, onCancel }) => {
         helperText="Used for timesheet cost calculations"
       />
 
-      <div className="bg-primary-50 border border-primary-200 rounded-lg p-4">
-        <p className="text-sm text-primary-800">
-          <strong>Note:</strong> A temporary password will be automatically generated and sent to the user's email address. They can change it after their first login.
-        </p>
-      </div>
+      {/* Permission checkbox - Only for Admins creating Project Managers */}
+      {user?.role === 'Admin' && formData.role === 'Project Manager' && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-start">
+            <input
+              type="checkbox"
+              id="can_manage_users"
+              name="can_manage_users"
+              checked={formData.can_manage_users}
+              onChange={(e) => setFormData({ ...formData, can_manage_users: e.target.checked })}
+              className="mt-1 h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+            />
+            <label htmlFor="can_manage_users" className="ml-3">
+              <span className="block text-sm font-medium text-gray-900">
+                Grant User Management Permission
+              </span>
+              <span className="block text-sm text-gray-600">
+                Allow this Project Manager to add, edit, and delete Team Members
+              </span>
+            </label>
+          </div>
+        </div>
+      )}
+
+      {!editMode && (
+        <div className="bg-primary-50 border border-primary-200 rounded-lg p-4">
+          <p className="text-sm text-primary-800">
+            <strong>Note:</strong> A temporary password will be automatically generated and sent to the user's email address. They can change it after their first login.
+          </p>
+        </div>
+      )}
 
       <div className="flex items-center justify-end space-x-3 pt-4">
         <Button type="button" variant="secondary" onClick={onCancel}>
           Cancel
         </Button>
         <Button type="submit" loading={loading} disabled={loading}>
-          Create User
+          {editMode ? 'Update User' : 'Create User'}
         </Button>
       </div>
     </form>

@@ -6,6 +6,9 @@ import { NotificationProvider } from './contexts/NotificationContext';
 import LoadingSpinner from './components/UI/LoadingSpinner';
 import Layout from './components/Layout/Layout';
 
+// Public Pages
+import Home from './pages/Home/Home';
+
 // Auth Pages
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
@@ -82,6 +85,9 @@ const PublicRoute = ({ children }) => {
 function AppRoutes() {
   return (
     <Routes>
+      {/* Home Page */}
+      <Route path="/" element={<Home />} />
+
       {/* Public Routes */}
       <Route
         path="/login"
@@ -259,7 +265,7 @@ function AppRoutes() {
       <Route
         path="/users"
         element={
-          <ProtectedRoute allowedRoles={['Admin']}>
+          <ProtectedRoute allowedRoles={['Admin', 'Project Manager']}>
             <Users />
           </ProtectedRoute>
         }
@@ -274,9 +280,8 @@ function AppRoutes() {
         }
       />
 
-      {/* Default redirect */}
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      {/* Default redirect for unknown routes */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
