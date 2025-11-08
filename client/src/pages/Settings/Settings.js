@@ -76,14 +76,7 @@ const Settings = () => {
   }
 
   return (
-    <div className="container mx-auto px-6 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Settings</h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-2">
-          Manage global lists and configurations for your business documents
-        </p>
-      </div>
-
+    <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {settingsModules.map((module, index) => (
           <SettingsCard key={index} {...module} />

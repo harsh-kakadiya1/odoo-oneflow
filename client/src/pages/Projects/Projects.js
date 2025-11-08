@@ -70,56 +70,42 @@ const Projects = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            {user?.role === 'Project Manager' ? 'My Projects' : 'Projects'}
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
-            {user?.role === 'Admin' && 'Manage all projects and track progress'}
-            {user?.role === 'Project Manager' && 'Manage your projects and team members'}
-            {user?.role === 'Team Member' && 'View your assigned projects'}
-            {user?.role === 'Sales/Finance' && 'View all projects and financials'}
-          </p>
+      {/* Search, Filter, and Action Bar */}
+      <div className="flex flex-col sm:flex-row gap-4 items-center">
+        {/* Search Bar */}
+        <div className="flex-1 w-full">
+          <Input
+            placeholder="Search projects..."
+            value={filters.search}
+            onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+          />
         </div>
+
+        {/* Status Filter */}
+        <select
+          value={filters.status}
+          onChange={(e) => {
+            setFilters({ ...filters, status: e.target.value });
+            fetchProjects();
+          }}
+          className="w-full sm:w-48 px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+        >
+          <option value="">All Status</option>
+          <option value="Planned">Planned</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Completed">Completed</option>
+          <option value="On Hold">On Hold</option>
+        </select>
+
+        {/* New Project Button */}
         {hasRole(['Admin', 'Project Manager']) && (
-          <Button onClick={() => setShowCreateModal(true)}>
+          <Button onClick={() => setShowCreateModal(true)} className="w-full sm:w-auto whitespace-nowrap">
             <Plus className="h-4 w-4 mr-2" />
             New Project
           </Button>
         )}
       </div>
-
-      {/* Filters */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="md:col-span-2">
-              <Input
-                placeholder="Search projects..."
-                value={filters.search}
-                onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-              />
-            </div>
-            <select
-              value={filters.status}
-              onChange={(e) => {
-                setFilters({ ...filters, status: e.target.value });
-                fetchProjects();
-              }}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-            >
-              <option value="">All Status</option>
-              <option value="Planned">Planned</option>
-              <option value="In Progress">In Progress</option>
-              <option value="Completed">Completed</option>
-              <option value="On Hold">On Hold</option>
-            </select>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Projects Grid */}
       {projects.length > 0 ? (

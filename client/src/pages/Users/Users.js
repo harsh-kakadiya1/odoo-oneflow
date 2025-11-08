@@ -181,70 +181,58 @@ const Users = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            {user?.role === 'Project Manager' ? 'Team Members' : 'Users'}
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
-            {user?.role === 'Project Manager' 
-              ? 'Manage your team members'
-              : 'Manage user accounts and permissions'}
-          </p>
+      {/* Search, Filters and Action Bar */}
+      <div className="flex flex-col lg:flex-row gap-4 items-center">
+        {/* Search Bar */}
+        <div className="flex-1 w-full">
+          <Input
+            placeholder="Search users by name or email..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && fetchUsers()}
+          />
         </div>
-        <Button onClick={() => setShowCreateModal(true)}>
+
+        {/* Role Filter */}
+        <select
+          value={roleFilter}
+          onChange={(e) => setRoleFilter(e.target.value)}
+          className="w-full lg:w-48 px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+        >
+          <option value="">All Roles</option>
+          <option value="Admin">Admin</option>
+          <option value="Project Manager">Project Manager</option>
+          <option value="Team Member">Team Member</option>
+          <option value="Sales/Finance">Sales/Finance</option>
+        </select>
+
+        {/* Sort By */}
+        <select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+          className="w-full lg:w-48 px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+        >
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+          <option value="name-asc">Name (A-Z)</option>
+          <option value="name-desc">Name (Z-A)</option>
+          <option value="manager-first">Managers First</option>
+          <option value="member-first">Members First</option>
+          <option value="hourly-rate-high">Hourly Rate (High-Low)</option>
+          <option value="hourly-rate-low">Hourly Rate (Low-High)</option>
+        </select>
+
+        {/* Add User Button */}
+        <Button onClick={() => setShowCreateModal(true)} className="w-full lg:w-auto whitespace-nowrap">
           <Plus className="h-4 w-4 mr-2" />
           {user?.role === 'Project Manager' ? 'Add Team Member' : 'Add User'}
         </Button>
       </div>
 
-      {/* Search and Filters */}
+      {/* Info Row */}
       <Card>
         <CardContent className="p-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="md:col-span-2">
-              <Input
-                placeholder="Search users by name or email..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && fetchUsers()}
-              />
-            </div>
-            
-            <div>
-              <select
-                value={roleFilter}
-                onChange={(e) => setRoleFilter(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-              >
-                <option value="">All Roles</option>
-                <option value="Admin">Admin</option>
-                <option value="Project Manager">Project Manager</option>
-                <option value="Team Member">Team Member</option>
-                <option value="Sales/Finance">Sales/Finance</option>
-              </select>
-            </div>
-
-            <div>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-              >
-                <option value="newest">Newest First</option>
-                <option value="oldest">Oldest First</option>
-                <option value="name-asc">Name (A-Z)</option>
-                <option value="name-desc">Name (Z-A)</option>
-                <option value="manager-first">Managers First</option>
-                <option value="member-first">Members First</option>
-                <option value="hourly-rate-high">Hourly Rate (High-Low)</option>
-                <option value="hourly-rate-low">Hourly Rate (Low-High)</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="mt-3 flex items-center justify-between">
+          <div className="flex items-center justify-between">
             <div className="text-sm text-gray-600 dark:text-gray-400">
               Showing {filteredUsers.length} of {users.length} users
               {roleFilter && ` • Filtered by: ${roleFilter}`}

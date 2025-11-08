@@ -61,21 +61,12 @@ const Analytics = () => {
   }
 
   return (
-    <div className="container mx-auto px-6 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Analytics Dashboard</h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-2">Monitor project performance, resource utilization, and key metrics</p>
-      </div>
-
+    <div className="space-y-6">
       {/* KPI Cards */}
-      <div className="mb-8">
-        <KpiCards data={analyticsData?.kpis} />
-      </div>
+      <KpiCards data={analyticsData?.kpis} />
 
       {/* Charts Section */}
-      <div className="space-y-8">
-        <AnalyticsCharts data={analyticsData?.charts} />
-      </div>
+      <AnalyticsCharts data={analyticsData?.charts} />
     </div>
   );
 };

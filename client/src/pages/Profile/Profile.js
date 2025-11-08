@@ -216,11 +216,6 @@ const Profile = () => {
 
   return (
     <div className="space-y-6 max-w-5xl">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Profile Settings</h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-1">Manage your account and company information</p>
-      </div>
-
       {/* User Info Card */}
       <Card>
         <CardContent className="p-6">
