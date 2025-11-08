@@ -76,11 +76,21 @@ const ProjectForm = ({ project, onSuccess, onCancel }) => {
 
     setLoading(true);
     try {
+      // Format the data before sending
+      const dataToSend = {
+        ...formData,
+        // Convert empty date strings to null
+        start_date: formData.start_date || null,
+        end_date: formData.end_date || null,
+        // Ensure budget is a number or null
+        budget: formData.budget ? parseFloat(formData.budget) : null
+      };
+
       if (project) {
-        await projectAPI.update(project.id, formData);
+        await projectAPI.update(project.id, dataToSend);
         toast.success('Project updated successfully');
       } else {
-        await projectAPI.create(formData);
+        await projectAPI.create(dataToSend);
         toast.success('Project created successfully');
       }
       onSuccess();

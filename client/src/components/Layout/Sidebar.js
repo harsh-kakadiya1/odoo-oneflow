@@ -15,7 +15,7 @@ import {
 import { useAuth } from '../../contexts/AuthContext';
 import { clsx } from 'clsx';
 
-const Sidebar = ({ onClose }) => {
+const Sidebar = ({ onClose, isExpanded, setIsExpanded }) => {
   const location = useLocation();
   const { user, hasRole } = useAuth();
 
@@ -48,14 +48,7 @@ const Sidebar = ({ onClose }) => {
       name: 'Settings',
       href: '/settings',
       icon: Settings,
-      roles: ['Admin', 'Sales/Finance', 'Project Manager'],
-      children: [
-        { name: 'Sales Orders', href: '/settings/sales-orders' },
-        { name: 'Purchase Orders', href: '/settings/purchase-orders' },
-        { name: 'Customer Invoices', href: '/settings/customer-invoices' },
-        { name: 'Vendor Bills', href: '/settings/vendor-bills' },
-        { name: 'Expenses', href: '/settings/expenses' }
-      ]
+      roles: ['Admin', 'Sales/Finance', 'Project Manager']
     },
     {
       name: 'Users',
@@ -80,39 +73,51 @@ const Sidebar = ({ onClose }) => {
   };
 
   return (
-    <div className="flex flex-col h-full bg-white border-r border-gray-200">
+    <div 
+      className={clsx(
+        "flex flex-col h-full bg-white rounded-2xl shadow-2xl overflow-hidden transition-all duration-300 ease-in-out",
+        isExpanded ? "w-64" : "w-20"
+      )}
+      onMouseEnter={() => setIsExpanded && setIsExpanded(true)}
+      onMouseLeave={() => setIsExpanded && setIsExpanded(false)}
+    >
       {/* Close button for mobile */}
       {onClose && (
         <div className="flex items-center justify-between p-4 border-b border-gray-200 md:hidden">
           <h2 className="text-lg font-semibold text-gray-900">Menu</h2>
           <button
             onClick={onClose}
-            className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 transition-colors"
+            className="p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
       )}
 
-      {/* Logo/Brand */}
-      <div className="p-4 border-b border-gray-200">
-        <div className="flex items-center space-x-3">
-          <div className="h-10 w-10 bg-primary-600 rounded-lg flex items-center justify-center">
+      {/* Logo/Brand - FIXED at top (always shows on hover) */}
+      <div className="p-4 border-b border-gray-200 flex-shrink-0">
+        <div className={clsx(
+          "flex items-center transition-all duration-300",
+          isExpanded ? "justify-start" : "justify-center"
+        )}>
+          <div className="h-10 w-10 bg-primary-600 rounded-lg flex items-center justify-center shadow-md flex-shrink-0">
             <FileText className="h-6 w-6 text-white" />
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-base font-bold text-gray-900">
-              OneFlow
-            </p>
-            <p className="text-xs text-gray-500">
-              Project Management
-            </p>
-          </div>
+          {isExpanded && (
+            <div className="ml-3 flex-1 min-w-0 overflow-hidden opacity-100 transition-opacity duration-300">
+              <p className="text-base font-bold text-gray-900 whitespace-nowrap">
+                OneFlow
+              </p>
+              <p className="text-xs text-gray-500 whitespace-nowrap">
+                Project Management
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
+      {/* Navigation - EXPANDABLE from this line */}
+      <nav className="flex-1 px-3 py-4 space-y-2 overflow-y-auto">
         {filteredNavigation.map((item) => {
           const Icon = item.icon;
           const active = isActive(item.href);
@@ -123,62 +128,51 @@ const Sidebar = ({ onClose }) => {
                 to={item.href}
                 onClick={onClose}
                 className={clsx(
-                  'group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors',
+                  'group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-200 shadow-sm',
                   active
-                    ? 'bg-primary-100 text-primary-700'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    ? 'bg-primary-600 text-white shadow-md'
+                    : 'text-gray-700 hover:bg-gray-100 hover:shadow-md',
+                  !isExpanded && 'justify-center'
                 )}
+                title={!isExpanded ? item.name : ''}
               >
                 <Icon
                   className={clsx(
-                    'mr-3 h-5 w-5 flex-shrink-0',
-                    active
-                      ? 'text-primary-500'
-                      : 'text-gray-400 group-hover:text-gray-500'
+                    'h-5 w-5 flex-shrink-0 transition-colors',
+                    active ? 'text-white' : 'text-gray-500 group-hover:text-gray-700',
+                    isExpanded && 'mr-3'
                   )}
                 />
-                {item.name}
+                {isExpanded && (
+                  <span className="whitespace-nowrap overflow-hidden">
+                    {item.name}
+                  </span>
+                )}
               </Link>
-              
-              {/* Sub-menu for Settings */}
-              {item.children && active && (
-                <div className="ml-8 mt-1 space-y-1">
-                  {item.children.map((child) => (
-                    <Link
-                      key={child.href}
-                      to={child.href}
-                      onClick={onClose}
-                      className={clsx(
-                        'block px-3 py-1.5 text-xs rounded-md transition-colors',
-                        location.pathname === child.href
-                          ? 'text-primary-700 bg-primary-50'
-                          : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                      )}
-                    >
-                      {child.name}
-                    </Link>
-                  ))}
-                </div>
-              )}
             </div>
           );
         })}
       </nav>
 
-      {/* User info */}
-      <div className="p-4 border-t border-gray-200">
-        <div className="flex items-center space-x-3">
-          <div className="h-8 w-8 bg-gray-200 rounded-full flex items-center justify-center">
+      {/* User info - Part of expandable section */}
+      <div className="p-4 border-t border-gray-200 flex-shrink-0">
+        <div className={clsx(
+          "flex items-center",
+          isExpanded ? "space-x-3" : "justify-center"
+        )}>
+          <div className="h-8 w-8 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm">
             <User className="h-4 w-4 text-gray-600" />
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-900 truncate">
-              {user?.name}
-            </p>
-            <p className="text-xs text-gray-500">
-              {user?.role}
-            </p>
-          </div>
+          {isExpanded && (
+            <div className="flex-1 min-w-0 opacity-100 transition-opacity duration-300">
+              <p className="text-sm font-medium text-gray-900 truncate">
+                {user?.firstName} {user?.lastName}
+              </p>
+              <p className="text-xs text-gray-500 truncate">
+                {user?.role}
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>
