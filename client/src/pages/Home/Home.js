@@ -20,6 +20,23 @@ import {
 const Home = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [currentTextIndex, setCurrentTextIndex] = React.useState(0);
+
+  const rotatingTexts = [
+    'increased productivity',
+    'improved collaboration',
+    'dynamic teams',
+    'task control'
+  ];
+
+  // Rotate text every 3 seconds
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTextIndex((prev) => (prev + 1) % rotatingTexts.length);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   // Redirect to dashboard if already logged in
   React.useEffect(() => {
@@ -105,12 +122,6 @@ const Home = () => {
                 Pricing
               </a>
               <Link
-                to="/login"
-                className="text-gray-600 hover:text-primary-600 font-medium transition-colors"
-              >
-                Sign in
-              </Link>
-              <Link
                 to="/register"
                 className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 font-medium transition-all transform hover:scale-105 shadow-lg"
               >
@@ -119,18 +130,12 @@ const Home = () => {
             </div>
 
             {/* Mobile Menu Button */}
-            <div className="md:hidden flex items-center space-x-2">
-              <Link
-                to="/login"
-                className="px-4 py-2 text-sm text-gray-600 hover:text-primary-600 font-medium"
-              >
-                Sign in
-              </Link>
+            <div className="md:hidden">
               <Link
                 to="/register"
                 className="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium"
               >
-                Start Free
+                Get Started
               </Link>
             </div>
           </div>
@@ -156,18 +161,38 @@ const Home = () => {
             </div>
 
             {/* Main Heading */}
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold text-gray-900 mb-6">
-              Invoicing Made
-              <span className="block bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">
-                Simple & Beautiful
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold mb-6">
+              <span className="block text-gray-900">
+                Project management software
+              </span>
+              <span className="block text-gray-900">
+                built for
+              </span>
+              <span className="block relative overflow-hidden" style={{ height: '1.2em' }}>
+                <span
+                  key={currentTextIndex}
+                  className="absolute inset-0 bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent animate-slide-up"
+                >
+                  {rotatingTexts[currentTextIndex]}
+                </span>
               </span>
             </h1>
 
-            {/* Subheading */}
-            <p className="text-xl sm:text-2xl text-gray-600 mb-10 max-w-3xl mx-auto leading-relaxed">
-              Create professional invoices, manage projects, and track expenses all in one powerful platform. 
-              Perfect for freelancers and small businesses.
-            </p>
+            {/* Subheading - Feature Points */}
+            <div className="flex flex-wrap justify-center items-center gap-6 mb-10 text-gray-700 font-medium">
+              <div className="flex items-center">
+                <CheckCircle className="h-5 w-5 text-primary-600 mr-2" />
+                Plan your projects
+              </div>
+              <div className="flex items-center">
+                <CheckCircle className="h-5 w-5 text-primary-600 mr-2" />
+                Track work efficiently
+              </div>
+              <div className="flex items-center">
+                <CheckCircle className="h-5 w-5 text-primary-600 mr-2" />
+                Collaborate with global teams
+              </div>
+            </div>
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
@@ -178,48 +203,342 @@ const Home = () => {
                 Start Free Trial
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Link>
-              <Link
-                to="/login"
-                className="px-8 py-4 bg-white border-2 border-gray-300 text-gray-700 rounded-xl font-semibold text-lg hover:border-primary-300 hover:bg-gray-50 transition-all transform hover:scale-105 shadow-lg"
-              >
-                Sign In
-              </Link>
-            </div>
-
-            {/* Trust Indicators */}
-            <div className="flex flex-wrap justify-center items-center gap-6 text-sm text-gray-600">
-              <div className="flex items-center">
-                <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
-                Free 30-day trial
-              </div>
-              <div className="flex items-center">
-                <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
-                No credit card required
-              </div>
-              <div className="flex items-center">
-                <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
-                Cancel anytime
-              </div>
             </div>
           </div>
 
           {/* Hero Image / Dashboard Preview */}
           <div className="mt-16 relative">
-            <div className="bg-gradient-to-br from-primary-600 to-primary-800 rounded-2xl shadow-2xl p-8 transform hover:scale-[1.02] transition-transform duration-300">
-              <div className="bg-white rounded-lg p-6 shadow-inner">
-                <div className="flex items-center space-x-2 mb-4">
+            <div className="bg-gradient-to-br from-primary-600 to-primary-800 rounded-2xl shadow-2xl p-6 transform hover:scale-[1.01] transition-transform duration-300">
+              <div className="bg-gray-50 rounded-xl p-6 shadow-inner min-h-[600px]">
+                {/* Browser Chrome */}
+                <div className="flex items-center space-x-2 mb-6">
                   <div className="w-3 h-3 rounded-full bg-red-400"></div>
                   <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
                   <div className="w-3 h-3 rounded-full bg-green-400"></div>
+                  <div className="ml-4 flex-1 h-7 bg-white rounded-lg flex items-center px-3">
+                    <div className="h-3 bg-gray-200 rounded w-1/3"></div>
+                  </div>
                 </div>
-                <div className="space-y-3">
-                  <div className="h-4 bg-gray-200 rounded w-3/4 animate-pulse"></div>
-                  <div className="h-4 bg-gray-200 rounded w-1/2 animate-pulse"></div>
-                  <div className="h-4 bg-gray-200 rounded w-5/6 animate-pulse"></div>
-                  <div className="grid grid-cols-3 gap-4 mt-6">
-                    <div className="h-24 bg-gradient-to-br from-primary-100 to-primary-200 rounded-lg animate-pulse"></div>
-                    <div className="h-24 bg-gradient-to-br from-success-100 to-success-200 rounded-lg animate-pulse"></div>
-                    <div className="h-24 bg-gradient-to-br from-warning-100 to-warning-200 rounded-lg animate-pulse"></div>
+
+                {/* Dashboard Content */}
+                <div className="space-y-4">
+                  {/* Header with Welcome */}
+                  <div className="bg-white rounded-xl p-4 shadow-sm">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-lg font-bold text-gray-900">Welcome back, Sarah!</h3>
+                        <p className="text-sm text-gray-500">Here's what's happening today</p>
+                      </div>
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold text-sm shadow-md">
+                        SM
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Stats Cards */}
+                  <div className="grid grid-cols-4 gap-3">
+                    <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-blue-400">
+                      <div className="text-xs text-gray-600 mb-2">Active Projects</div>
+                      <div className="text-2xl font-bold text-blue-600">12</div>
+                    </div>
+                    <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-green-400">
+                      <div className="text-xs text-gray-600 mb-2">Completed</div>
+                      <div className="text-2xl font-bold text-green-600">48</div>
+                    </div>
+                    <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-yellow-400">
+                      <div className="text-xs text-gray-600 mb-2">Hours Logged</div>
+                      <div className="text-2xl font-bold text-yellow-600">156</div>
+                    </div>
+                    <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-purple-400">
+                      <div className="text-xs text-gray-600 mb-2">Revenue</div>
+                      <div className="text-2xl font-bold text-purple-600">$45K</div>
+                    </div>
+                  </div>
+
+                  {/* Main Content Area - Charts and Projects */}
+                  <div className="grid grid-cols-3 gap-4">
+                    {/* Left - Line Chart */}
+                    <div className="col-span-2 bg-white rounded-xl p-5 shadow-sm">
+                      <div className="text-sm font-semibold text-gray-700 mb-4">Weekly Activity</div>
+                      {/* Simple Line Chart */}
+                      <div className="relative h-40">
+                        <svg className="w-full h-full" viewBox="0 0 300 120" preserveAspectRatio="none">
+                          {/* Grid lines */}
+                          <line x1="0" y1="30" x2="300" y2="30" stroke="#f3f4f6" strokeWidth="1"/>
+                          <line x1="0" y1="60" x2="300" y2="60" stroke="#f3f4f6" strokeWidth="1"/>
+                          <line x1="0" y1="90" x2="300" y2="90" stroke="#f3f4f6" strokeWidth="1"/>
+                          {/* Line chart path */}
+                          <path
+                            d="M 0 80 L 50 60 L 100 40 L 150 50 L 200 30 L 250 45 L 300 20"
+                            fill="none"
+                            stroke="#3b82f6"
+                            strokeWidth="3"
+                            strokeLinecap="round"
+                          />
+                          {/* Area fill */}
+                          <path
+                            d="M 0 80 L 50 60 L 100 40 L 150 50 L 200 30 L 250 45 L 300 20 L 300 120 L 0 120 Z"
+                            fill="url(#gradient)"
+                            opacity="0.2"
+                          />
+                          <defs>
+                            <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                              <stop offset="0%" stopColor="#3b82f6" />
+                              <stop offset="100%" stopColor="#3b82f6" stopOpacity="0" />
+                            </linearGradient>
+                          </defs>
+                        </svg>
+                      </div>
+                      <div className="flex justify-between mt-3">
+                        {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, i) => (
+                          <div key={i} className="text-xs text-gray-400">{day}</div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Right - Team Members */}
+                    <div className="bg-white rounded-xl p-5 shadow-sm">
+                      <div className="text-sm font-semibold text-gray-700 mb-4">Team Members</div>
+                      <div className="space-y-3">
+                        {/* Team Member 1 - Admin */}
+                        <div className="flex items-center space-x-3">
+                          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white text-xs font-bold shadow-md">
+                            SM
+                          </div>
+                          <div className="flex-1">
+                            <div className="text-xs font-medium text-gray-800">Sarah Miller</div>
+                            <div className="text-xs text-purple-600 font-medium">Admin</div>
+                          </div>
+                        </div>
+                        {/* Team Member 2 - Manager */}
+                        <div className="flex items-center space-x-3">
+                          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-xs font-bold shadow-md">
+                            JD
+                          </div>
+                          <div className="flex-1">
+                            <div className="text-xs font-medium text-gray-800">John Davis</div>
+                            <div className="text-xs text-blue-600 font-medium">Project Manager</div>
+                          </div>
+                        </div>
+                        {/* Team Member 3 - Employee */}
+                        <div className="flex items-center space-x-3">
+                          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white text-xs font-bold shadow-md">
+                            AK
+                          </div>
+                          <div className="flex-1">
+                            <div className="text-xs font-medium text-gray-800">Alex Kim</div>
+                            <div className="text-xs text-green-600 font-medium">Team Member</div>
+                          </div>
+                        </div>
+                        {/* Team Member 4 */}
+                        <div className="flex items-center space-x-3">
+                          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center text-white text-xs font-bold shadow-md">
+                            MC
+                          </div>
+                          <div className="flex-1">
+                            <div className="text-xs font-medium text-gray-800">Maria Chen</div>
+                            <div className="text-xs text-pink-600 font-medium">Sales/Finance</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Project Progress Bars */}
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* Project 1 */}
+                    <div className="bg-white rounded-xl p-5 shadow-sm">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="text-xs font-semibold text-gray-800">Website Redesign</div>
+                        <div className="text-xs font-semibold text-blue-600">75%</div>
+                      </div>
+                      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full" style={{ width: '75%' }}></div>
+                      </div>
+                      <div className="flex items-center justify-between mt-3">
+                        <div className="flex -space-x-2">
+                          <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 border-2 border-white"></div>
+                          <div className="w-6 h-6 rounded-full bg-gradient-to-br from-green-400 to-green-600 border-2 border-white"></div>
+                          <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 border-2 border-white"></div>
+                        </div>
+                        <div className="text-xs text-gray-500">Due: Dec 15</div>
+                      </div>
+                    </div>
+
+                    {/* Project 2 */}
+                    <div className="bg-white rounded-xl p-5 shadow-sm">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="text-xs font-semibold text-gray-800">Mobile App Development</div>
+                        <div className="text-xs font-semibold text-green-600">45%</div>
+                      </div>
+                      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-green-400 to-green-600 rounded-full" style={{ width: '45%' }}></div>
+                      </div>
+                      <div className="flex items-center justify-between mt-3">
+                        <div className="flex -space-x-2">
+                          <div className="w-6 h-6 rounded-full bg-gradient-to-br from-pink-400 to-pink-600 border-2 border-white"></div>
+                          <div className="w-6 h-6 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 border-2 border-white"></div>
+                        </div>
+                        <div className="text-xs text-gray-500">Due: Jan 20</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Bottom Section - Donut Chart and Task Progress */}
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* Donut Chart - Project Status */}
+                    <div className="bg-white rounded-xl p-5 shadow-sm">
+                      <div className="text-sm font-semibold text-gray-700 mb-4">Project Status</div>
+                      <div className="flex items-center justify-center">
+                        {/* Donut Chart */}
+                        <svg className="w-32 h-32" viewBox="0 0 100 100">
+                          {/* Background circle */}
+                          <circle cx="50" cy="50" r="40" fill="none" stroke="#f3f4f6" strokeWidth="12"/>
+                          {/* Blue segment (Completed) - 40% */}
+                          <circle 
+                            cx="50" cy="50" r="40" 
+                            fill="none" 
+                            stroke="#3b82f6" 
+                            strokeWidth="12"
+                            strokeDasharray="100 151"
+                            transform="rotate(-90 50 50)"
+                          />
+                          {/* Yellow segment (Active) - 30% */}
+                          <circle 
+                            cx="50" cy="50" r="40" 
+                            fill="none" 
+                            stroke="#fbbf24" 
+                            strokeWidth="12"
+                            strokeDasharray="75 176"
+                            strokeDashoffset="-100"
+                            transform="rotate(-90 50 50)"
+                          />
+                          {/* Cyan segment (In Progress) - 20% */}
+                          <circle 
+                            cx="50" cy="50" r="40" 
+                            fill="none" 
+                            stroke="#06b6d4" 
+                            strokeWidth="12"
+                            strokeDasharray="50 201"
+                            strokeDashoffset="-175"
+                            transform="rotate(-90 50 50)"
+                          />
+                          {/* Center text */}
+                          <text x="50" y="50" textAnchor="middle" dy="7" fontSize="20" fontWeight="bold" fill="#1f2937">
+                            8
+                          </text>
+                        </svg>
+                      </div>
+                      {/* Legend */}
+                      <div className="mt-4 space-y-2">
+                        <div className="flex items-center justify-between text-xs">
+                          <div className="flex items-center">
+                            <div className="w-3 h-3 rounded-full bg-blue-400 mr-2"></div>
+                            <span className="text-gray-600">Completed</span>
+                          </div>
+                          <span className="font-semibold text-gray-700">40%</span>
+                        </div>
+                        <div className="flex items-center justify-between text-xs">
+                          <div className="flex items-center">
+                            <div className="w-3 h-3 rounded-full bg-yellow-400 mr-2"></div>
+                            <span className="text-gray-600">Active</span>
+                          </div>
+                          <span className="font-semibold text-gray-700">30%</span>
+                        </div>
+                        <div className="flex items-center justify-between text-xs">
+                          <div className="flex items-center">
+                            <div className="w-3 h-3 rounded-full bg-cyan-400 mr-2"></div>
+                            <span className="text-gray-600">In Progress</span>
+                          </div>
+                          <span className="font-semibold text-gray-700">20%</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Task Progress Card */}
+                    <div className="bg-white rounded-xl p-5 shadow-sm">
+                      <div className="text-sm font-semibold text-gray-700 mb-4">Current Sprint</div>
+                      <div className="flex items-center space-x-4">
+                        {/* Circular Progress */}
+                        <div className="relative w-20 h-20">
+                          <svg className="w-full h-full transform -rotate-90">
+                            <circle cx="40" cy="40" r="32" stroke="#e5e7eb" strokeWidth="8" fill="none"/>
+                            <circle 
+                              cx="40" cy="40" r="32" 
+                              stroke="#3b82f6" 
+                              strokeWidth="8" 
+                              fill="none"
+                              strokeDasharray="201"
+                              strokeDashoffset="138"
+                              strokeLinecap="round"
+                            />
+                          </svg>
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <span className="text-sm font-bold text-blue-600">31%</span>
+                          </div>
+                        </div>
+                        {/* Details */}
+                        <div className="flex-1 space-y-2">
+                          <div className="text-xs font-medium text-gray-800">Martin Young</div>
+                          <div className="text-xs text-gray-500">Nov 2 - Nov 14</div>
+                          <div className="text-xs text-red-500 font-medium">2 days behind</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Employee Tracking / Task Assignment */}
+                  <div className="bg-white rounded-xl p-5 shadow-sm">
+                    <div className="text-sm font-semibold text-gray-700 mb-4">Active Tasks</div>
+                    <div className="space-y-3">
+                      {/* Task Row 1 */}
+                      <div className="flex items-center justify-between p-3 bg-gradient-to-r from-blue-50 to-transparent rounded-lg border-l-3 border-blue-400">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-xs font-bold shadow-md">
+                            AM
+                          </div>
+                          <div>
+                            <div className="text-xs font-medium text-gray-800">Alice Martinez</div>
+                            <div className="text-xs text-blue-600">UI/UX Design Task</div>
+                          </div>
+                        </div>
+                        <div className="px-3 py-1 bg-blue-100 rounded-full">
+                          <span className="text-xs font-semibold text-blue-700">In Progress</span>
+                        </div>
+                      </div>
+
+                      {/* Task Row 2 */}
+                      <div className="flex items-center justify-between p-3 bg-gradient-to-r from-green-50 to-transparent rounded-lg border-l-3 border-green-400">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white text-xs font-bold shadow-md">
+                            SJ
+                          </div>
+                          <div>
+                            <div className="text-xs font-medium text-gray-800">Sam Johnson</div>
+                            <div className="text-xs text-green-600">Backend Development</div>
+                          </div>
+                        </div>
+                        <div className="px-3 py-1 bg-green-100 rounded-full">
+                          <span className="text-xs font-semibold text-green-700">Completed</span>
+                        </div>
+                      </div>
+
+                      {/* Task Row 3 */}
+                      <div className="flex items-center justify-between p-3 bg-gradient-to-r from-purple-50 to-transparent rounded-lg border-l-3 border-purple-400">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white text-xs font-bold shadow-md">
+                            RK
+                          </div>
+                          <div>
+                            <div className="text-xs font-medium text-gray-800">Robert Kumar</div>
+                            <div className="text-xs text-purple-600">Database Optimization</div>
+                          </div>
+                        </div>
+                        <div className="px-3 py-1 bg-purple-100 rounded-full">
+                          <span className="text-xs font-semibold text-purple-700">Review</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -551,9 +870,6 @@ const Home = () => {
               Sign In
             </Link>
           </div>
-          <p className="mt-6 text-primary-100 text-sm">
-            No credit card required • Cancel anytime • 30-day free trial
-          </p>
         </div>
       </section>
 
