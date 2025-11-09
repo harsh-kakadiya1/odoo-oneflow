@@ -156,15 +156,15 @@ const Tasks = () => {
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="flex-shrink-0 bg-white border-b border-gray-200 px-6 py-4">
+      <div className="flex-shrink-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Tasks</h1>
-            <p className="text-gray-600 mt-1">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Tasks</h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-1">
               {totalTasks} total tasks across all projects
             </p>
           </div>
-          <Button onClick={handleCreateTask} className="bg-blue-600 hover:bg-blue-700">
+          <Button onClick={handleCreateTask} className="bg-primary-600 hover:bg-primary-700">
             <Plus className="w-4 h-4 mr-2" />
             New Task
           </Button>
@@ -188,7 +188,7 @@ const Tasks = () => {
           <select
             value={priorityFilter}
             onChange={(e) => setPriorityFilter(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
           >
             <option value="">All Priorities</option>
             <option value="Low">Low</option>
@@ -199,20 +199,20 @@ const Tasks = () => {
 
           {/* Clear Filters */}
           {hasFilters && (
-            <Button variant="outline" onClick={clearFilters} className="text-gray-600">
+            <Button variant="outline" onClick={clearFilters} className="text-gray-600 dark:text-gray-400">
               <X className="w-4 h-4 mr-1" />
               Clear
             </Button>
           )}
 
           {/* View Toggle */}
-          <div className="flex bg-gray-100 rounded-lg p-1 ml-auto">
+          <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1 ml-auto">
             <button
               onClick={() => setViewMode('kanban')}
               className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
                 viewMode === 'kanban'
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
               <Grid3X3 className="w-4 h-4 mr-1 inline" />
@@ -222,8 +222,8 @@ const Tasks = () => {
               onClick={() => setViewMode('list')}
               className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
                 viewMode === 'list'
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
               <List className="w-4 h-4 mr-1 inline" />
@@ -234,7 +234,7 @@ const Tasks = () => {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden bg-gray-50 dark:bg-gray-900">
         {viewMode === 'kanban' ? (
           <div className="h-full p-6">
             <TaskKanbanView

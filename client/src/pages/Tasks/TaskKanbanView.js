@@ -130,128 +130,108 @@ const TaskKanbanView = ({ projectId, tasks: initialTasks, onTasksUpdate, onEditT
     }
   };
 
-  const TaskCard = ({ task, index }) => (
-    <Draggable draggableId={task.id.toString()} index={index}>
-      {(provided, snapshot) => (
-        <div
-          ref={provided.innerRef}
-          {...provided.draggableProps}
-          {...provided.dragHandleProps}
-          className={`mb-3 ${snapshot.isDragging ? 'rotate-2 opacity-90' : ''}`}
-        >
-          <Card className={`cursor-pointer hover:shadow-md transition-all duration-200 ${
-            snapshot.isDragging ? 'shadow-lg' : ''
-          }`}>
-            <CardContent className="p-4">
-              {/* Cover Image */}
-              {task.cover_image && (
-                <div className="mb-3 rounded-lg overflow-hidden">
-                  <img 
-                    src={task.cover_image} 
-                    alt={task.title}
-                    className="w-full h-32 object-cover"
-                  />
-                </div>
-              )}
-
-              {/* Task Header */}
-              <div className="flex justify-between items-start mb-2">
-                <h4 className="font-medium text-gray-900 text-sm line-clamp-2">
-                  {task.title}
-                </h4>
-                <TaskCardMenu
-                  onEdit={() => handleEditTask(task)}
-                  onDelete={() => handleDeleteTask(task)}
-                  onChangeCover={() => handleChangeCover(task)}
-                />
-              </div>
-
-              {/* Project Name */}
-              {task.project && (
-                <p className="text-xs text-gray-500 mb-2">
-                  Project: {task.project.name}
-                </p>
-              )}
-
-              {/* Priority and Due Date */}
-              <div className="flex flex-wrap gap-1 mb-3">
-                <Badge 
-                  variant="custom"
-                  className={`text-xs px-2 py-1 rounded-full flex items-center gap-1 ${getPriorityColor(task.priority)}`}
-                >
-                  {getPriorityIcon(task.priority)}
-                  {task.priority}
-                </Badge>
-                
-                {task.due_date && (
-                  <Badge 
-                    variant={isOverdue(task.due_date) ? "danger" : "secondary"}
-                    className="text-xs px-2 py-1 rounded-full flex items-center gap-1"
-                  >
-                    <Calendar className="w-3 h-3" />
-                    {formatDate(task.due_date)}
-                  </Badge>
-                )}
-              </div>
-
-              {/* Assignees */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  {task.assignees && task.assignees.length > 0 && (
-                    <div className="flex items-center gap-1">
-                      <Users className="w-3 h-3 text-gray-500" />
-                      <div className="flex -space-x-1">
-                        {task.assignees.slice(0, 3).map((assignee, i) => (
-                          <div
-                            key={assignee.id}
-                            className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-xs text-white font-medium border border-white"
-                            title={`${assignee.firstName} ${assignee.lastName}`}
-                          >
-                            {assignee.firstName?.[0]}{assignee.lastName?.[0]}
-                          </div>
-                        ))}
-                        {task.assignees.length > 3 && (
-                          <div className="w-6 h-6 bg-gray-500 rounded-full flex items-center justify-center text-xs text-white font-medium border border-white">
-                            +{task.assignees.length - 3}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                  {task.assignee && (!task.assignees || task.assignees.length === 0) && (
-                    <div className="flex items-center gap-1">
-                      <Users className="w-3 h-3 text-gray-500" />
-                      <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-xs text-white font-medium">
-                        {task.assignee.firstName?.[0]}{task.assignee.lastName?.[0]}
-                      </div>
-                    </div>
-                  )}
-                </div>
-                
-                {/* Priority Score Indicator */}
-                {task.priority_score && (
-                  <div className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                    {task.priority_score}
+  const TaskCard = ({ task, index }) => {
+    // Calculate assignee count
+    const assigneesCount = task.assignees?.length || (task.assignee ? 1 : 0);
+    
+    return (
+      <Draggable draggableId={task.id.toString()} index={index}>
+        {(provided, snapshot) => (
+          <div
+            ref={provided.innerRef}
+            {...provided.draggableProps}
+            {...provided.dragHandleProps}
+            className={`mb-3 ${snapshot.isDragging ? 'rotate-2 opacity-90' : ''}`}
+          >
+            <Card className={`cursor-pointer hover:shadow-md transition-all duration-200 ${
+              snapshot.isDragging ? 'shadow-lg' : ''
+            }`}>
+              <CardContent className="p-4">
+                {/* Cover Image */}
+                {task.cover_image && (
+                  <div className="mb-3 rounded-lg overflow-hidden">
+                    <img 
+                      src={task.cover_image} 
+                      alt={task.title}
+                      className="w-full h-32 object-cover"
+                    />
                   </div>
                 )}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-    </Draggable>
-  );
+
+                {/* Task Header - ID and Menu */}
+                <div className="flex justify-between items-start mb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg font-bold text-gray-900 dark:text-white">
+                      {task.id}
+                    </span>
+                  </div>
+                  <TaskCardMenu
+                    onEdit={() => handleEditTask(task)}
+                    onDelete={() => handleDeleteTask(task)}
+                    onChangeCover={() => handleChangeCover(task)}
+                  />
+                </div>
+
+                {/* Project Name */}
+                {task.project && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                    Project: {task.project.name}
+                  </p>
+                )}
+
+                {/* Priority and Due Date Badges */}
+                <div className="flex flex-wrap gap-1.5 mb-3">
+                  <Badge 
+                    variant="custom"
+                    className={`text-xs px-2 py-1 rounded-full flex items-center gap-1 ${getPriorityColor(task.priority)}`}
+                  >
+                    {getPriorityIcon(task.priority)}
+                    {task.priority}
+                  </Badge>
+                  
+                  {task.due_date && (
+                    <Badge 
+                      variant={isOverdue(task.due_date) ? "danger" : "secondary"}
+                      className="text-xs px-2 py-1 rounded-full flex items-center gap-1"
+                    >
+                      <Calendar className="w-3 h-3" />
+                      {formatDate(task.due_date)}
+                    </Badge>
+                  )}
+                </div>
+
+                {/* Separator Line */}
+                <div className="border-t border-gray-200 dark:border-gray-600 mb-3"></div>
+
+                {/* Assignee Count */}
+                <div className="flex items-center gap-1.5">
+                  <Users className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                  <span className="text-xs text-gray-600 dark:text-gray-300">
+                    {assigneesCount > 0 ? (
+                      <span className="font-medium">{assigneesCount} {assigneesCount === 1 ? 'user' : 'users'} assigned</span>
+                    ) : (
+                      <span>Not assigned</span>
+                    )}
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+      </Draggable>
+    );
+  };
 
   const Column = ({ status, tasks, color }) => (
     <div className={`flex-1 min-h-96 rounded-lg border-2 border-dashed p-4 ${color}`}>
       <div className="flex justify-between items-center mb-4">
-        <h3 className="font-semibold text-gray-800">
+        <h3 className="font-semibold text-gray-800 dark:text-gray-200">
           {status} ({tasks.length})
         </h3>
         <Button
           size="sm"
           variant="ghost"
-          className="p-1 h-8 w-8"
+          className="p-1 h-8 w-8 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
           onClick={() => {/* TODO: Add new task */}}
         >
           <Plus className="w-4 h-4" />
@@ -264,7 +244,7 @@ const TaskKanbanView = ({ projectId, tasks: initialTasks, onTasksUpdate, onEditT
             ref={provided.innerRef}
             {...provided.droppableProps}
             className={`min-h-72 ${
-              snapshot.isDraggingOver ? 'bg-blue-50 border-blue-300' : ''
+              snapshot.isDraggingOver ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-300 dark:border-blue-600' : ''
             } rounded-lg transition-colors duration-200`}
           >
             {tasks.map((task, index) => (
@@ -284,17 +264,17 @@ const TaskKanbanView = ({ projectId, tasks: initialTasks, onTasksUpdate, onEditT
           <Column
             status="New"
             tasks={columns['New'] || []}
-            color="border-blue-300 bg-blue-50"
+            color="border-blue-300 dark:border-blue-600 bg-blue-50 dark:bg-blue-900/10"
           />
           <Column
             status="In Progress"
             tasks={columns['In Progress'] || []}
-            color="border-yellow-300 bg-yellow-50"
+            color="border-yellow-300 dark:border-yellow-600 bg-yellow-50 dark:bg-yellow-900/10"
           />
           <Column
             status="Done"
             tasks={columns['Done'] || []}
-            color="border-green-300 bg-green-50"
+            color="border-green-300 dark:border-green-600 bg-green-50 dark:bg-green-900/10"
           />
         </div>
       </DragDropContext>

@@ -43,12 +43,12 @@ router.get('/', protect, async (req, res) => {
           {
             model: User,
             as: 'projectManager',
-            attributes: ['id', 'name', 'email']
+            attributes: ['id', 'firstName', 'lastName', 'name', 'email']
           },
           {
             model: User,
             as: 'members',
-            attributes: ['id', 'name', 'email', 'role'],
+            attributes: ['id', 'firstName', 'lastName', 'name', 'email', 'role'],
             through: { attributes: [] },
             where: { id: req.user.id }
           },
@@ -89,12 +89,12 @@ router.get('/', protect, async (req, res) => {
           {
             model: User,
             as: 'projectManager',
-            attributes: ['id', 'name', 'email']
+            attributes: ['id', 'firstName', 'lastName', 'name', 'email']
           },
           {
             model: User,
             as: 'members',
-            attributes: ['id', 'name', 'email', 'role'],
+            attributes: ['id', 'firstName', 'lastName', 'name', 'email', 'role'],
             through: { attributes: [] }
           },
           {
@@ -116,12 +116,12 @@ router.get('/', protect, async (req, res) => {
           {
             model: User,
             as: 'projectManager',
-            attributes: ['id', 'name', 'email']
+            attributes: ['id', 'firstName', 'lastName', 'name', 'email']
           },
           {
             model: User,
             as: 'members',
-            attributes: ['id', 'name', 'email', 'role'],
+            attributes: ['id', 'firstName', 'lastName', 'name', 'email', 'role'],
             through: { attributes: [] },
             where: { id: req.user.id }
           },
@@ -160,12 +160,12 @@ router.get('/', protect, async (req, res) => {
           {
             model: User,
             as: 'projectManager',
-            attributes: ['id', 'name', 'email']
+            attributes: ['id', 'firstName', 'lastName', 'name', 'email']
           },
           {
             model: User,
             as: 'members',
-            attributes: ['id', 'name', 'email', 'role'],
+            attributes: ['id', 'firstName', 'lastName', 'name', 'email', 'role'],
             through: { attributes: [] }
           },
           {
@@ -219,12 +219,12 @@ router.get('/:id', protect, isProjectMember, async (req, res) => {
         {
           model: User,
           as: 'projectManager',
-          attributes: ['id', 'name', 'email', 'role']
+          attributes: ['id', 'firstName', 'lastName', 'name', 'email', 'role']
         },
         {
           model: User,
           as: 'members',
-          attributes: ['id', 'name', 'email', 'role'],
+          attributes: ['id', 'firstName', 'lastName', 'name', 'email', 'role'],
           through: { attributes: [] }
         },
         {
@@ -235,7 +235,7 @@ router.get('/:id', protect, isProjectMember, async (req, res) => {
             {
               model: User,
               as: 'assignee',
-              attributes: ['id', 'name', 'email']
+              attributes: ['id', 'firstName', 'lastName', 'name', 'email']
             }
           ]
         }
@@ -502,12 +502,12 @@ router.put('/:id', protect, async (req, res) => {
         {
           model: User,
           as: 'projectManager',
-          attributes: ['id', 'name', 'email']
+          attributes: ['id', 'firstName', 'lastName', 'name', 'email']
         },
         {
           model: User,
           as: 'members',
-          attributes: ['id', 'name', 'email', 'role'],
+          attributes: ['id', 'firstName', 'lastName', 'name', 'email', 'role'],
           through: { attributes: [] }
         }
       ]

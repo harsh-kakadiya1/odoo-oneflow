@@ -97,6 +97,7 @@ export const timesheetAPI = {
   delete: (id) => api.delete(`/timesheets/${id}`),
   getUserAnalytics: (userId, params) => api.get(`/timesheets/analytics/user/${userId}`, { params }),
   getProjectAnalytics: (projectId) => api.get(`/timesheets/analytics/project/${projectId}`),
+  getCompanyAnalytics: (params) => api.get('/timesheets/analytics/company', { params }),
 };
 
 // Sales Order APIs

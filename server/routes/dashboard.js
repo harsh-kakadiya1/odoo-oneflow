@@ -90,17 +90,17 @@ router.get('/stats', protect, async (req, res) => {
       }
       stats.overdueTasks = overdueCount;
 
-      // Revenue billed this month - scoped to company
-      const revenueWhere = currentUser.company_id 
-        ? { company_id: currentUser.company_id }
-        : {};
-      const revenueResult = await CustomerInvoice.sum('amount', {
+      // Revenue billed this month - scoped to company through projects
+      let revenueResult = 0;
+      if (projectIds.length > 0) {
+        revenueResult = await CustomerInvoice.sum('amount', {
           where: {
-            ...revenueWhere,
+            project_id: { [Op.in]: projectIds },
             invoice_date: { [Op.gte]: monthAgo },
             status: { [Op.in]: ['Sent', 'Paid'] }
           }
         });
+      }
       stats.revenueBilledMonth = parseFloat(revenueResult) || 0;
 
       // Pending expenses count - scoped to company projects
@@ -120,24 +120,29 @@ router.get('/stats', protect, async (req, res) => {
         where: companyWhere
       });
 
-      // Open sales orders - scoped to company
-      const salesOrderWhere = currentUser.company_id 
-        ? { company_id: currentUser.company_id }
-        : {};
-      stats.openSalesOrders = await require('../models').SalesOrder.count({
-        where: { 
-          ...salesOrderWhere,
-          status: { [Op.in]: ['Draft', 'Confirmed'] } 
-        }
-      });
+      // Open sales orders - scoped to company through projects
+      let openSalesOrdersCount = 0;
+      if (projectIds.length > 0) {
+        openSalesOrdersCount = await require('../models').SalesOrder.count({
+          where: { 
+            project_id: { [Op.in]: projectIds },
+            status: { [Op.in]: ['Draft', 'Confirmed'] } 
+          }
+        });
+      }
+      stats.openSalesOrders = openSalesOrdersCount;
 
-      // Unpaid invoices - scoped to company
-      stats.unpaidInvoices = await CustomerInvoice.count({
-        where: { 
-          ...revenueWhere,
-          status: { [Op.in]: ['Draft', 'Sent'] } 
-        }
-      });
+      // Unpaid invoices - scoped to company through projects
+      let unpaidInvoicesCount = 0;
+      if (projectIds.length > 0) {
+        unpaidInvoicesCount = await CustomerInvoice.count({
+          where: { 
+            project_id: { [Op.in]: projectIds },
+            status: { [Op.in]: ['Draft', 'Sent'] } 
+          }
+        });
+      }
+      stats.unpaidInvoices = unpaidInvoicesCount;
 
       console.log('Dashboard stats calculated:', stats);
 

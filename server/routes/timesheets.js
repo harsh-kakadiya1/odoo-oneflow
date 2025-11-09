@@ -424,6 +424,120 @@ router.get('/analytics/user/:userId', protect, async (req, res) => {
   }
 });
 
+// @route   GET /api/timesheets/analytics/company
+// @desc    Get company-wide timesheet analytics (for Admin dashboard)
+// @access  Private (Admin only)
+router.get('/analytics/company', protect, async (req, res) => {
+  try {
+    const { startDate, endDate } = req.query;
+
+    // Get current user's company
+    const currentUser = await User.findByPk(req.user.id);
+    
+    // Build where clause for timesheets based on company
+    let where = {};
+    if (startDate && endDate) {
+      where.log_date = { [Op.between]: [startDate, endDate] };
+    }
+
+    // Get all users from the company
+    const companyWhere = currentUser.company_id 
+      ? { company_id: currentUser.company_id }
+      : {};
+    
+    const companyUsers = await User.findAll({
+      where: companyWhere,
+      attributes: ['id']
+    });
+    const userIds = companyUsers.map(u => u.id);
+
+    if (userIds.length > 0) {
+      where.user_id = { [Op.in]: userIds };
+    }
+
+    // Get all timesheets for the company
+    const timesheets = await Timesheet.findAll({
+      where,
+      include: [
+        {
+          model: Task,
+          as: 'task',
+          include: [{
+            model: Project,
+            as: 'project',
+            attributes: ['id', 'name']
+          }]
+        },
+        {
+          model: User,
+          as: 'user',
+          attributes: ['id', 'firstName', 'lastName', 'email']
+        }
+      ],
+      order: [['log_date', 'DESC']]
+    });
+
+    const totalHours = timesheets.reduce((sum, t) => sum + parseFloat(t.hours_logged), 0);
+    const billableHours = timesheets.filter(t => t.is_billable).reduce((sum, t) => sum + parseFloat(t.hours_logged), 0);
+    const totalEarnings = timesheets.reduce((sum, t) => sum + parseFloat(t.cost), 0);
+
+    // Group by user
+    const byUser = timesheets.reduce((acc, t) => {
+      const userId = t.user_id;
+      if (!acc[userId]) {
+        acc[userId] = {
+          userId,
+          userName: `${t.user.firstName} ${t.user.lastName}`,
+          totalHours: 0,
+          billableHours: 0,
+          entries: 0
+        };
+      }
+      acc[userId].totalHours += parseFloat(t.hours_logged);
+      if (t.is_billable) {
+        acc[userId].billableHours += parseFloat(t.hours_logged);
+      }
+      acc[userId].entries += 1;
+      return acc;
+    }, {});
+
+    // Group by date
+    const byDate = timesheets.reduce((acc, t) => {
+      const date = t.log_date;
+      if (!acc[date]) acc[date] = { hours: 0, billableHours: 0, cost: 0 };
+      acc[date].hours += parseFloat(t.hours_logged);
+      if (t.is_billable) acc[date].billableHours += parseFloat(t.hours_logged);
+      acc[date].cost += parseFloat(t.cost);
+      return acc;
+    }, {});
+
+    const days = Object.keys(byDate).length;
+    const avgHoursPerDay = days > 0 ? totalHours / days : 0;
+
+    res.status(200).json({
+      success: true,
+      analytics: {
+        totalHours,
+        billableHours,
+        nonBillableHours: totalHours - billableHours,
+        totalEarnings,
+        billablePercentage: totalHours > 0 ? (billableHours / totalHours) * 100 : 0,
+        avgHoursPerDay,
+        workingDays: days,
+        entriesCount: timesheets.length,
+        byUser: Object.values(byUser),
+        byDate
+      }
+    });
+  } catch (error) {
+    console.error('Get company analytics error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error fetching company analytics'
+    });
+  }
+});
+
 // @route   GET /api/timesheets/analytics/project/:projectId
 // @desc    Get project timesheet analytics
 // @access  Private (Admin, PM, or project member)

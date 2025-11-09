@@ -189,7 +189,7 @@ const ProjectDetail = () => {
         )}
       </div>
 
-      {/* Project Manager - Below Header */}
+      {/* Project Manager - Simple Display */}
       <div className="text-sm text-gray-600 dark:text-gray-400">
         <span className="font-medium">Manager:</span>{' '}
         <span className="text-gray-900 dark:text-white">
@@ -361,26 +361,29 @@ const ProjectDetail = () => {
                 {/* Project Manager */}
                 <div>
                   <p className="font-medium text-gray-700 dark:text-gray-300 mb-3">Project Manager</p>
-                  <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    <div className="h-10 w-10 bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center">
-                      <span className="text-primary-600 dark:text-primary-400 font-medium text-sm">
-                        {project.projectManager?.firstName?.charAt(0) || project.projectManager?.name?.charAt(0) || 'P'}
-                        {project.projectManager?.lastName?.charAt(0) || 'M'}
-                      </span>
+                  {project.projectManager ? (
+                    <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <div className="h-10 w-10 bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center">
+                        <span className="text-primary-600 dark:text-primary-400 font-medium text-sm">
+                          {project.projectManager.firstName?.charAt(0) || project.projectManager.name?.charAt(0) || 'P'}
+                          {project.projectManager.lastName?.charAt(0) || 'M'}
+                        </span>
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900 dark:text-white">
+                          {`${project.projectManager.firstName || ''} ${project.projectManager.lastName || ''}`.trim() || 
+                           project.projectManager.name || 
+                           project.projectManager.email?.split('@')[0] || 
+                           `Manager #${project.projectManager.id}`}
+                        </p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          {project.projectManager.email || ''}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-medium text-gray-900 dark:text-white">
-                        {project.projectManager ? 
-                          `${project.projectManager.firstName || ''} ${project.projectManager.lastName || ''}`.trim() || 
-                          project.projectManager.name || 
-                          'Not assigned'
-                          : 'Not assigned'}
-                      </p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {project.projectManager?.email || ''}
-                      </p>
-                    </div>
-                  </div>
+                  ) : (
+                    <p className="text-sm text-gray-500 dark:text-gray-400 p-3">No manager assigned</p>
+                  )}
                 </div>
 
                 {/* Team Members */}
@@ -388,26 +391,29 @@ const ProjectDetail = () => {
                   <p className="font-medium text-gray-700 dark:text-gray-300 mb-3">
                     Team Members ({project.members?.length || 0})
                   </p>
-                  <div className="space-y-2 max-h-40 overflow-y-auto">
+                  <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
                     {project.members && project.members.length > 0 ? (
                       project.members.map((member) => {
                         const fullName = member.firstName && member.lastName 
                           ? `${member.firstName} ${member.lastName}`.trim()
-                          : member.name || 'Unknown';
+                          : member.name || member.email?.split('@')[0] || `User #${member.id}`;
                         const initials = member.firstName && member.lastName
                           ? `${member.firstName.charAt(0)}${member.lastName.charAt(0)}`
-                          : member.name?.substring(0, 2) || 'TM';
+                          : (member.name?.substring(0, 2) || member.email?.substring(0, 2) || 'TM').toUpperCase();
                         
                         return (
-                          <div key={member.id} className="flex items-center space-x-3 p-2 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                            <div className="h-8 w-8 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center">
-                              <span className="text-gray-700 dark:text-gray-300 font-medium text-xs">
+                          <div key={member.id} className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                            <div className="h-10 w-10 bg-blue-500 dark:bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                              <span className="text-white font-medium text-sm">
                                 {initials}
                               </span>
                             </div>
-                            <div>
+                            <div className="flex-1 min-w-0">
                               <p className="text-sm font-medium text-gray-900 dark:text-white">
                                 {fullName}
+                              </p>
+                              <p className="text-sm text-gray-500 dark:text-gray-400">
+                                {member.email || ''}
                               </p>
                             </div>
                           </div>
