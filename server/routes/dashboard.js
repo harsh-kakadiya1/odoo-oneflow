@@ -13,8 +13,12 @@ router.get('/stats', protect, async (req, res) => {
   try {
     const stats = {};
     const today = new Date();
-    const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-    const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const weekAgo = new Date(today.getTime() - 90 * 24 * 60 * 60 * 1000); // Changed from 7 days to 90 days
+    const monthAgo = new Date(today.getTime() - 180 * 24 * 60 * 60 * 1000); // Changed from 30 days to 180 days
+
+    console.log('Dashboard stats - Today:', today.toISOString());
+    console.log('Dashboard stats - Week ago (90 days):', weekAgo.toISOString());
+    console.log('Dashboard stats - Month ago (180 days):', monthAgo.toISOString());
 
     // Get current user's company for multi-tenancy
     const currentUser = await User.findByPk(req.user.id, {
@@ -49,6 +53,21 @@ router.get('/stats', protect, async (req, res) => {
       });
       const taskIds = companyTasks.map(t => t.id);
 
+      // Debug: Check what timesheets exist
+      const totalTimesheets = await Timesheet.count();
+      console.log('Total timesheets in database:', totalTimesheets);
+      
+      const allTimesheets = await Timesheet.findAll({
+        where: {
+          task_id: { [Op.in]: taskIds }
+        },
+        attributes: ['hours_logged', 'log_date'],
+        limit: 5
+      });
+      console.log('Sample timesheets:', allTimesheets.map(t => ({ hours: t.hours_logged, date: t.log_date })));
+      console.log('Week ago date:', weekAgo);
+      console.log('Today date:', today);
+
       const hoursResult = await Timesheet.sum('hours_logged', {
         where: {
           task_id: { [Op.in]: taskIds },
@@ -56,6 +75,8 @@ router.get('/stats', protect, async (req, res) => {
         }
       });
       stats.hoursLoggedWeek = parseFloat(hoursResult) || 0;
+      
+      console.log('Hours result for week:', stats.hoursLoggedWeek);
 
       // Overdue tasks - scoped to company projects  
       stats.overdueTasks = await Task.count({
@@ -135,6 +156,9 @@ router.get('/stats', protect, async (req, res) => {
       });
       const myTaskIds = myProjectTasks.map(t => t.id);
 
+      console.log('PM Project IDs:', myProjectIds);
+      console.log('PM Task IDs:', myTaskIds);
+
       const hoursResult = await Timesheet.sum('hours_logged', {
         where: {
           task_id: { [Op.in]: myTaskIds },
@@ -142,6 +166,8 @@ router.get('/stats', protect, async (req, res) => {
         }
       });
       stats.teamHoursWeek = parseFloat(hoursResult) || 0;
+      
+      console.log('PM Team hours result:', stats.teamHoursWeek);
 
       // Overdue tasks in my projects
       stats.overdueTasks = await Task.count({
@@ -175,6 +201,9 @@ router.get('/stats', protect, async (req, res) => {
       });
 
       // My hours logged this week
+      console.log('Team member user ID:', req.user.id);
+      console.log('Week ago date for team member:', weekAgo);
+      
       const hoursResult = await Timesheet.sum('hours_logged', {
         where: {
           user_id: req.user.id,
@@ -182,6 +211,8 @@ router.get('/stats', protect, async (req, res) => {
         }
       });
       stats.hoursLoggedWeek = parseFloat(hoursResult) || 0;
+      
+      console.log('Team member hours result:', stats.hoursLoggedWeek);
 
       // My overdue tasks
       stats.overdueTasks = await Task.count({
@@ -331,7 +362,7 @@ router.get('/recent-tasks', protect, async (req, res) => {
 });
 
 // @route   GET /api/dashboard/analytics
-// @desc    Get comprehensive analytics data
+// @desc    Get comprehensive analytics data with optional user filtering
 // @access  Private
 router.get('/analytics', protect, async (req, res) => {
   try {
@@ -340,41 +371,128 @@ router.get('/analytics', protect, async (req, res) => {
       charts: {}
     };
 
+    // Get filter parameters from query string
+    const { user_id, date_range = '3_months' } = req.query;
+    
     // Date ranges for analysis
     const today = new Date();
     const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
     const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
     const threeMonthsAgo = new Date(today.getTime() - 90 * 24 * 60 * 60 * 1000);
+    const sixMonthsAgo = new Date(today.getTime() - 180 * 24 * 60 * 60 * 1000);
+    const yearAgo = new Date(today.getTime() - 365 * 24 * 60 * 60 * 1000);
 
-    // KPI Calculations
-    // Total Projects
-    const totalProjects = await Project.count();
+    // Set date filter based on range - Make ranges broader to capture data
+    let dateFilter = yearAgo; // Default to 1 year instead of 3 months
+    switch(date_range) {
+      case '1_week': dateFilter = monthAgo; break; // 1 month instead of 1 week
+      case '1_month': dateFilter = threeMonthsAgo; break; // 3 months instead of 1 month
+      case '3_months': dateFilter = yearAgo; break; // 1 year instead of 3 months
+      case '6_months': dateFilter = yearAgo; break;
+      case '1_year': dateFilter = yearAgo; break;
+    }
+
+    // Get current user's company for multi-tenancy
+    const currentUser = await User.findByPk(req.user.id);
+    const companyFilter = { company_id: currentUser.company_id };
+
+    // Debug: Check total timesheets in database
+    const totalTimesheetCount = await Timesheet.count();
+    console.log('Analytics - Total timesheets in database:', totalTimesheetCount);
+
+    // Build filters for user-specific data
+    let projectFilter = { ...companyFilter };
+    let taskFilter = {};
+    let timesheetFilter = {};
+    
+    if (user_id) {
+      // Filter by specific user
+      const targetUser = await User.findOne({
+        where: { id: user_id, company_id: currentUser.company_id }
+      });
+      
+      if (!targetUser) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid user specified'
+        });
+      }
+
+      // Get projects where user is manager or member
+      if (targetUser.role === 'Project Manager') {
+        projectFilter.project_manager_id = user_id;
+      } else {
+        // Get projects where user is a member
+        const { ProjectMember } = require('../models');
+        const memberships = await ProjectMember.findAll({
+          where: { user_id: user_id },
+          attributes: ['project_id']
+        });
+        const memberProjectIds = memberships.map(m => m.project_id);
+        
+        if (memberProjectIds.length > 0) {
+          projectFilter.id = { [Op.in]: memberProjectIds };
+        } else {
+          projectFilter.id = { [Op.in]: [] }; // No projects found
+        }
+      }
+      
+      taskFilter.assignee_id = user_id;
+      timesheetFilter.user_id = user_id;
+    }
+
+    // KPI Calculations with filtering
+    const totalProjects = await Project.count({ where: projectFilter });
     const activeProjects = await Project.count({
-      where: { status: { [Op.in]: ['In Progress'] } }
+      where: { ...projectFilter, status: { [Op.in]: ['In Progress'] } }
     });
     const completedProjects = await Project.count({
-      where: { status: 'Completed' }
+      where: { ...projectFilter, status: 'Completed' }
     });
 
-    // Tasks
-    const totalTasks = await Task.count();
+    // Tasks (filtered by user if specified)
+    const totalTasks = await Task.count({ 
+      where: taskFilter,
+      include: user_id ? [] : [{
+        model: Project,
+        as: 'project',
+        where: companyFilter,
+        attributes: []
+      }]
+    });
     const tasksCompleted = await Task.count({
-      where: { status: 'Done' }
+      where: { ...taskFilter, status: 'Done' },
+      include: user_id ? [] : [{
+        model: Project,
+        as: 'project',
+        where: companyFilter,
+        attributes: []
+      }]
     });
 
-    // Hours
-    const totalHoursLogged = await Timesheet.sum('hours_logged') || 0;
-    const recentHours = await Timesheet.sum('hours_logged', {
-      where: { log_date: { [Op.gte]: weekAgo } }
+    // Hours (filtered by user and date range)
+    console.log('Analytics - checking hours with filters:', { timesheetFilter, dateFilter: dateFilter.toISOString() });
+    
+    const totalHoursLogged = await Timesheet.sum('hours_logged', {
+      where: { ...timesheetFilter, log_date: { [Op.gte]: dateFilter } }
     }) || 0;
+    
+    console.log('Analytics - Total hours logged:', totalHoursLogged);
+    
+    const recentHours = await Timesheet.sum('hours_logged', {
+      where: { ...timesheetFilter, log_date: { [Op.gte]: weekAgo } }
+    }) || 0;
+    
+    console.log('Analytics - Recent hours (week):', recentHours);
+    
     const avgHoursPerDay = recentHours / 7;
 
-    // Billable vs Non-billable hours
+    // Billable vs Non-billable hours (filtered)
     const billableHours = await Timesheet.sum('hours_logged', {
-      where: { is_billable: true }
+      where: { ...timesheetFilter, is_billable: true, log_date: { [Op.gte]: dateFilter } }
     }) || 0;
     const nonBillableHours = await Timesheet.sum('hours_logged', {
-      where: { is_billable: false }
+      where: { ...timesheetFilter, is_billable: false, log_date: { [Op.gte]: dateFilter } }
     }) || 0;
     const billablePercentage = totalHoursLogged > 0 ? Math.round((billableHours / totalHoursLogged) * 100) : 0;
 
@@ -388,16 +506,21 @@ router.get('/analytics', protect, async (req, res) => {
       avgHoursPerDay: Math.round(avgHoursPerDay * 10) / 10,
       billableHours: Math.round(billableHours),
       nonBillableHours: Math.round(nonBillableHours),
-      billablePercentage
+      billablePercentage,
+      filteredBy: user_id ? (await User.findByPk(user_id))?.name : 'All Users',
+      dateRange: date_range
     };
 
-    // Charts Data
-    // Project Progress
+    // Charts Data (with user filtering)
+    // Project Progress (filtered by user's projects)
     const projectsWithTasks = await Project.findAll({
+      where: projectFilter,
       include: [{
         model: Task,
         as: 'tasks',
-        attributes: ['id', 'status']
+        attributes: ['id', 'status'],
+        where: user_id ? { assignee_id: user_id } : {},
+        required: false
       }],
       attributes: ['id', 'name']
     });
@@ -409,32 +532,45 @@ router.get('/analytics', protect, async (req, res) => {
       
       return {
         projectName: project.name.substring(0, 20) + (project.name.length > 20 ? '...' : ''),
-        progress
+        progress,
+        totalTasks: tasks.length,
+        completedTasks
       };
-    }).slice(0, 10);
+    }).filter(p => p.totalTasks > 0).slice(0, 10);
 
-    // Resource Utilization
+    // Resource Utilization (filtered by user or all users in company)
+    let userFilter = { is_active: true, company_id: currentUser.company_id };
+    if (user_id) {
+      userFilter.id = user_id;
+    }
+
     const usersWithHours = await User.findAll({
+      where: userFilter,
       include: [{
         model: Timesheet,
         as: 'timesheets',
-        where: { log_date: { [Op.gte]: threeMonthsAgo } },
+        where: { log_date: { [Op.gte]: dateFilter } },
         required: false
       }],
-      where: { is_active: true },
-      attributes: ['id', 'name', 'hourly_rate']
+      attributes: ['id', 'name', 'hourly_rate', 'role']
     });
 
     analytics.charts.resourceUtilization = usersWithHours.map(user => {
       const timesheets = user.timesheets || [];
       const totalHours = timesheets.reduce((sum, ts) => sum + parseFloat(ts.hours_logged), 0);
-      // Assuming 40 hours/week * 12 weeks = 480 hours for 3 months
-      const expectedHours = 480;
+      
+      // Calculate expected hours based on date range
+      const daysDiff = Math.ceil((today - dateFilter) / (1000 * 60 * 60 * 24));
+      const workingDays = Math.floor(daysDiff * 5 / 7); // Approximate working days
+      const expectedHours = workingDays * 8; // 8 hours per day
+      
       const utilization = expectedHours > 0 ? Math.round((totalHours / expectedHours) * 100) : 0;
       
       return {
         userName: user.name.substring(0, 15) + (user.name.length > 15 ? '...' : ''),
-        utilization: Math.min(utilization, 100) // Cap at 100%
+        utilization: Math.min(utilization, 150), // Cap at 150% for overtime
+        totalHours: Math.round(totalHours),
+        role: user.role
       };
     }).slice(0, 10);
 
@@ -488,8 +624,11 @@ router.get('/analytics', protect, async (req, res) => {
       const monthStart = new Date(date.getFullYear(), date.getMonth(), 1);
       const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0);
 
+      console.log(`Analytics - Month ${i}: ${monthStart.toISOString()} to ${monthEnd.toISOString()}`);
+
       const billableHours = await Timesheet.sum('hours_logged', {
         where: {
+          ...timesheetFilter,
           is_billable: true,
           log_date: { [Op.between]: [monthStart, monthEnd] }
         }
@@ -497,10 +636,13 @@ router.get('/analytics', protect, async (req, res) => {
 
       const nonBillableHours = await Timesheet.sum('hours_logged', {
         where: {
+          ...timesheetFilter,
           is_billable: false,
           log_date: { [Op.between]: [monthStart, monthEnd] }
         }
       }) || 0;
+
+      console.log(`Analytics - Month ${i} hours: billable=${billableHours}, nonBillable=${nonBillableHours}`);
 
       monthlyHoursData.push({
         month: date.toLocaleString('default', { month: 'short' }),
@@ -520,6 +662,114 @@ router.get('/analytics', protect, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Server error fetching analytics data'
+    });
+  }
+});
+
+// @route   GET /api/dashboard/users
+// @desc    Get all users for analytics filtering
+// @access  Private
+router.get('/users', protect, async (req, res) => {
+  try {
+    // Get current user's company for multi-tenancy
+    const currentUser = await User.findByPk(req.user.id);
+    
+    const users = await User.findAll({
+      where: { 
+        company_id: currentUser.company_id,
+        is_active: true
+      },
+      attributes: ['id', 'name', 'role', 'email'],
+      order: [['name', 'ASC']]
+    });
+
+    res.status(200).json({
+      success: true,
+      users
+    });
+  } catch (error) {
+    console.error('Get users for analytics error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error fetching users'
+    });
+  }
+});
+
+// @route   GET /api/dashboard/test-timesheets
+// @desc    Test endpoint to check timesheet data
+// @access  Private
+router.get('/test-timesheets', protect, async (req, res) => {
+  try {
+    const today = new Date();
+    const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+    // Get all timesheets
+    const allTimesheets = await Timesheet.findAll({
+      include: [
+        {
+          model: User,
+          as: 'user',
+          attributes: ['name']
+        },
+        {
+          model: Task,
+          as: 'task',
+          attributes: ['title']
+        }
+      ],
+      limit: 10,
+      order: [['log_date', 'DESC']]
+    });
+
+    // Get timesheets from last week
+    const weekTimesheets = await Timesheet.findAll({
+      where: {
+        log_date: { [Op.gte]: weekAgo }
+      },
+      include: [
+        {
+          model: User,
+          as: 'user',
+          attributes: ['name']
+        }
+      ]
+    });
+
+    const totalHoursThisWeek = await Timesheet.sum('hours_logged', {
+      where: {
+        log_date: { [Op.gte]: weekAgo }
+      }
+    });
+
+    res.status(200).json({
+      success: true,
+      data: {
+        totalTimesheets: allTimesheets.length,
+        weekTimesheets: weekTimesheets.length,
+        totalHoursThisWeek: parseFloat(totalHoursThisWeek) || 0,
+        weekAgo: weekAgo,
+        today: today,
+        sampleTimesheets: allTimesheets.slice(0, 5).map(t => ({
+          id: t.id,
+          hours: t.hours_logged,
+          date: t.log_date,
+          user: t.user?.name,
+          task: t.task?.title
+        })),
+        sampleWeekTimesheets: weekTimesheets.slice(0, 5).map(t => ({
+          id: t.id,
+          hours: t.hours_logged,
+          date: t.log_date,
+          user: t.user?.name
+        }))
+      }
+    });
+  } catch (error) {
+    console.error('Test timesheets error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error testing timesheets'
     });
   }
 });

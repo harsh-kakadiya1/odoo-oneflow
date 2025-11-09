@@ -6,14 +6,14 @@ const Layout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-100">
       {/* Mobile sidebar */}
       <div className={`fixed inset-0 flex z-40 md:hidden ${sidebarOpen ? '' : 'hidden'}`}>
         <div 
           className="fixed inset-0 bg-gray-600 bg-opacity-75 transition-opacity" 
           onClick={() => setSidebarOpen(false)} 
         />
-        <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white">
+        <div className="relative flex-1 flex flex-col max-w-xs w-full bg-gray-50">
           <Sidebar onClose={() => setSidebarOpen(false)} />
         </div>
       </div>

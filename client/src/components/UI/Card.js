@@ -3,7 +3,7 @@ import { clsx } from 'clsx';
 
 const Card = ({ children, className = '', ...props }) => {
   return (
-    <div className={clsx('bg-white rounded-lg shadow-soft border border-gray-200', className)} {...props}>
+    <div className={clsx('bg-gray-50 rounded-lg shadow-soft border border-gray-300', className)} {...props}>
       {children}
     </div>
   );
@@ -11,7 +11,7 @@ const Card = ({ children, className = '', ...props }) => {
 
 const CardHeader = ({ children, className = '' }) => {
   return (
-    <div className={clsx('px-6 py-4 border-b border-gray-200', className)}>
+    <div className={clsx('px-6 py-4 border-b border-gray-300', className)}>
       {children}
     </div>
   );
@@ -19,7 +19,7 @@ const CardHeader = ({ children, className = '' }) => {
 
 const CardTitle = ({ children, className = '' }) => {
   return (
-    <h3 className={clsx('text-lg font-semibold text-gray-900', className)}>
+    <h3 className={clsx('text-lg font-semibold text-gray-800', className)}>
       {children}
     </h3>
   );
@@ -27,7 +27,7 @@ const CardTitle = ({ children, className = '' }) => {
 
 const CardDescription = ({ children, className = '' }) => {
   return (
-    <p className={clsx('text-sm text-gray-500 mt-1', className)}>
+    <p className={clsx('text-sm text-gray-600 mt-1', className)}>
       {children}
     </p>
   );
@@ -43,7 +43,7 @@ const CardContent = ({ children, className = '' }) => {
 
 const CardFooter = ({ children, className = '' }) => {
   return (
-    <div className={clsx('px-6 py-4 border-t border-gray-200 bg-gray-50', className)}>
+    <div className={clsx('px-6 py-4 border-t border-gray-300 bg-gray-100', className)}>
       {children}
     </div>
   );

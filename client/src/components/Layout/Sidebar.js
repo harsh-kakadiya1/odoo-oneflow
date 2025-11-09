@@ -80,14 +80,14 @@ const Sidebar = ({ onClose }) => {
   };
 
   return (
-    <div className="flex flex-col h-full bg-white border-r border-gray-200">
+    <div className="flex flex-col h-full bg-gray-50 border-r border-gray-300">
       {/* Close button for mobile */}
       {onClose && (
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 md:hidden">
-          <h2 className="text-lg font-semibold text-gray-900">Menu</h2>
+        <div className="flex items-center justify-between p-4 border-b border-gray-300 md:hidden">
+          <h2 className="text-lg font-semibold text-gray-800">Menu</h2>
           <button
             onClick={onClose}
-            className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 transition-colors"
+            className="p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-200 transition-colors"
           >
             <X className="h-5 w-5" />
           </button>
@@ -101,10 +101,10 @@ const Sidebar = ({ onClose }) => {
             <FileText className="h-6 w-6 text-white" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-base font-bold text-gray-900">
+            <p className="text-base font-bold text-gray-800">
               OneFlow
             </p>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-600">
               Project Management
             </p>
           </div>
@@ -126,7 +126,7 @@ const Sidebar = ({ onClose }) => {
                   'group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors',
                   active
                     ? 'bg-primary-100 text-primary-700'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    : 'text-gray-700 hover:bg-gray-200 hover:text-gray-900'
                 )}
               >
                 <Icon

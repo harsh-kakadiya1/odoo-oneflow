@@ -148,6 +148,8 @@ export const dashboardAPI = {
   getStats: () => api.get('/dashboard/stats'),
   getRecentProjects: () => api.get('/dashboard/recent-projects'),
   getRecentTasks: () => api.get('/dashboard/recent-tasks'),
+  getAnalytics: (params) => api.get('/dashboard/analytics', { params }),
+  getUsers: () => api.get('/dashboard/users'),
 };
 
 // Company APIs

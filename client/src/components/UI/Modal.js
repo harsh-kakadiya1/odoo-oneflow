@@ -37,16 +37,16 @@ const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
         {/* Modal */}
         <div
           className={clsx(
-            'relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 w-full',
+            'relative transform overflow-hidden rounded-lg bg-gray-50 text-left shadow-xl transition-all sm:my-8 w-full border border-gray-300',
             sizeClasses[size]
           )}
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-300">
+            <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-500 transition-colors"
+              className="text-gray-500 hover:text-gray-700 transition-colors"
             >
               <X className="h-5 w-5" />
             </button>

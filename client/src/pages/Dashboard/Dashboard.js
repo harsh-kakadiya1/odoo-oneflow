@@ -55,6 +55,10 @@ const Dashboard = () => {
         dashboardAPI.getRecentTasks()
       ]);
 
+      console.log('Dashboard API Response - Stats:', statsRes.data.stats);
+      console.log('Dashboard API Response - Projects:', projectsRes.data.projects);
+      console.log('Dashboard API Response - Tasks:', tasksRes.data.tasks);
+
       setStats(statsRes.data.stats);
       setRecentProjects(projectsRes.data.projects);
       setRecentTasks(tasksRes.data.tasks);
