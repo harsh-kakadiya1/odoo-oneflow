@@ -8,7 +8,7 @@ import {
   ShoppingCart, 
   Receipt, 
   CreditCard, 
-  DollarSign,
+  IndianRupee,
   Package,
   ExternalLink
 } from 'lucide-react';
@@ -127,7 +127,7 @@ const Settings = () => {
     },
     {
       title: 'Expenses',
-      icon: DollarSign,
+      icon: IndianRupee,
       href: '/settings/expenses',
       color: 'bg-red-500',
       count: documentCounts.expenses

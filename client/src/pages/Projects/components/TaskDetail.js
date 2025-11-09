@@ -7,7 +7,7 @@ import {
   Paperclip,
   Send,
   Download,
-  DollarSign,
+  IndianRupee,
   CheckCircle
 } from 'lucide-react';
 import { Card, CardContent } from '../../../components/UI/Card';
@@ -301,7 +301,7 @@ const TaskDetail = ({ task, onUpdate }) => {
 
               <Card>
                 <CardContent className="p-4 text-center">
-                  <DollarSign className="h-8 w-8 text-purple-600 dark:text-purple-400 mx-auto mb-2" />
+                  <IndianRupee className="h-8 w-8 text-purple-600 dark:text-purple-400 mx-auto mb-2" />
                   <p className="text-2xl font-bold text-gray-900 dark:text-white">₹{totalCost.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">Total Cost</p>
                 </CardContent>
@@ -353,7 +353,7 @@ const TaskDetail = ({ task, onUpdate }) => {
                                 {timesheet.user ? `${timesheet.user.firstName} ${timesheet.user.lastName}` : 'Unknown'}
                               </span>
                               <span className="text-gray-600 dark:text-gray-400">
-                                <DollarSign className="h-4 w-4 inline mr-1" />
+                                <IndianRupee className="h-4 w-4 inline mr-1" />
                                 ₹{parseFloat(timesheet.cost).toLocaleString('en-IN')}
                               </span>
                             </div>

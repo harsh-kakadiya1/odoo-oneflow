@@ -257,6 +257,7 @@ router.put('/:id', protect, async (req, res) => {
       if (due_date !== undefined) task.due_date = due_date;
       if (priority) task.priority = priority;
       if (status) task.status = status;
+      if (req.body.hasOwnProperty('cover_image')) task.cover_image = req.body.cover_image;
 
       await task.save();
     }
@@ -348,7 +349,7 @@ router.delete('/:id', protect, async (req, res) => {
 // @access  Private (Assignee or Admin)
 router.post('/:id/timesheets', protect, async (req, res) => {
   try {
-    const { hours_logged, description, is_billable, log_date } = req.body;
+    const { hours_logged, description, log_date } = req.body;
 
     if (!hours_logged || hours_logged <= 0) {
       return res.status(400).json({
@@ -376,7 +377,6 @@ router.post('/:id/timesheets', protect, async (req, res) => {
       hours_logged,
       log_date: log_date || new Date(),
       description,
-      is_billable: is_billable !== undefined ? is_billable : true,
       cost
     });
 
@@ -454,7 +454,7 @@ router.get('/:id/timesheets', protect, async (req, res) => {
 // @access  Private
 router.post('/:id/time', protect, async (req, res) => {
   try {
-    const { hours, description, is_billable } = req.body;
+    const { hours, description } = req.body;
     
     // Check if task exists
     const task = await Task.findByPk(req.params.id);
@@ -465,13 +465,16 @@ router.post('/:id/time', protect, async (req, res) => {
       });
     }
 
+    // Calculate cost
+    const cost = await calculateTimesheetCost(parseFloat(hours), req.user.id);
+
     const timeEntry = await Timesheet.create({
       task_id: req.params.id,
       user_id: req.user.id,
-      hours: parseFloat(hours),
+      hours_logged: parseFloat(hours),
       description,
-      is_billable: is_billable !== false,
-      log_date: new Date()
+      log_date: new Date(),
+      cost
     });
 
     res.status(201).json({

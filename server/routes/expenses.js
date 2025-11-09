@@ -138,7 +138,7 @@ router.get('/:id', protect, async (req, res) => {
 // @access  Private (All authenticated users)
 router.post('/', protect, upload.single('receipt'), async (req, res) => {
   try {
-    const { description, project_id, amount, is_billable, expense_date, category } = req.body;
+    const { description, project_id, amount, expense_date, category } = req.body;
 
     if (!description || !amount) {
       return res.status(400).json({
@@ -156,7 +156,6 @@ router.post('/', protect, upload.single('receipt'), async (req, res) => {
       user_id: req.user.id,
       amount,
       status: 'Pending',
-      is_billable: is_billable || false,
       expense_date: expense_date || new Date(),
       receipt_url,
       category
@@ -233,7 +232,7 @@ router.put('/:id', protect, async (req, res) => {
       });
     }
 
-    const { description, amount, is_billable, expense_date, category, status } = req.body;
+    const { description, amount, expense_date, category, status } = req.body;
 
     // Check permissions for status change (approval/rejection)
     if (status && status !== expense.status) {
@@ -264,7 +263,6 @@ router.put('/:id', protect, async (req, res) => {
     if (expense.user_id === req.user.id && expense.status === 'Pending') {
       if (description) expense.description = description;
       if (amount) expense.amount = amount;
-      if (is_billable !== undefined) expense.is_billable = is_billable;
       if (expense_date) expense.expense_date = expense_date;
       if (category !== undefined) expense.category = category;
     } else if (expense.user_id !== req.user.id && req.user.role !== 'Admin') {

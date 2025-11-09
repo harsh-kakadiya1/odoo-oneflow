@@ -11,7 +11,7 @@ const generatePONumber = async () => {
   
   const lastPO = await PurchaseOrder.findOne({
     where: {
-      po_number: {
+      order_number: {
         [Op.like]: `${prefix}-${year}-%`
       }
     },
@@ -20,7 +20,7 @@ const generatePONumber = async () => {
 
   let nextNumber = 1;
   if (lastPO) {
-    const lastNumber = parseInt(lastPO.po_number.split('-')[2]);
+    const lastNumber = parseInt(lastPO.order_number.split('-')[2]);
     nextNumber = lastNumber + 1;
   }
 
@@ -49,7 +49,7 @@ router.get('/', protect, authorize('Admin', 'Sales/Finance', 'Project Manager'),
 
     if (search) {
       where[Op.or] = [
-        { po_number: { [Op.like]: `%${search}%` } },
+        { order_number: { [Op.like]: `%${search}%` } },
         { vendor_name: { [Op.like]: `%${search}%` } }
       ];
     }
@@ -130,11 +130,11 @@ router.post('/', protect, authorize('Admin', 'Sales/Finance', 'Project Manager')
     }
 
     // Generate PO number
-    const po_number = await generatePONumber();
+    const order_number = await generatePONumber();
 
     // Create purchase order
     const purchaseOrder = await PurchaseOrder.create({
-      po_number,
+      order_number,
       project_id,
       vendor_name,
       vendor_email,

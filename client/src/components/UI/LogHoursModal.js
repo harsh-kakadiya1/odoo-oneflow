@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Modal from './Modal';
 import Input from './Input';
 import Button from './Button';
-import { Clock, DollarSign, Info } from 'lucide-react';
+import { Clock, IndianRupee, Info } from 'lucide-react';
 import { taskAPI } from '../../utils/api';
 import { useAuth } from '../../contexts/AuthContext';
 import toast from 'react-hot-toast';
@@ -12,8 +12,7 @@ const LogHoursModal = ({ isOpen, onClose, task, onSuccess }) => {
   const [formData, setFormData] = useState({
     log_date: new Date().toISOString().split('T')[0],
     hours_logged: '',
-    description: '',
-    is_billable: true
+    description: ''
   });
   const [saving, setSaving] = useState(false);
 
@@ -46,8 +45,7 @@ const LogHoursModal = ({ isOpen, onClose, task, onSuccess }) => {
       setFormData({
         log_date: new Date().toISOString().split('T')[0],
         hours_logged: '',
-        description: '',
-        is_billable: true
+        description: ''
       });
     } catch (error) {
       console.error('Error logging hours:', error);
@@ -85,50 +83,19 @@ const LogHoursModal = ({ isOpen, onClose, task, onSuccess }) => {
           </label>
           <Input
             type="number"
-            step="0.25"
+            step="0.01"
             min="0.01"
             max="24"
             value={formData.hours_logged}
             onChange={(e) => setFormData({...formData, hours_logged: e.target.value})}
-            placeholder="4.5"
+            placeholder="e.g., 1, 2.5, 8"
             required
           />
           <div className="flex items-start mt-1">
             <Info className="h-3 w-3 text-gray-400 mr-1 mt-0.5" />
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              Enter in decimal format (e.g., 1.5 = 1 hour 30 minutes, 0.25 = 15 minutes)
+              Enter any number of hours (e.g., 1, 2.5, 8, 0.5)
             </p>
-          </div>
-        </div>
-
-        {/* Billable Toggle */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Billable to Customer?
-          </label>
-          <div className="flex gap-4">
-            <label className="flex items-center cursor-pointer">
-              <input
-                type="radio"
-                checked={formData.is_billable === true}
-                onChange={() => setFormData({...formData, is_billable: true})}
-                className="mr-2 h-4 w-4 text-primary-600 focus:ring-primary-500"
-              />
-              <span className="text-sm text-gray-900 dark:text-white">
-                ✅ Yes - Billable (Can invoice customer)
-              </span>
-            </label>
-            <label className="flex items-center cursor-pointer">
-              <input
-                type="radio"
-                checked={formData.is_billable === false}
-                onChange={() => setFormData({...formData, is_billable: false})}
-                className="mr-2 h-4 w-4 text-primary-600 focus:ring-primary-500"
-              />
-              <span className="text-sm text-gray-900 dark:text-white">
-                ⚪ No - Internal/Overhead
-              </span>
-            </label>
           </div>
         </div>
 
@@ -150,7 +117,7 @@ const LogHoursModal = ({ isOpen, onClose, task, onSuccess }) => {
         <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <DollarSign className="h-5 w-5 text-blue-600 dark:text-blue-400 mr-2" />
+              <IndianRupee className="h-5 w-5 text-blue-600 dark:text-blue-400 mr-2" />
               <span className="font-medium text-gray-900 dark:text-white">Cost Calculation:</span>
             </div>
             <span className="text-xl font-bold text-blue-600 dark:text-blue-400">
@@ -160,11 +127,6 @@ const LogHoursModal = ({ isOpen, onClose, task, onSuccess }) => {
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
             {formData.hours_logged || 0} hrs × ₹{userHourlyRate.toLocaleString('en-IN')}/hr
           </p>
-          {formData.is_billable && (
-            <p className="text-xs text-green-600 dark:text-green-400 mt-2">
-              ✅ This time can be billed to the customer
-            </p>
-          )}
         </div>
 
         {/* Actions */}

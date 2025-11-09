@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { 
   Plus, 
   ExternalLink, 
-  DollarSign, 
+  IndianRupee, 
   ShoppingCart, 
   FileText, 
   Receipt,
@@ -57,7 +57,7 @@ const LinksPanel = ({ projectId }) => {
     {
       key: 'salesOrders',
       title: 'Sales Orders',
-      icon: DollarSign,
+      icon: IndianRupee,
       color: 'green',
       createRoute: '/settings/sales-orders/new',
       viewRoute: '/settings/sales-orders',

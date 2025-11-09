@@ -39,11 +39,6 @@ const Expense = sequelize.define('Expense', {
     allowNull: false,
     defaultValue: 'Pending'
   },
-  is_billable: {
-    type: DataTypes.BOOLEAN,
-    allowNull: false,
-    defaultValue: false
-  },
   expense_date: {
     type: DataTypes.DATEONLY,
     allowNull: false,

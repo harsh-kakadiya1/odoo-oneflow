@@ -5,7 +5,7 @@ import {
   Settings, 
   Users, 
   Calendar, 
-  DollarSign, 
+  IndianRupee, 
   BarChart3,
   Clock,
   FileText,
@@ -139,7 +139,7 @@ const ProjectDetail = () => {
     { id: 'overview', label: 'Overview', icon: BarChart3 },
     { id: 'tasks', label: 'Tasks', icon: FileText },
     { id: 'timesheets', label: 'Timesheets', icon: Clock },
-    { id: 'links', label: 'Links', icon: DollarSign }
+    { id: 'links', label: 'Links', icon: IndianRupee }
   ];
 
   return (
@@ -250,7 +250,7 @@ const ProjectDetail = () => {
               </p>
             </div>
             <div className="h-12 w-12 bg-green-100 dark:bg-green-900 rounded-xl flex items-center justify-center">
-              <DollarSign className="h-6 w-6 text-green-600 dark:text-green-400" />
+              <IndianRupee className="h-6 w-6 text-green-600 dark:text-green-400" />
             </div>
           </div>
         </div>

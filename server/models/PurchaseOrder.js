@@ -7,7 +7,7 @@ const PurchaseOrder = sequelize.define('PurchaseOrder', {
     primaryKey: true,
     autoIncrement: true
   },
-  po_number: {
+  order_number: {
     type: DataTypes.STRING(50),
     allowNull: false,
     unique: true

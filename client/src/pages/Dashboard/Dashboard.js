@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { 
   FolderKanban, 
   Clock, 
-  DollarSign,
+  IndianRupee,
   AlertCircle,
   Calendar,
   CheckCircle2,
@@ -80,6 +80,7 @@ const Dashboard = () => {
       ]);
 
       console.log('✅ Dashboard API Response:', {
+        userRole: user?.role,
         stats: statsRes.data.stats,
         projectsCount: projectsRes.data.projects?.length || 0,
         tasksCount: tasksRes.data.tasks?.length || 0,
@@ -91,6 +92,17 @@ const Dashboard = () => {
       if (Object.keys(statsRes.data.stats || {}).length === 0) {
         console.warn('⚠️ Warning: Stats object is empty. User may not have company_id set!');
         console.warn('🔧 Fix: Run QUICK_DATABASE_FIX.sql script and logout/login');
+      }
+
+      // Debug Admin dashboard specifically
+      if (user?.role === 'Admin' || user?.role === 'Sales/Finance') {
+        console.log('🔍 Admin Dashboard Debug:', {
+          activeProjects: statsRes.data.stats?.activeProjects,
+          overdueTasks: statsRes.data.stats?.overdueTasks,
+          hoursLoggedWeek: statsRes.data.stats?.hoursLoggedWeek,
+          revenueBilledMonth: statsRes.data.stats?.revenueBilledMonth,
+          totalProjects: statsRes.data.stats?.totalProjects
+        });
       }
 
       setStats(statsRes.data.stats || {});
@@ -241,6 +253,18 @@ const Dashboard = () => {
 
   // Check if user needs to fix company_id
   const hasNoData = !stats || Object.keys(stats).length === 0;
+  
+  // Debug: Log current stats for Admin
+  if (user?.role === 'Admin' || user?.role === 'Sales/Finance') {
+    console.log('🎯 Admin Dashboard UI State:', {
+      stats,
+      hasNoData,
+      activeProjects: stats?.activeProjects,
+      overdueTasks: stats?.overdueTasks,
+      hoursLoggedWeek: stats?.hoursLoggedWeek,
+      revenueBilledMonth: stats?.revenueBilledMonth
+    });
+  }
 
   return (
     <div className="space-y-6">
@@ -300,14 +324,21 @@ const Dashboard = () => {
               <div>
                 <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Hours This Week</p>
                 <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
-                  {timesheetStats?.totalHours.toFixed(1) || '0.0'}
+                  {user?.role === 'Admin' || user?.role === 'Sales/Finance' 
+                    ? (stats?.hoursLoggedWeek || 0).toFixed(1)
+                    : (timesheetStats?.totalHours || 0).toFixed(1)}
                 </p>
               </div>
               <div className="h-14 w-14 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
                 <Clock className="h-7 w-7 text-white" />
               </div>
             </div>
-            {timesheetStats && (
+            {(user?.role === 'Admin' || user?.role === 'Sales/Finance') ? (
+              <div className="flex items-center justify-between text-sm pt-3 border-t border-gray-100 dark:border-gray-700">
+                <span className="text-gray-500 dark:text-gray-400">All Users:</span>
+                <span className="font-semibold text-green-600 dark:text-green-400">{(stats?.hoursLoggedWeek || 0).toFixed(1)} hrs</span>
+              </div>
+            ) : timesheetStats && (
               <div className="flex items-center justify-between text-sm pt-3 border-t border-gray-100 dark:border-gray-700">
                 <span className="text-gray-500 dark:text-gray-400">Billable:</span>
                 <span className="font-semibold text-green-600 dark:text-green-400">{timesheetStats.billableHours.toFixed(1)} hrs</span>
@@ -326,7 +357,7 @@ const Dashboard = () => {
               </p>
             </div>
             <div className="h-14 w-14 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center shadow-lg">
-              <DollarSign className="h-7 w-7 text-white" />
+              <IndianRupee className="h-7 w-7 text-white" />
             </div>
           </div>
         </div>

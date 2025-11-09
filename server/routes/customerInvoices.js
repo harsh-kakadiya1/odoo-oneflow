@@ -65,7 +65,7 @@ router.get('/', protect, authorize('Admin', 'Sales/Finance', 'Project Manager'),
         {
           model: SalesOrder,
           as: 'salesOrder',
-          attributes: ['id', 'so_number']
+          attributes: ['id', 'order_number']
         }
       ],
       order: [['created_at', 'DESC']]
@@ -100,7 +100,7 @@ router.get('/:id', protect, authorize('Admin', 'Sales/Finance', 'Project Manager
         {
           model: SalesOrder,
           as: 'salesOrder',
-          attributes: ['id', 'so_number', 'amount']
+          attributes: ['id', 'order_number', 'amount']
         }
       ]
     });
@@ -166,7 +166,7 @@ router.post('/', protect, authorize('Admin', 'Sales/Finance', 'Project Manager')
         {
           model: SalesOrder,
           as: 'salesOrder',
-          attributes: ['id', 'so_number']
+          attributes: ['id', 'order_number']
         }
       ]
     });
@@ -229,7 +229,7 @@ router.put('/:id', protect, authorize('Admin', 'Sales/Finance', 'Project Manager
         {
           model: SalesOrder,
           as: 'salesOrder',
-          attributes: ['id', 'so_number']
+          attributes: ['id', 'order_number']
         }
       ]
     });

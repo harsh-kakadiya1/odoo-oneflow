@@ -3,7 +3,7 @@ import { Card, CardContent } from '../../components/UI/Card';
 import Button from '../../components/UI/Button';
 import Badge from '../../components/UI/Badge';
 import LoadingSpinner from '../../components/UI/LoadingSpinner';
-import { Clock, DollarSign, Calendar, TrendingUp, CheckCircle } from 'lucide-react';
+import { Clock, IndianRupee, Calendar, TrendingUp, CheckCircle } from 'lucide-react';
 import { timesheetAPI } from '../../utils/api';
 import { useAuth } from '../../contexts/AuthContext';
 import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subDays } from 'date-fns';
@@ -159,7 +159,7 @@ const MyTimesheets = () => {
                   </p>
                 </div>
                 <div className="h-12 w-12 bg-purple-100 dark:bg-purple-900 rounded-xl flex items-center justify-center">
-                  <DollarSign className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+                  <IndianRupee className="h-6 w-6 text-purple-600 dark:text-purple-400" />
                 </div>
               </div>
             </CardContent>
@@ -265,7 +265,7 @@ const MyTimesheets = () => {
                                   {timesheet.is_billable ? '✅ Billable' : '⚪ Internal'}
                                 </Badge>
                                 <span className="flex items-center text-gray-700 dark:text-gray-300">
-                                  <DollarSign className="h-4 w-4 mr-1" />
+                                  <IndianRupee className="h-4 w-4 mr-1" />
                                   <span className="font-semibold">₹{parseFloat(timesheet.cost).toLocaleString('en-IN')}</span>
                                 </span>
                               </div>

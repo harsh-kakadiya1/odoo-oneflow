@@ -10,7 +10,6 @@ import {
   User,
   FileText,
   X,
-  DollarSign,
   LogOut,
   Clock
 } from 'lucide-react';

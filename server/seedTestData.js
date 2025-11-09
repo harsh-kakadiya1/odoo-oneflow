@@ -360,7 +360,6 @@ const seedTestData = async () => {
         hours_logged: parseFloat(randomHours.toFixed(2)),
         log_date: randomDate,
         description: `Working on ${randomTask.title}`,
-        is_billable: isBillable
       });
     }
 
@@ -370,7 +369,7 @@ const seedTestData = async () => {
     console.log('🛒 Creating sales orders...');
     await SalesOrder.bulkCreate([
       {
-        so_number: 'SO-2024-0001',
+        order_number: 'SO-2024-0001',
         customer_name: 'Acme Corporation',
         customer_email: 'procurement@acme.com',
         customer_phone: '+1 (555) 111-2222',
@@ -382,7 +381,7 @@ const seedTestData = async () => {
         project_id: projects[0].id
       },
       {
-        so_number: 'SO-2024-0002',
+        order_number: 'SO-2024-0002',
         customer_name: 'StartUp Tech',
         customer_email: 'ceo@startup.tech',
         customer_phone: '+1 (555) 222-3333',
@@ -394,7 +393,7 @@ const seedTestData = async () => {
         project_id: projects[1].id
       },
       {
-        so_number: 'SO-2024-0003',
+        order_number: 'SO-2024-0003',
         customer_name: 'Data Insights Ltd',
         customer_email: 'orders@datainsights.com',
         order_date: new Date('2024-01-05'),
@@ -451,7 +450,7 @@ const seedTestData = async () => {
     console.log('📦 Creating purchase orders...');
     await PurchaseOrder.bulkCreate([
       {
-        po_number: 'PO-2024-001',
+        order_number: 'PO-2024-001',
         vendor_name: 'Cloud Hosting Solutions',
         vendor_email: 'sales@cloudhosting.com',
         vendor_phone: '+1 (555) 444-5555',
@@ -463,7 +462,7 @@ const seedTestData = async () => {
         project_id: projects[0].id
       },
       {
-        po_number: 'PO-2024-002',
+        order_number: 'PO-2024-002',
         vendor_name: 'Software Licensing Corp',
         vendor_email: 'licensing@softwarecorp.com',
         order_date: new Date('2024-02-01'),

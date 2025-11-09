@@ -9,7 +9,7 @@ import {
   Users, 
   CheckCircle, 
   ArrowRight,
-  DollarSign,
+  IndianRupee,
   Clock,
   BarChart3,
   Globe,
@@ -91,7 +91,7 @@ const Home = () => {
 
   const stats = [
     { number: '10K+', label: 'Active Users' },
-    { number: '$50M+', label: 'Invoices Processed' },
+    { number: '₹50M+', label: 'Invoices Processed' },
     { number: '99.9%', label: 'Uptime' },
     { number: '24/7', label: 'Support' }
   ];
@@ -251,7 +251,7 @@ const Home = () => {
                     </div>
                     <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border-l-4 border-purple-400">
                       <div className="text-xs text-gray-600 dark:text-gray-400 mb-2">Revenue</div>
-                      <div className="text-2xl font-bold text-purple-600">$45K</div>
+                      <div className="text-2xl font-bold text-purple-600">₹45K</div>
                     </div>
                   </div>
 
@@ -629,10 +629,10 @@ const Home = () => {
                 <div className="bg-white dark:bg-gray-800 rounded-xl p-6 space-y-4">
                   <div className="flex items-center justify-between pb-4 border-b border-gray-200 dark:border-gray-700">
                     <div className="flex items-center space-x-3">
-                      <DollarSign className="h-8 w-8 text-primary-600" />
+                      <IndianRupee className="h-8 w-8 text-primary-600" />
                       <div>
                         <div className="text-sm text-gray-500 dark:text-gray-400">Total Revenue</div>
-                        <div className="text-2xl font-bold text-gray-900 dark:text-white">$125,430</div>
+                        <div className="text-2xl font-bold text-gray-900 dark:text-white">₹1,25,430</div>
                       </div>
                     </div>
                     <div className="text-green-500 text-sm font-semibold">+12.5%</div>
@@ -689,7 +689,7 @@ const Home = () => {
               <div className="text-center mb-6">
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Starter</h3>
                 <div className="flex items-baseline justify-center">
-                  <span className="text-5xl font-bold text-gray-900 dark:text-white">$0</span>
+                  <span className="text-5xl font-bold text-gray-900 dark:text-white">₹0</span>
                   <span className="text-gray-500 dark:text-gray-400 ml-2">/month</span>
                 </div>
               </div>
@@ -725,7 +725,7 @@ const Home = () => {
               <div className="text-center mb-6">
                 <h3 className="text-2xl font-bold text-white mb-2">Professional</h3>
                 <div className="flex items-baseline justify-center">
-                  <span className="text-5xl font-bold text-white">$29</span>
+                  <span className="text-5xl font-bold text-white">₹29</span>
                   <span className="text-primary-100 ml-2">/month</span>
                 </div>
               </div>
@@ -760,7 +760,7 @@ const Home = () => {
               <div className="text-center mb-6">
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Enterprise</h3>
                 <div className="flex items-baseline justify-center">
-                  <span className="text-5xl font-bold text-gray-900 dark:text-white">$99</span>
+                  <span className="text-5xl font-bold text-gray-900 dark:text-white">₹99</span>
                   <span className="text-gray-500 dark:text-gray-400 ml-2">/month</span>
                 </div>
               </div>

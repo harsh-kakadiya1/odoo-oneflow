@@ -42,11 +42,6 @@ const Timesheet = sequelize.define('Timesheet', {
     type: DataTypes.TEXT,
     allowNull: true
   },
-  is_billable: {
-    type: DataTypes.BOOLEAN,
-    allowNull: false,
-    defaultValue: true
-  },
   cost: {
     type: DataTypes.DECIMAL(10, 2),
     allowNull: false,

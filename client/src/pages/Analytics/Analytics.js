@@ -3,7 +3,7 @@ import {
   Users, 
   TrendingUp, 
   Clock, 
-  DollarSign,
+  IndianRupee,
   FolderKanban,
   CheckCircle2,
   Filter,
@@ -233,7 +233,7 @@ const Analytics = () => {
               </p>
             </div>
             <div className="h-14 w-14 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center shadow-lg">
-              <DollarSign className="h-7 w-7 text-white" />
+              <IndianRupee className="h-7 w-7 text-white" />
             </div>
           </div>
         </div>

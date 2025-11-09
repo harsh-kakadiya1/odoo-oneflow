@@ -639,12 +639,12 @@ router.get('/:id/links', protect, async (req, res) => {
     const [salesOrders, purchaseOrders, customerInvoices, vendorBills, expenses] = await Promise.all([
       SalesOrder.findAll({
         where: { project_id: projectId },
-        attributes: ['id', 'so_number', 'customer_name', 'customer_email', 'amount', 'status', 'order_date'],
+        attributes: ['id', 'order_number', 'customer_name', 'customer_email', 'amount', 'status', 'order_date'],
         order: [['created_at', 'DESC']]
       }),
       PurchaseOrder.findAll({
         where: { project_id: projectId },
-        attributes: ['id', 'po_number', 'vendor_name', 'vendor_email', 'amount', 'status', 'order_date'],
+        attributes: ['id', 'order_number', 'vendor_name', 'vendor_email', 'amount', 'status', 'order_date'],
         order: [['created_at', 'DESC']]
       }),
       CustomerInvoice.findAll({
@@ -659,7 +659,7 @@ router.get('/:id/links', protect, async (req, res) => {
       }),
       Expense.findAll({
         where: { project_id: projectId },
-        attributes: ['id', 'description', 'amount', 'status', 'expense_date', 'category', 'is_billable'],
+        attributes: ['id', 'description', 'amount', 'status', 'expense_date', 'category'],
         include: [{
           model: User,
           as: 'user',
@@ -672,7 +672,7 @@ router.get('/:id/links', protect, async (req, res) => {
     const links = {
       salesOrders: salesOrders.map(so => ({
         id: so.id,
-        number: so.so_number,
+        number: so.order_number,
         partner_name: so.customer_name,
         customer_name: so.customer_name,
         customer_email: so.customer_email,
@@ -683,7 +683,7 @@ router.get('/:id/links', protect, async (req, res) => {
       })),
       purchaseOrders: purchaseOrders.map(po => ({
         id: po.id,
-        number: po.po_number,
+        number: po.order_number,
         vendor_name: po.vendor_name,
         vendor_email: po.vendor_email,
         total_amount: po.amount,
@@ -721,7 +721,6 @@ router.get('/:id/links', protect, async (req, res) => {
         status: exp.status,
         date: exp.expense_date,
         category: exp.category,
-        is_billable: exp.is_billable,
         user_name: exp.user ? `${exp.user.firstName} ${exp.user.lastName}` : 'Unknown'
       }))
     };

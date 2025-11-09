@@ -11,7 +11,7 @@ const generateSONumber = async () => {
   
   const lastSO = await SalesOrder.findOne({
     where: {
-      so_number: {
+      order_number: {
         [Op.like]: `${prefix}-${year}-%`
       }
     },
@@ -20,7 +20,7 @@ const generateSONumber = async () => {
 
   let nextNumber = 1;
   if (lastSO) {
-    const lastNumber = parseInt(lastSO.so_number.split('-')[2]);
+    const lastNumber = parseInt(lastSO.order_number.split('-')[2]);
     nextNumber = lastNumber + 1;
   }
 
@@ -49,7 +49,7 @@ router.get('/', protect, authorize('Admin', 'Sales/Finance', 'Project Manager'),
 
     if (search) {
       where[Op.or] = [
-        { so_number: { [Op.like]: `%${search}%` } },
+        { order_number: { [Op.like]: `%${search}%` } },
         { customer_name: { [Op.like]: `%${search}%` } }
       ];
     }
@@ -130,11 +130,11 @@ router.post('/', protect, authorize('Admin', 'Sales/Finance'), async (req, res) 
     }
 
     // Generate SO number
-    const so_number = await generateSONumber();
+    const order_number = await generateSONumber();
 
     // Create sales order
     const salesOrder = await SalesOrder.create({
-      so_number,
+      order_number,
       project_id,
       customer_name,
       customer_email,

@@ -36,9 +36,9 @@ router.get('/my', protect, async (req, res) => {
       order: [['log_date', 'DESC'], ['created_at', 'DESC']]
     });
 
-    // Calculate summary
+    // Calculate summary (all hours are billable since is_billable column doesn't exist)
     const totalHours = timesheets.reduce((sum, t) => sum + parseFloat(t.hours_logged), 0);
-    const billableHours = timesheets.filter(t => t.is_billable).reduce((sum, t) => sum + parseFloat(t.hours_logged), 0);
+    const billableHours = totalHours; // All hours are billable
     const totalEarnings = timesheets.reduce((sum, t) => sum + parseFloat(t.cost), 0);
 
     res.status(200).json({
@@ -47,9 +47,9 @@ router.get('/my', protect, async (req, res) => {
       summary: {
         totalHours,
         billableHours,
-        nonBillableHours: totalHours - billableHours,
+        nonBillableHours: 0, // No non-billable hours
         totalEarnings,
-        billablePercentage: totalHours > 0 ? (billableHours / totalHours) * 100 : 0
+        billablePercentage: 100 // All hours are billable
       },
       timesheets
     });
@@ -94,11 +94,11 @@ router.get('/project/:projectId', protect, async (req, res) => {
       order: [['log_date', 'DESC']]
     });
 
-    // Calculate metrics
+    // Calculate metrics (all hours are billable)
     const totalHours = timesheets.reduce((sum, t) => sum + parseFloat(t.hours_logged), 0);
-    const billableHours = timesheets.filter(t => t.is_billable).reduce((sum, t) => sum + parseFloat(t.hours_logged), 0);
+    const billableHours = totalHours; // All hours are billable
     const totalCost = timesheets.reduce((sum, t) => sum + parseFloat(t.cost), 0);
-    const billableCost = timesheets.filter(t => t.is_billable).reduce((sum, t) => sum + parseFloat(t.cost), 0);
+    const billableCost = totalCost; // All cost is billable
 
     // Group by user
     const byUser = timesheets.reduce((acc, t) => {
@@ -114,11 +114,7 @@ router.get('/project/:projectId', protect, async (req, res) => {
         };
       }
       acc[userId].totalHours += parseFloat(t.hours_logged);
-      if (t.is_billable) {
-        acc[userId].billableHours += parseFloat(t.hours_logged);
-      } else {
-        acc[userId].nonBillableHours += parseFloat(t.hours_logged);
-      }
+      acc[userId].billableHours += parseFloat(t.hours_logged); // All hours are billable
       acc[userId].cost += parseFloat(t.cost);
       acc[userId].entries += 1;
       return acc;
@@ -149,7 +145,7 @@ router.get('/project/:projectId', protect, async (req, res) => {
       if (!acc[date]) acc[date] = { hours: 0, cost: 0, billableHours: 0 };
       acc[date].hours += parseFloat(t.hours_logged);
       acc[date].cost += parseFloat(t.cost);
-      if (t.is_billable) acc[date].billableHours += parseFloat(t.hours_logged);
+      acc[date].billableHours += parseFloat(t.hours_logged); // All hours are billable
       return acc;
     }, {});
 
@@ -219,7 +215,7 @@ router.put('/:id', protect, async (req, res) => {
       });
     }
 
-    const { hours_logged, description, is_billable, log_date } = req.body;
+    const { hours_logged, description, log_date } = req.body;
 
     // Update fields
     if (hours_logged !== undefined) {
@@ -237,7 +233,6 @@ router.put('/:id', protect, async (req, res) => {
     }
 
     if (description !== undefined) timesheet.description = description;
-    if (is_billable !== undefined) timesheet.is_billable = is_billable;
     if (log_date !== undefined) timesheet.log_date = log_date;
 
     await timesheet.save();
@@ -361,7 +356,7 @@ router.get('/analytics/user/:userId', protect, async (req, res) => {
 
     const totalHours = timesheets.reduce((sum, t) => sum + parseFloat(t.hours_logged), 0);
     const totalEarnings = timesheets.reduce((sum, t) => sum + parseFloat(t.cost), 0);
-    const billableHours = timesheets.filter(t => t.is_billable).reduce((sum, t) => sum + parseFloat(t.hours_logged), 0);
+    const billableHours = totalHours; // All hours are billable
 
     // Group by project
     const byProject = timesheets.reduce((acc, t) => {
@@ -390,7 +385,7 @@ router.get('/analytics/user/:userId', protect, async (req, res) => {
       const date = t.log_date;
       if (!acc[date]) acc[date] = { hours: 0, billable: 0, cost: 0 };
       acc[date].hours += parseFloat(t.hours_logged);
-      if (t.is_billable) acc[date].billable += parseFloat(t.hours_logged);
+      acc[date].billable += parseFloat(t.hours_logged); // All hours are billable
       acc[date].cost += parseFloat(t.cost);
       return acc;
     }, {});
@@ -472,9 +467,9 @@ router.get('/analytics/project/:projectId', protect, async (req, res) => {
     });
 
     const totalHours = timesheets.reduce((sum, t) => sum + parseFloat(t.hours_logged), 0);
-    const billableHours = timesheets.filter(t => t.is_billable).reduce((sum, t) => sum + parseFloat(t.hours_logged), 0);
+    const billableHours = totalHours; // All hours are billable
     const totalCost = timesheets.reduce((sum, t) => sum + parseFloat(t.cost), 0);
-    const billableCost = timesheets.filter(t => t.is_billable).reduce((sum, t) => sum + parseFloat(t.cost), 0);
+    const billableCost = totalCost; // All cost is billable
 
     // Group by user
     const byUser = timesheets.reduce((acc, t) => {
@@ -492,11 +487,7 @@ router.get('/analytics/project/:projectId', protect, async (req, res) => {
         };
       }
       acc[userId].totalHours += parseFloat(t.hours_logged);
-      if (t.is_billable) {
-        acc[userId].billableHours += parseFloat(t.hours_logged);
-      } else {
-        acc[userId].nonBillableHours += parseFloat(t.hours_logged);
-      }
+      acc[userId].billableHours += parseFloat(t.hours_logged); // All hours are billable
       acc[userId].cost += parseFloat(t.cost);
       acc[userId].entries += 1;
       return acc;
@@ -528,7 +519,7 @@ router.get('/analytics/project/:projectId', protect, async (req, res) => {
       if (!acc[date]) acc[date] = { hours: 0, cost: 0, billableHours: 0, entries: 0 };
       acc[date].hours += parseFloat(t.hours_logged);
       acc[date].cost += parseFloat(t.cost);
-      if (t.is_billable) acc[date].billableHours += parseFloat(t.hours_logged);
+      acc[date].billableHours += parseFloat(t.hours_logged); // All hours are billable
       acc[date].entries += 1;
       return acc;
     }, {});

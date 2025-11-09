@@ -49,58 +49,81 @@ router.get('/stats', protect, async (req, res) => {
 
       console.log(`Active projects found: ${stats.activeProjects} for company ${currentUser.company_id}`);
 
-      // Total hours logged this week - scoped to company projects
-      const companyProjects = await Project.findAll({
-        where: companyWhere,
-        attributes: ['id']
-      });
-      const projectIds = companyProjects.map(p => p.id);
-      
-      // Handle empty projectIds array
-      let taskIds = [];
-      if (projectIds.length > 0) {
-        const companyTasks = await Task.findAll({
-          where: { project_id: { [Op.in]: projectIds } },
+      // Total hours logged this week - from all users in company
+      // For Admin: Get hours from all users in the company (not just from tasks)
+      let hoursResult = 0;
+      if (currentUser.company_id) {
+        // Get all users in the company
+        const companyUsers = await User.findAll({
+          where: { company_id: currentUser.company_id },
           attributes: ['id']
         });
-        taskIds = companyTasks.map(t => t.id);
-      }
-
-      let hoursResult = 0;
-      if (taskIds.length > 0) {
+        const userIds = companyUsers.map(u => u.id);
+        
+        if (userIds.length > 0) {
+          hoursResult = await Timesheet.sum('hours_logged', {
+            where: {
+              user_id: { [Op.in]: userIds },
+              log_date: { [Op.gte]: weekAgo }
+            }
+          });
+        }
+      } else {
+        // If no company_id, get all hours (backward compatibility)
         hoursResult = await Timesheet.sum('hours_logged', {
           where: {
-            task_id: { [Op.in]: taskIds },
             log_date: { [Op.gte]: weekAgo }
           }
         });
       }
       stats.hoursLoggedWeek = parseFloat(hoursResult) || 0;
 
-      // Overdue tasks - scoped to company projects  
+      // Overdue tasks - from all company projects (all managers' projects)
+      // Get all company projects first
+      const companyProjects = await Project.findAll({
+        where: companyWhere,
+        attributes: ['id']
+      });
+      const projectIds = companyProjects.map(p => p.id);
+      
+      console.log(`📊 Admin Dashboard - Found ${projectIds.length} projects for company ${currentUser.company_id}`);
+      console.log(`📊 Project IDs:`, projectIds);
+      
+      // Debug: Check if there are ANY projects in the database
+      if (projectIds.length === 0 && currentUser.company_id) {
+        const allProjects = await Project.count();
+        const projectsWithDifferentCompany = await Project.count({
+          where: { company_id: { [Op.ne]: currentUser.company_id } }
+        });
+        console.warn(`⚠️ No projects found for company ${currentUser.company_id}!`);
+        console.warn(`📊 Total projects in DB: ${allProjects}`);
+        console.warn(`📊 Projects with different company_id: ${projectsWithDifferentCompany}`);
+      }
+      
       let overdueCount = 0;
       if (projectIds.length > 0) {
         overdueCount = await Task.count({
           where: {
             project_id: { [Op.in]: projectIds },
             due_date: { [Op.lt]: today },
-            status: { [Op.notIn]: ['Done'] }
+            status: { [Op.notIn]: ['Done', 'Completed'] }
           }
         });
       }
       stats.overdueTasks = overdueCount;
 
-      // Revenue billed this month - scoped to company
-      const revenueWhere = currentUser.company_id 
-        ? { company_id: currentUser.company_id }
-        : {};
-      const revenueResult = await CustomerInvoice.sum('amount', {
+      // Revenue billed this month - scoped to company projects
+      // CustomerInvoice doesn't have company_id, so we need to join with Project
+      let revenueResult = 0;
+      if (projectIds.length > 0) {
+        revenueResult = await CustomerInvoice.sum('amount', {
           where: {
-            ...revenueWhere,
+            project_id: { [Op.in]: projectIds },
             invoice_date: { [Op.gte]: monthAgo },
             status: { [Op.in]: ['Sent', 'Paid'] }
           }
         });
+      }
       stats.revenueBilledMonth = parseFloat(revenueResult) || 0;
 
       // Pending expenses count - scoped to company projects
@@ -120,26 +143,46 @@ router.get('/stats', protect, async (req, res) => {
         where: companyWhere
       });
 
-      // Open sales orders - scoped to company
-      const salesOrderWhere = currentUser.company_id 
-        ? { company_id: currentUser.company_id }
-        : {};
-      stats.openSalesOrders = await require('../models').SalesOrder.count({
-        where: { 
-          ...salesOrderWhere,
-          status: { [Op.in]: ['Draft', 'Confirmed'] } 
-        }
-      });
+      // Open sales orders - scoped to company projects
+      // SalesOrder doesn't have company_id, so we need to filter by project_id
+      let openSalesOrdersCount = 0;
+      if (projectIds.length > 0) {
+        openSalesOrdersCount = await require('../models').SalesOrder.count({
+          where: { 
+            project_id: { [Op.in]: projectIds },
+            status: { [Op.in]: ['Draft', 'Confirmed'] } 
+          }
+        });
+      }
+      stats.openSalesOrders = openSalesOrdersCount;
 
-      // Unpaid invoices - scoped to company
-      stats.unpaidInvoices = await CustomerInvoice.count({
-        where: { 
-          ...revenueWhere,
-          status: { [Op.in]: ['Draft', 'Sent'] } 
-        }
-      });
+      // Unpaid invoices - scoped to company projects
+      let unpaidInvoicesCount = 0;
+      if (projectIds.length > 0) {
+        unpaidInvoicesCount = await CustomerInvoice.count({
+          where: { 
+            project_id: { [Op.in]: projectIds },
+            status: { [Op.in]: ['Draft', 'Sent'] } 
+          }
+        });
+      }
+      stats.unpaidInvoices = unpaidInvoicesCount;
 
-      console.log('Dashboard stats calculated:', stats);
+      console.log('📊 Admin Dashboard stats calculated:', {
+        userRole: req.user.role,
+        userId: req.user.id,
+        userName: currentUser.firstName + ' ' + currentUser.lastName,
+        companyId: currentUser.company_id,
+        projectIdsCount: projectIds.length,
+        activeProjects: stats.activeProjects,
+        overdueTasks: stats.overdueTasks,
+        hoursLoggedWeek: stats.hoursLoggedWeek,
+        revenueBilledMonth: stats.revenueBilledMonth,
+        totalProjects: stats.totalProjects,
+        openSalesOrders: stats.openSalesOrders,
+        unpaidInvoices: stats.unpaidInvoices,
+        pendingExpenses: stats.pendingExpenses
+      });
 
     } else if (req.user.role === 'Project Manager') {
       // Statistics for Project Manager's projects (within their company)
@@ -247,10 +290,12 @@ router.get('/stats', protect, async (req, res) => {
       totalProjects: stats.totalProjects || 0,
       openTasks: stats.openTasks || 0,
       pendingExpenses: stats.pendingExpenses || 0,
+      openSalesOrders: stats.openSalesOrders || 0,
+      unpaidInvoices: stats.unpaidInvoices || 0,
       ...stats // Override with any additional stats
     };
 
-    console.log('Final dashboard stats being sent:', finalStats);
+    console.log('✅ Final dashboard stats being sent to frontend:', JSON.stringify(finalStats, null, 2));
 
     res.status(200).json({
       success: true,
@@ -634,13 +679,9 @@ router.get('/analytics', protect, async (req, res) => {
     }) || 0;
     const avgHoursPerDay = recentHours / 7;
 
-    // Billable vs Non-billable hours
-    const billableHours = await Timesheet.sum('hours_logged', {
-      where: { is_billable: true }
-    }) || 0;
-    const nonBillableHours = await Timesheet.sum('hours_logged', {
-      where: { is_billable: false }
-    }) || 0;
+    // Billable vs Non-billable hours (all hours are billable since is_billable column doesn't exist)
+    const billableHours = totalHoursLogged; // All hours are billable
+    const nonBillableHours = 0; // No non-billable hours
     const billablePercentage = totalHoursLogged > 0 ? Math.round((billableHours / totalHoursLogged) * 100) : 0;
 
     analytics.kpis = {
@@ -764,19 +805,14 @@ router.get('/analytics', protect, async (req, res) => {
       const monthStart = new Date(date.getFullYear(), date.getMonth(), 1);
       const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0);
 
+      // All hours are billable since is_billable column doesn't exist
       const billableHours = await Timesheet.sum('hours_logged', {
         where: {
-          is_billable: true,
           log_date: { [Op.between]: [monthStart, monthEnd] }
         }
       }) || 0;
 
-      const nonBillableHours = await Timesheet.sum('hours_logged', {
-        where: {
-          is_billable: false,
-          log_date: { [Op.between]: [monthStart, monthEnd] }
-        }
-      }) || 0;
+      const nonBillableHours = 0; // No non-billable hours
 
       monthlyHoursData.push({
         month: date.toLocaleString('default', { month: 'short' }),
