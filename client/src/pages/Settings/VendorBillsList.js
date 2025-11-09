@@ -27,7 +27,7 @@ const VendorBillsList = () => {
         ...filters
       };
       const response = await vendorBillAPI.getAll(params);
-      setBills(response.data.bills || []);
+      setBills(response.data.vendorBills || response.data.bills || []);
     } catch (error) {
       console.error('Error fetching vendor bills:', error);
       toast.error('Failed to load vendor bills');
@@ -84,7 +84,7 @@ const VendorBillsList = () => {
   ];
 
   const renderRow = (bill) => (
-    <tr key={bill.id} className="hover:bg-gray-50">
+    <tr key={bill.id} className="hover:bg-gray-50 dark:bg-gray-700">
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="flex items-center">
           <Link
@@ -96,17 +96,17 @@ const VendorBillsList = () => {
         </div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
-        <div className="text-sm text-gray-900">{bill.vendor_name}</div>
-        <div className="text-sm text-gray-500">{bill.vendor_email}</div>
+        <div className="text-sm text-gray-900 dark:text-white">{bill.vendor_name}</div>
+        <div className="text-sm text-gray-500 dark:text-gray-400">{bill.vendor_email}</div>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
         {bill.bill_date ? format(new Date(bill.bill_date), 'MMM dd, yyyy') : '-'}
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
         {bill.due_date ? format(new Date(bill.due_date), 'MMM dd, yyyy') : '-'}
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-        ${bill.amount?.toLocaleString() || '0.00'}
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+        ₹{bill.amount?.toLocaleString('en-IN') || '0'}
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         <Badge color={getStatusColor(bill.status)}>

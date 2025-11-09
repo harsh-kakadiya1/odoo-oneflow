@@ -10,7 +10,8 @@ import {
   Clock,
   MessageSquare,
   Paperclip,
-  AlertCircle
+  AlertCircle,
+  FileText
 } from 'lucide-react';
 import { Card, CardContent } from '../../../components/UI/Card';
 import Button from '../../../components/UI/Button';
@@ -172,7 +173,7 @@ const TaskList = ({ projectId }) => {
       {/* Header and Controls */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
         <div className="flex items-center space-x-4">
-          <h3 className="text-xl font-semibold text-gray-900">Tasks</h3>
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Tasks</h3>
           <Badge variant="outline">
             {filteredTasks.length} of {tasks.length}
           </Badge>
@@ -180,13 +181,13 @@ const TaskList = ({ projectId }) => {
 
         <div className="flex items-center space-x-2">
           {/* View Toggle */}
-          <div className="flex bg-gray-100 rounded-lg p-1">
+          <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
             <button
               onClick={() => setViewMode('all')}
               className={`px-3 py-1 text-sm rounded-md transition-colors ${
                 viewMode === 'all'
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-white dark:bg-gray-800 text-blue-600 shadow-sm'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-white'
               }`}
             >
               All Tasks
@@ -195,8 +196,8 @@ const TaskList = ({ projectId }) => {
               onClick={() => setViewMode('my')}
               className={`px-3 py-1 text-sm rounded-md transition-colors ${
                 viewMode === 'my'
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-white dark:bg-gray-800 text-blue-600 shadow-sm'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-white'
               }`}
             >
               My Tasks
@@ -228,7 +229,7 @@ const TaskList = ({ projectId }) => {
               <select
                 value={filters.status}
                 onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="">All Status</option>
                 <option value="New">New</option>
@@ -241,7 +242,7 @@ const TaskList = ({ projectId }) => {
               <select
                 value={filters.priority}
                 onChange={(e) => setFilters({ ...filters, priority: e.target.value })}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="">All Priority</option>
                 <option value="Low">Low</option>
@@ -262,23 +263,25 @@ const TaskList = ({ projectId }) => {
         </CardContent>
       </Card>
 
-      {/* Task Grid */}
+      {/* Task Grid - New Design Matching Project Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredTasks.length === 0 ? (
-          <div className="col-span-full text-center py-12">
-            <p className="text-gray-500">
-              {viewMode === 'my' ? 'No tasks assigned to you' : 'No tasks found'}
-            </p>
-            {hasRole(['Admin', 'Project Manager']) && (
-              <Button
-                variant="outline"
-                onClick={handleCreateTask}
-                className="mt-4"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Create First Task
-              </Button>
-            )}
+          <div className="col-span-full">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-12 text-center">
+              <div className="h-16 w-16 bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                <FileText className="h-8 w-8 text-primary-600 dark:text-primary-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No tasks found</h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
+                {viewMode === 'my' ? 'No tasks assigned to you' : 'Get started by creating your first task'}
+              </p>
+              {hasRole(['Admin', 'Project Manager']) && (
+                <Button onClick={handleCreateTask}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create First Task
+                </Button>
+              )}
+            </div>
           </div>
         ) : (
           filteredTasks.map((task) => {
@@ -287,192 +290,148 @@ const TaskList = ({ projectId }) => {
             const isDueSoon = daysUntilDue !== null && daysUntilDue >= 0 && daysUntilDue <= 3;
 
             return (
-              <Card 
+              <div 
                 key={task.id} 
-                className={`group hover:shadow-md transition-shadow cursor-pointer ${
-                  isOverdue ? 'border-red-200 bg-red-50' : 
-                  isDueSoon ? 'border-yellow-200 bg-yellow-50' : ''
-                }`}
+                className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-200 cursor-pointer"
                 onClick={() => handleViewTask(task)}
               >
-                <CardContent>
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-gray-900 mb-1">{task.title}</h4>
-                      <div className="flex items-center space-x-2 mb-2">
-                        <Badge variant={getStatusColor(task.status)} size="sm">
-                          {task.status}
-                        </Badge>
-                        <Badge variant={getPriorityColor(task.priority)} size="sm">
-                          {task.priority}
-                        </Badge>
-                      </div>
+                <div className="p-6">
+                  {/* Task Name, Status, and Priority - Header */}
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-lg font-bold text-gray-900 dark:text-white flex-1 mr-2">
+                      {task.title}
+                    </h4>
+                    <div className="flex items-center space-x-2 flex-shrink-0">
+                      <Badge variant={getStatusColor(task.status)} size="sm">
+                        {task.status}
+                      </Badge>
+                      <Badge variant={getPriorityColor(task.priority)} size="sm">
+                        {task.priority}
+                      </Badge>
                     </div>
+                  </div>
 
-                    {canEditTaskDetails(task) && (
-                      <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button
-                          variant="ghost"
-                          size="sm"
+                  {/* Separator Line */}
+                  <div className="border-t border-gray-200 dark:border-gray-700 mb-4"></div>
+
+                  {/* Edit and Delete Buttons */}
+                  {canEditTaskDetails(task) && (
+                    <div className="flex items-center space-x-2 mb-4">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditTask(task);
+                        }}
+                        className="flex items-center px-3 py-1.5 text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                      >
+                        <Edit className="h-3 w-3 mr-1" />
+                        Edit
+                      </button>
+                      {hasRole(['Admin', 'Project Manager']) && (
+                        <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleEditTask(task);
+                            handleDeleteTask(task.id);
                           }}
+                          className="flex items-center px-3 py-1.5 text-sm bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/30 transition-colors"
                         >
-                          <Edit className="h-3 w-3" />
-                        </Button>
-                        {hasRole(['Admin', 'Project Manager']) && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeleteTask(task.id);
-                            }}
-                            className="text-red-600 hover:bg-red-50"
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
-                        )}
-                      </div>
-                    )}
-                  </div>
-
-                  {task.description && (
-                    <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-                      {task.description}
-                    </p>
-                  )}
-
-                  <div className="space-y-2">
-                    {/* Assignee */}
-                    <div className="flex items-center space-x-2 text-sm">
-                      <User className="h-4 w-4 text-gray-400" />
-                      <span className="text-gray-600">
-                        {task.assignee?.name || 'Unassigned'}
-                      </span>
-                    </div>
-
-                    {/* Due Date */}
-                    <div className="flex items-center space-x-2 text-sm">
-                      <Calendar className="h-4 w-4 text-gray-400" />
-                      <span className={`${
-                        isOverdue ? 'text-red-600 font-medium' :
-                        isDueSoon ? 'text-yellow-600 font-medium' : 'text-gray-600'
-                      }`}>
-                        {formatDate(task.due_date)}
-                        {isOverdue && (
-                          <span className="ml-1">
-                            <AlertCircle className="h-3 w-3 inline" />
-                            Overdue
-                          </span>
-                        )}
-                        {isDueSoon && !isOverdue && (
-                          <span className="ml-1 text-yellow-600">
-                            Due in {daysUntilDue} day{daysUntilDue !== 1 ? 's' : ''}
-                          </span>
-                        )}
-                      </span>
-                    </div>
-
-                    {/* Task Meta */}
-                    <div className="flex items-center justify-between pt-2 border-t border-gray-200">
-                      <div className="flex items-center space-x-3 text-xs text-gray-500">
-                        {task.comments_count > 0 && (
-                          <div className="flex items-center space-x-1">
-                            <MessageSquare className="h-3 w-3" />
-                            <span>{task.comments_count}</span>
-                          </div>
-                        )}
-                        {task.attachments_count > 0 && (
-                          <div className="flex items-center space-x-1">
-                            <Paperclip className="h-3 w-3" />
-                            <span>{task.attachments_count}</span>
-                          </div>
-                        )}
-                        {task.logged_hours > 0 && (
-                          <div className="flex items-center space-x-1">
-                            <Clock className="h-3 w-3" />
-                            <span>{task.logged_hours}h</span>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Quick Status Actions */}
-                      {canChangeTaskStatus(task) && (
-                        <div className="flex space-x-1">
-                          {task.status === 'New' && (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleStatusChange(task.id, 'In Progress');
-                              }}
-                              className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded hover:bg-blue-200 transition-colors"
-                            >
-                              Start
-                            </button>
-                          )}
-                          {task.status === 'In Progress' && (
-                            <>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleStatusChange(task.id, 'Done');
-                                }}
-                                className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded hover:bg-green-200 transition-colors"
-                              >
-                                Complete
-                              </button>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleStatusChange(task.id, 'Blocked');
-                                }}
-                                className="text-xs bg-yellow-100 text-yellow-600 px-2 py-1 rounded hover:bg-yellow-200 transition-colors"
-                              >
-                                Block
-                              </button>
-                            </>
-                          )}
-                          {task.status === 'Blocked' && (
-                            <>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleStatusChange(task.id, 'In Progress');
-                                }}
-                                className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded hover:bg-blue-200 transition-colors"
-                              >
-                                Resume
-                              </button>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleStatusChange(task.id, 'Done');
-                                }}
-                                className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded hover:bg-green-200 transition-colors"
-                              >
-                                Complete
-                              </button>
-                            </>
-                          )}
-                          {task.status === 'Done' && (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleStatusChange(task.id, 'In Progress');
-                              }}
-                              className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded hover:bg-gray-200 transition-colors"
-                            >
-                              Reopen
-                            </button>
-                          )}
-                        </div>
+                          <Trash2 className="h-3 w-3 mr-1" />
+                          Delete
+                        </button>
                       )}
                     </div>
+                  )}
+
+                  {/* Assigned Members */}
+                  <div className="mb-3">
+                    <div className="flex items-center justify-between text-sm mb-1">
+                      <span className="text-gray-500 dark:text-gray-400 flex items-center">
+                        <User className="h-3 w-3 mr-1" />
+                        Assigned:
+                      </span>
+                      <span className="font-medium text-gray-900 dark:text-white">
+                        {task.assignee ? 
+                          (task.assignee.firstName && task.assignee.lastName 
+                            ? `${task.assignee.firstName} ${task.assignee.lastName}`.trim()
+                            : task.assignee.name || 'Assigned')
+                          : 'Unassigned'}
+                      </span>
+                    </div>
                   </div>
-                </CardContent>
-              </Card>
+
+                  {/* Due Date */}
+                  <div className="mb-4">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-500 dark:text-gray-400 flex items-center">
+                        <Calendar className="h-3 w-3 mr-1" />
+                        Due Date:
+                      </span>
+                      <span className={`font-medium ${
+                        isOverdue ? 'text-red-600 dark:text-red-400' :
+                        isDueSoon ? 'text-yellow-600 dark:text-yellow-400' : 
+                        'text-gray-900 dark:text-white'
+                      }`}>
+                        {formatDate(task.due_date)}
+                        {isOverdue && ' (Overdue)'}
+                        {isDueSoon && !isOverdue && ` (${daysUntilDue}d)`}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Task Progress Change */}
+                  {canChangeTaskStatus(task) && (
+                    <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                      <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">Change Status:</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        {task.status !== 'In Progress' && task.status !== 'Done' && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleStatusChange(task.id, 'In Progress');
+                            }}
+                            className="text-xs bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 px-3 py-2 rounded-lg hover:bg-primary-200 dark:hover:bg-primary-800 transition-colors font-medium"
+                          >
+                            Start
+                          </button>
+                        )}
+                        {task.status !== 'Done' && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleStatusChange(task.id, 'Done');
+                            }}
+                            className="text-xs bg-success-100 dark:bg-success-900 text-success-700 dark:text-success-300 px-3 py-2 rounded-lg hover:bg-success-200 dark:hover:bg-success-800 transition-colors font-medium"
+                          >
+                            Complete
+                          </button>
+                        )}
+                        {task.status === 'In Progress' && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleStatusChange(task.id, 'Blocked');
+                            }}
+                            className="text-xs bg-warning-100 dark:bg-warning-900 text-warning-700 dark:text-warning-300 px-3 py-2 rounded-lg hover:bg-warning-200 dark:hover:bg-warning-800 transition-colors font-medium"
+                          >
+                            Block
+                          </button>
+                        )}
+                        {task.status === 'Done' && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleStatusChange(task.id, 'In Progress');
+                            }}
+                            className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-3 py-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors font-medium"
+                          >
+                            Reopen
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
             );
           })
         )}

@@ -40,22 +40,26 @@ const ExpenseForm = () => {
       ]
     },
     {
+      name: 'is_billable',
+      label: 'Billable to Customer',
+      type: 'select',
+      required: true,
+      options: [
+        { value: 'false', label: 'No - Internal Expense' },
+        { value: 'true', label: 'Yes - Billable to Customer' }
+      ]
+    },
+    {
       name: 'status',
       label: 'Status',
       type: 'select',
       required: true,
       options: [
-        { value: 'Pending', label: 'Pending' },
+        { value: 'Pending', label: 'Pending Approval' },
         { value: 'Approved', label: 'Approved' },
         { value: 'Rejected', label: 'Rejected' },
         { value: 'Reimbursed', label: 'Reimbursed' }
       ]
-    },
-    {
-      name: 'notes',
-      label: 'Notes',
-      type: 'textarea',
-      placeholder: 'Additional notes about this expense...'
     }
   ];
 

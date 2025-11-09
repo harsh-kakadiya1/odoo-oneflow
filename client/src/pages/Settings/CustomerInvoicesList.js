@@ -27,7 +27,7 @@ const CustomerInvoicesList = () => {
         ...filters
       };
       const response = await customerInvoiceAPI.getAll(params);
-      setInvoices(response.data.invoices || []);
+      setInvoices(response.data.customerInvoices || response.data.invoices || []);
     } catch (error) {
       console.error('Error fetching customer invoices:', error);
       toast.error('Failed to load customer invoices');
@@ -85,7 +85,7 @@ const CustomerInvoicesList = () => {
   ];
 
   const renderRow = (invoice) => (
-    <tr key={invoice.id} className="hover:bg-gray-50">
+    <tr key={invoice.id} className="hover:bg-gray-50 dark:bg-gray-700">
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="flex items-center">
           <Link
@@ -97,17 +97,17 @@ const CustomerInvoicesList = () => {
         </div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
-        <div className="text-sm text-gray-900">{invoice.customer_name}</div>
-        <div className="text-sm text-gray-500">{invoice.customer_email}</div>
+        <div className="text-sm text-gray-900 dark:text-white">{invoice.customer_name}</div>
+        <div className="text-sm text-gray-500 dark:text-gray-400">{invoice.customer_email}</div>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
         {invoice.invoice_date ? format(new Date(invoice.invoice_date), 'MMM dd, yyyy') : '-'}
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
         {invoice.due_date ? format(new Date(invoice.due_date), 'MMM dd, yyyy') : '-'}
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-        ${invoice.amount?.toLocaleString() || '0.00'}
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+        ₹{invoice.amount?.toLocaleString('en-IN') || '0'}
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         <Badge color={getStatusColor(invoice.status)}>

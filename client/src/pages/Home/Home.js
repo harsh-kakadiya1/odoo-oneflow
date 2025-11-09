@@ -73,8 +73,8 @@ const Home = () => {
     },
     {
       icon: Globe,
-      title: 'Multi-Currency',
-      description: 'Support for multiple currencies and international clients.'
+      title: 'Financial Management',
+      description: 'Complete financial tracking and reporting in Indian Rupees.'
     }
   ];
 
@@ -97,9 +97,9 @@ const Home = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-gray-800">
       {/* Navigation */}
-      <nav className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+      <nav className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
@@ -107,18 +107,18 @@ const Home = () => {
               <div className="p-2 bg-primary-100 rounded-xl">
                 <FileText className="h-6 w-6 text-primary-600" />
               </div>
-              <span className="text-2xl font-bold text-gray-900">OneFlow</span>
+              <span className="text-2xl font-bold text-gray-900 dark:text-white">OneFlow</span>
             </div>
 
             {/* Navigation Links */}
             <div className="hidden md:flex items-center space-x-8">
-              <a href="#features" className="text-gray-600 hover:text-primary-600 font-medium transition-colors">
+              <a href="#features" className="text-gray-600 dark:text-gray-400 hover:text-primary-600 font-medium transition-colors">
                 Features
               </a>
-              <a href="#benefits" className="text-gray-600 hover:text-primary-600 font-medium transition-colors">
+              <a href="#benefits" className="text-gray-600 dark:text-gray-400 hover:text-primary-600 font-medium transition-colors">
                 Benefits
               </a>
-              <a href="#pricing" className="text-gray-600 hover:text-primary-600 font-medium transition-colors">
+              <a href="#pricing" className="text-gray-600 dark:text-gray-400 hover:text-primary-600 font-medium transition-colors">
                 Pricing
               </a>
               <Link
@@ -162,10 +162,10 @@ const Home = () => {
 
             {/* Main Heading */}
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold mb-6">
-              <span className="block text-gray-900">
+              <span className="block text-gray-900 dark:text-white">
                 Project management software
               </span>
-              <span className="block text-gray-900">
+              <span className="block text-gray-900 dark:text-white">
                 built for
               </span>
               <span className="block relative overflow-hidden" style={{ height: '1.2em' }}>
@@ -179,7 +179,7 @@ const Home = () => {
             </h1>
 
             {/* Subheading - Feature Points */}
-            <div className="flex flex-wrap justify-center items-center gap-6 mb-10 text-gray-700 font-medium">
+            <div className="flex flex-wrap justify-center items-center gap-6 mb-10 text-gray-700 dark:text-gray-300 font-medium">
               <div className="flex items-center">
                 <CheckCircle className="h-5 w-5 text-primary-600 mr-2" />
                 Plan your projects
@@ -209,13 +209,13 @@ const Home = () => {
           {/* Hero Image / Dashboard Preview */}
           <div className="mt-16 relative">
             <div className="bg-gradient-to-br from-primary-600 to-primary-800 rounded-2xl shadow-2xl p-6 transform hover:scale-[1.01] transition-transform duration-300">
-              <div className="bg-gray-50 rounded-xl p-6 shadow-inner min-h-[600px]">
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-6 shadow-inner min-h-[600px]">
                 {/* Browser Chrome */}
                 <div className="flex items-center space-x-2 mb-6">
                   <div className="w-3 h-3 rounded-full bg-red-400"></div>
                   <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
                   <div className="w-3 h-3 rounded-full bg-green-400"></div>
-                  <div className="ml-4 flex-1 h-7 bg-white rounded-lg flex items-center px-3">
+                  <div className="ml-4 flex-1 h-7 bg-white dark:bg-gray-800 rounded-lg flex items-center px-3">
                     <div className="h-3 bg-gray-200 rounded w-1/3"></div>
                   </div>
                 </div>
@@ -223,11 +223,11 @@ const Home = () => {
                 {/* Dashboard Content */}
                 <div className="space-y-4">
                   {/* Header with Welcome */}
-                  <div className="bg-white rounded-xl p-4 shadow-sm">
+                  <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="text-lg font-bold text-gray-900">Welcome back, Sarah!</h3>
-                        <p className="text-sm text-gray-500">Here's what's happening today</p>
+                        <h3 className="text-lg font-bold text-gray-900 dark:text-white">Welcome back, Sarah!</h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Here's what's happening today</p>
                       </div>
                       <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold text-sm shadow-md">
                         SM
@@ -237,20 +237,20 @@ const Home = () => {
 
                   {/* Stats Cards */}
                   <div className="grid grid-cols-4 gap-3">
-                    <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-blue-400">
-                      <div className="text-xs text-gray-600 mb-2">Active Projects</div>
+                    <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border-l-4 border-blue-400">
+                      <div className="text-xs text-gray-600 dark:text-gray-400 mb-2">Active Projects</div>
                       <div className="text-2xl font-bold text-blue-600">12</div>
                     </div>
-                    <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-green-400">
-                      <div className="text-xs text-gray-600 mb-2">Completed</div>
+                    <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border-l-4 border-green-400">
+                      <div className="text-xs text-gray-600 dark:text-gray-400 mb-2">Completed</div>
                       <div className="text-2xl font-bold text-green-600">48</div>
                     </div>
-                    <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-yellow-400">
-                      <div className="text-xs text-gray-600 mb-2">Hours Logged</div>
+                    <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border-l-4 border-yellow-400">
+                      <div className="text-xs text-gray-600 dark:text-gray-400 mb-2">Hours Logged</div>
                       <div className="text-2xl font-bold text-yellow-600">156</div>
                     </div>
-                    <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-purple-400">
-                      <div className="text-xs text-gray-600 mb-2">Revenue</div>
+                    <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border-l-4 border-purple-400">
+                      <div className="text-xs text-gray-600 dark:text-gray-400 mb-2">Revenue</div>
                       <div className="text-2xl font-bold text-purple-600">$45K</div>
                     </div>
                   </div>
@@ -258,8 +258,8 @@ const Home = () => {
                   {/* Main Content Area - Charts and Projects */}
                   <div className="grid grid-cols-3 gap-4">
                     {/* Left - Line Chart */}
-                    <div className="col-span-2 bg-white rounded-xl p-5 shadow-sm">
-                      <div className="text-sm font-semibold text-gray-700 mb-4">Weekly Activity</div>
+                    <div className="col-span-2 bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm">
+                      <div className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">Weekly Activity</div>
                       {/* Simple Line Chart */}
                       <div className="relative h-40">
                         <svg className="w-full h-full" viewBox="0 0 300 120" preserveAspectRatio="none">
@@ -297,8 +297,8 @@ const Home = () => {
                     </div>
 
                     {/* Right - Team Members */}
-                    <div className="bg-white rounded-xl p-5 shadow-sm">
-                      <div className="text-sm font-semibold text-gray-700 mb-4">Team Members</div>
+                    <div className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm">
+                      <div className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">Team Members</div>
                       <div className="space-y-3">
                         {/* Team Member 1 - Admin */}
                         <div className="flex items-center space-x-3">
@@ -306,7 +306,7 @@ const Home = () => {
                             SM
                           </div>
                           <div className="flex-1">
-                            <div className="text-xs font-medium text-gray-800">Sarah Miller</div>
+                            <div className="text-xs font-medium text-gray-800 dark:text-gray-200">Sarah Miller</div>
                             <div className="text-xs text-purple-600 font-medium">Admin</div>
                           </div>
                         </div>
@@ -316,7 +316,7 @@ const Home = () => {
                             JD
                           </div>
                           <div className="flex-1">
-                            <div className="text-xs font-medium text-gray-800">John Davis</div>
+                            <div className="text-xs font-medium text-gray-800 dark:text-gray-200">John Davis</div>
                             <div className="text-xs text-blue-600 font-medium">Project Manager</div>
                           </div>
                         </div>
@@ -326,7 +326,7 @@ const Home = () => {
                             AK
                           </div>
                           <div className="flex-1">
-                            <div className="text-xs font-medium text-gray-800">Alex Kim</div>
+                            <div className="text-xs font-medium text-gray-800 dark:text-gray-200">Alex Kim</div>
                             <div className="text-xs text-green-600 font-medium">Team Member</div>
                           </div>
                         </div>
@@ -336,7 +336,7 @@ const Home = () => {
                             MC
                           </div>
                           <div className="flex-1">
-                            <div className="text-xs font-medium text-gray-800">Maria Chen</div>
+                            <div className="text-xs font-medium text-gray-800 dark:text-gray-200">Maria Chen</div>
                             <div className="text-xs text-pink-600 font-medium">Sales/Finance</div>
                           </div>
                         </div>
@@ -347,12 +347,12 @@ const Home = () => {
                   {/* Project Progress Bars */}
                   <div className="grid grid-cols-2 gap-4">
                     {/* Project 1 */}
-                    <div className="bg-white rounded-xl p-5 shadow-sm">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm">
                       <div className="flex items-center justify-between mb-3">
-                        <div className="text-xs font-semibold text-gray-800">Website Redesign</div>
+                        <div className="text-xs font-semibold text-gray-800 dark:text-gray-200">Website Redesign</div>
                         <div className="text-xs font-semibold text-blue-600">75%</div>
                       </div>
-                      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                      <div className="h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
                         <div className="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full" style={{ width: '75%' }}></div>
                       </div>
                       <div className="flex items-center justify-between mt-3">
@@ -361,17 +361,17 @@ const Home = () => {
                           <div className="w-6 h-6 rounded-full bg-gradient-to-br from-green-400 to-green-600 border-2 border-white"></div>
                           <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 border-2 border-white"></div>
                         </div>
-                        <div className="text-xs text-gray-500">Due: Dec 15</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">Due: Dec 15</div>
                       </div>
                     </div>
 
                     {/* Project 2 */}
-                    <div className="bg-white rounded-xl p-5 shadow-sm">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm">
                       <div className="flex items-center justify-between mb-3">
-                        <div className="text-xs font-semibold text-gray-800">Mobile App Development</div>
+                        <div className="text-xs font-semibold text-gray-800 dark:text-gray-200">Mobile App Development</div>
                         <div className="text-xs font-semibold text-green-600">45%</div>
                       </div>
-                      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                      <div className="h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
                         <div className="h-full bg-gradient-to-r from-green-400 to-green-600 rounded-full" style={{ width: '45%' }}></div>
                       </div>
                       <div className="flex items-center justify-between mt-3">
@@ -379,7 +379,7 @@ const Home = () => {
                           <div className="w-6 h-6 rounded-full bg-gradient-to-br from-pink-400 to-pink-600 border-2 border-white"></div>
                           <div className="w-6 h-6 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 border-2 border-white"></div>
                         </div>
-                        <div className="text-xs text-gray-500">Due: Jan 20</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">Due: Jan 20</div>
                       </div>
                     </div>
                   </div>
@@ -387,8 +387,8 @@ const Home = () => {
                   {/* Bottom Section - Donut Chart and Task Progress */}
                   <div className="grid grid-cols-2 gap-4">
                     {/* Donut Chart - Project Status */}
-                    <div className="bg-white rounded-xl p-5 shadow-sm">
-                      <div className="text-sm font-semibold text-gray-700 mb-4">Project Status</div>
+                    <div className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm">
+                      <div className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">Project Status</div>
                       <div className="flex items-center justify-center">
                         {/* Donut Chart */}
                         <svg className="w-32 h-32" viewBox="0 0 100 100">
@@ -434,30 +434,30 @@ const Home = () => {
                         <div className="flex items-center justify-between text-xs">
                           <div className="flex items-center">
                             <div className="w-3 h-3 rounded-full bg-blue-400 mr-2"></div>
-                            <span className="text-gray-600">Completed</span>
+                            <span className="text-gray-600 dark:text-gray-400">Completed</span>
                           </div>
-                          <span className="font-semibold text-gray-700">40%</span>
+                          <span className="font-semibold text-gray-700 dark:text-gray-300">40%</span>
                         </div>
                         <div className="flex items-center justify-between text-xs">
                           <div className="flex items-center">
                             <div className="w-3 h-3 rounded-full bg-yellow-400 mr-2"></div>
-                            <span className="text-gray-600">Active</span>
+                            <span className="text-gray-600 dark:text-gray-400">Active</span>
                           </div>
-                          <span className="font-semibold text-gray-700">30%</span>
+                          <span className="font-semibold text-gray-700 dark:text-gray-300">30%</span>
                         </div>
                         <div className="flex items-center justify-between text-xs">
                           <div className="flex items-center">
                             <div className="w-3 h-3 rounded-full bg-cyan-400 mr-2"></div>
-                            <span className="text-gray-600">In Progress</span>
+                            <span className="text-gray-600 dark:text-gray-400">In Progress</span>
                           </div>
-                          <span className="font-semibold text-gray-700">20%</span>
+                          <span className="font-semibold text-gray-700 dark:text-gray-300">20%</span>
                         </div>
                       </div>
                     </div>
 
                     {/* Task Progress Card */}
-                    <div className="bg-white rounded-xl p-5 shadow-sm">
-                      <div className="text-sm font-semibold text-gray-700 mb-4">Current Sprint</div>
+                    <div className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm">
+                      <div className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">Current Sprint</div>
                       <div className="flex items-center space-x-4">
                         {/* Circular Progress */}
                         <div className="relative w-20 h-20">
@@ -479,8 +479,8 @@ const Home = () => {
                         </div>
                         {/* Details */}
                         <div className="flex-1 space-y-2">
-                          <div className="text-xs font-medium text-gray-800">Martin Young</div>
-                          <div className="text-xs text-gray-500">Nov 2 - Nov 14</div>
+                          <div className="text-xs font-medium text-gray-800 dark:text-gray-200">Martin Young</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">Nov 2 - Nov 14</div>
                           <div className="text-xs text-red-500 font-medium">2 days behind</div>
                         </div>
                       </div>
@@ -488,8 +488,8 @@ const Home = () => {
                   </div>
 
                   {/* Employee Tracking / Task Assignment */}
-                  <div className="bg-white rounded-xl p-5 shadow-sm">
-                    <div className="text-sm font-semibold text-gray-700 mb-4">Active Tasks</div>
+                  <div className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm">
+                    <div className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">Active Tasks</div>
                     <div className="space-y-3">
                       {/* Task Row 1 */}
                       <div className="flex items-center justify-between p-3 bg-gradient-to-r from-blue-50 to-transparent rounded-lg border-l-3 border-blue-400">
@@ -498,7 +498,7 @@ const Home = () => {
                             AM
                           </div>
                           <div>
-                            <div className="text-xs font-medium text-gray-800">Alice Martinez</div>
+                            <div className="text-xs font-medium text-gray-800 dark:text-gray-200">Alice Martinez</div>
                             <div className="text-xs text-blue-600">UI/UX Design Task</div>
                           </div>
                         </div>
@@ -514,7 +514,7 @@ const Home = () => {
                             SJ
                           </div>
                           <div>
-                            <div className="text-xs font-medium text-gray-800">Sam Johnson</div>
+                            <div className="text-xs font-medium text-gray-800 dark:text-gray-200">Sam Johnson</div>
                             <div className="text-xs text-green-600">Backend Development</div>
                           </div>
                         </div>
@@ -530,7 +530,7 @@ const Home = () => {
                             RK
                           </div>
                           <div>
-                            <div className="text-xs font-medium text-gray-800">Robert Kumar</div>
+                            <div className="text-xs font-medium text-gray-800 dark:text-gray-200">Robert Kumar</div>
                             <div className="text-xs text-purple-600">Database Optimization</div>
                           </div>
                         </div>
@@ -548,13 +548,13 @@ const Home = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 bg-white border-y border-gray-200">
+      <section className="py-16 bg-white dark:bg-gray-800 border-y border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
               <div key={index} className="text-center">
                 <div className="text-4xl font-bold text-primary-600 mb-2">{stat.number}</div>
-                <div className="text-gray-600 font-medium">{stat.label}</div>
+                <div className="text-gray-600 dark:text-gray-400 font-medium">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -562,13 +562,13 @@ const Home = () => {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-20 bg-gray-50">
+      <section id="features" className="py-20 bg-gray-50 dark:bg-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
               Everything You Need to Run Your Business
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
               Powerful features designed to save you time and help you get paid faster
             </p>
           </div>
@@ -577,13 +577,13 @@ const Home = () => {
             {features.map((feature, index) => (
               <div
                 key={index}
-                className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100"
+                className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100"
               >
                 <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center mb-4 shadow-lg">
                   <feature.icon className="h-6 w-6 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">{feature.title}</h3>
-                <p className="text-gray-600 leading-relaxed">{feature.description}</p>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">{feature.title}</h3>
+                <p className="text-gray-600 dark:text-gray-400 leading-relaxed">{feature.description}</p>
               </div>
             ))}
           </div>
@@ -591,15 +591,15 @@ const Home = () => {
       </section>
 
       {/* Benefits Section */}
-      <section id="benefits" className="py-20 bg-white">
+      <section id="benefits" className="py-20 bg-white dark:bg-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left - Content */}
             <div>
-              <h2 className="text-4xl font-bold text-gray-900 mb-6">
+              <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-6">
                 Why Choose OneFlow?
               </h2>
-              <p className="text-xl text-gray-600 mb-8">
+              <p className="text-xl text-gray-600 dark:text-gray-400 mb-8">
                 Join thousands of businesses that trust OneFlow to manage their invoicing and finances
               </p>
 
@@ -607,7 +607,7 @@ const Home = () => {
                 {benefits.map((benefit, index) => (
                   <div key={index} className="flex items-start space-x-3">
                     <CheckCircle className="h-6 w-6 text-green-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-700">{benefit}</span>
+                    <span className="text-gray-700 dark:text-gray-300">{benefit}</span>
                   </div>
                 ))}
               </div>
@@ -626,31 +626,31 @@ const Home = () => {
             {/* Right - Visual */}
             <div className="relative">
               <div className="bg-gradient-to-br from-primary-100 to-primary-200 rounded-2xl p-8 shadow-2xl">
-                <div className="bg-white rounded-xl p-6 space-y-4">
-                  <div className="flex items-center justify-between pb-4 border-b border-gray-200">
+                <div className="bg-white dark:bg-gray-800 rounded-xl p-6 space-y-4">
+                  <div className="flex items-center justify-between pb-4 border-b border-gray-200 dark:border-gray-700">
                     <div className="flex items-center space-x-3">
                       <DollarSign className="h-8 w-8 text-primary-600" />
                       <div>
-                        <div className="text-sm text-gray-500">Total Revenue</div>
-                        <div className="text-2xl font-bold text-gray-900">$125,430</div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400">Total Revenue</div>
+                        <div className="text-2xl font-bold text-gray-900 dark:text-white">$125,430</div>
                       </div>
                     </div>
                     <div className="text-green-500 text-sm font-semibold">+12.5%</div>
                   </div>
                   <div className="space-y-3">
                     {[1, 2, 3].map((i) => (
-                      <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div key={i} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                         <div className="flex items-center space-x-3">
                           <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
                             <FileText className="h-5 w-5 text-primary-600" />
                           </div>
                           <div>
-                            <div className="font-medium text-gray-900">Invoice #{1000 + i}</div>
-                            <div className="text-sm text-gray-500">Client Project</div>
+                            <div className="font-medium text-gray-900 dark:text-white">Invoice #{1000 + i}</div>
+                            <div className="text-sm text-gray-500 dark:text-gray-400">Client Project</div>
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className="font-semibold text-gray-900">${(i * 1250).toFixed(2)}</div>
+                          <div className="font-semibold text-gray-900 dark:text-white">${(i * 1250).toFixed(2)}</div>
                           <div className="text-xs text-green-600">Paid</div>
                         </div>
                       </div>
@@ -659,12 +659,12 @@ const Home = () => {
                 </div>
               </div>
               {/* Floating Elements */}
-              <div className="absolute -top-4 -right-4 bg-white rounded-xl p-4 shadow-xl border border-gray-100">
+              <div className="absolute -top-4 -right-4 bg-white dark:bg-gray-800 rounded-xl p-4 shadow-xl border border-gray-100">
                 <div className="flex items-center space-x-2">
                   <Star className="h-5 w-5 text-yellow-400 fill-current" />
-                  <span className="font-semibold text-gray-900">4.9/5</span>
+                  <span className="font-semibold text-gray-900 dark:text-white">4.9/5</span>
                 </div>
-                <div className="text-xs text-gray-500 mt-1">User Rating</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">User Rating</div>
               </div>
             </div>
           </div>
@@ -675,41 +675,41 @@ const Home = () => {
       <section id="pricing" className="py-20 bg-gradient-to-br from-gray-50 to-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
               Simple, Transparent Pricing
             </h2>
-            <p className="text-xl text-gray-600">
+            <p className="text-xl text-gray-600 dark:text-gray-400">
               Start free, upgrade when you're ready
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {/* Free Plan */}
-            <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-200">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg border border-gray-200 dark:border-gray-700">
               <div className="text-center mb-6">
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">Starter</h3>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Starter</h3>
                 <div className="flex items-baseline justify-center">
-                  <span className="text-5xl font-bold text-gray-900">$0</span>
-                  <span className="text-gray-500 ml-2">/month</span>
+                  <span className="text-5xl font-bold text-gray-900 dark:text-white">$0</span>
+                  <span className="text-gray-500 dark:text-gray-400 ml-2">/month</span>
                 </div>
               </div>
               <ul className="space-y-3 mb-8">
-                <li className="flex items-center text-gray-600">
+                <li className="flex items-center text-gray-600 dark:text-gray-400">
                   <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
                   Up to 5 invoices/month
                 </li>
-                <li className="flex items-center text-gray-600">
+                <li className="flex items-center text-gray-600 dark:text-gray-400">
                   <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
                   1 project
                 </li>
-                <li className="flex items-center text-gray-600">
+                <li className="flex items-center text-gray-600 dark:text-gray-400">
                   <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
                   Basic support
                 </li>
               </ul>
               <Link
                 to="/register"
-                className="block w-full text-center px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:border-primary-300 hover:bg-gray-50 transition-all"
+                className="block w-full text-center px-6 py-3 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-semibold hover:border-primary-300 hover:bg-gray-50 dark:bg-gray-700 transition-all"
               >
                 Get Started
               </Link>
@@ -718,7 +718,7 @@ const Home = () => {
             {/* Pro Plan - Highlighted */}
             <div className="bg-gradient-to-br from-primary-600 to-primary-700 rounded-2xl p-8 shadow-2xl transform scale-105 relative">
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <span className="bg-yellow-400 text-gray-900 px-4 py-1 rounded-full text-sm font-bold shadow-lg">
+                <span className="bg-yellow-400 text-gray-900 dark:text-white px-4 py-1 rounded-full text-sm font-bold shadow-lg">
                   POPULAR
                 </span>
               </div>
@@ -749,42 +749,42 @@ const Home = () => {
               </ul>
               <Link
                 to="/register"
-                className="block w-full text-center px-6 py-3 bg-white text-primary-600 rounded-lg font-semibold hover:bg-gray-50 transition-all shadow-lg"
+                className="block w-full text-center px-6 py-3 bg-white dark:bg-gray-800 text-primary-600 rounded-lg font-semibold hover:bg-gray-50 dark:bg-gray-700 transition-all shadow-lg"
               >
                 Start Free Trial
               </Link>
             </div>
 
             {/* Enterprise Plan */}
-            <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-200">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg border border-gray-200 dark:border-gray-700">
               <div className="text-center mb-6">
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">Enterprise</h3>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Enterprise</h3>
                 <div className="flex items-baseline justify-center">
-                  <span className="text-5xl font-bold text-gray-900">$99</span>
-                  <span className="text-gray-500 ml-2">/month</span>
+                  <span className="text-5xl font-bold text-gray-900 dark:text-white">$99</span>
+                  <span className="text-gray-500 dark:text-gray-400 ml-2">/month</span>
                 </div>
               </div>
               <ul className="space-y-3 mb-8">
-                <li className="flex items-center text-gray-600">
+                <li className="flex items-center text-gray-600 dark:text-gray-400">
                   <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
                   Everything in Pro
                 </li>
-                <li className="flex items-center text-gray-600">
+                <li className="flex items-center text-gray-600 dark:text-gray-400">
                   <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
                   Advanced analytics
                 </li>
-                <li className="flex items-center text-gray-600">
+                <li className="flex items-center text-gray-600 dark:text-gray-400">
                   <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
                   Custom integrations
                 </li>
-                <li className="flex items-center text-gray-600">
+                <li className="flex items-center text-gray-600 dark:text-gray-400">
                   <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
                   24/7 phone support
                 </li>
               </ul>
               <Link
                 to="/register"
-                className="block w-full text-center px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:border-primary-300 hover:bg-gray-50 transition-all"
+                className="block w-full text-center px-6 py-3 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-semibold hover:border-primary-300 hover:bg-gray-50 dark:bg-gray-700 transition-all"
               >
                 Contact Sales
               </Link>
@@ -794,10 +794,10 @@ const Home = () => {
       </section>
 
       {/* Testimonial Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white dark:bg-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
               Loved by Businesses Worldwide
             </h2>
           </div>
@@ -823,16 +823,16 @@ const Home = () => {
                 rating: 5
               }
             ].map((testimonial, index) => (
-              <div key={index} className="bg-gray-50 rounded-2xl p-8 border border-gray-200">
+              <div key={index} className="bg-gray-50 dark:bg-gray-700 rounded-2xl p-8 border border-gray-200 dark:border-gray-700">
                 <div className="flex items-center mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
                     <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
                   ))}
                 </div>
-                <p className="text-gray-700 mb-6 italic">"{testimonial.quote}"</p>
+                <p className="text-gray-700 dark:text-gray-300 mb-6 italic">"{testimonial.quote}"</p>
                 <div>
-                  <div className="font-semibold text-gray-900">{testimonial.author}</div>
-                  <div className="text-sm text-gray-500">{testimonial.role}</div>
+                  <div className="font-semibold text-gray-900 dark:text-white">{testimonial.author}</div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">{testimonial.role}</div>
                 </div>
               </div>
             ))}
@@ -844,8 +844,8 @@ const Home = () => {
       <section className="py-20 bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800 relative overflow-hidden">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
+          <div className="absolute top-0 left-0 w-96 h-96 bg-white dark:bg-gray-800 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 right-0 w-96 h-96 bg-white dark:bg-gray-800 rounded-full blur-3xl"></div>
         </div>
 
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -858,14 +858,14 @@ const Home = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               to="/register"
-              className="group px-8 py-4 bg-white text-primary-600 rounded-xl font-semibold text-lg hover:bg-gray-50 transition-all transform hover:scale-105 shadow-2xl flex items-center justify-center"
+              className="group px-8 py-4 bg-white dark:bg-gray-800 text-primary-600 rounded-xl font-semibold text-lg hover:bg-gray-50 dark:bg-gray-700 transition-all transform hover:scale-105 shadow-2xl flex items-center justify-center"
             >
               Start Free Trial
               <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link
               to="/login"
-              className="px-8 py-4 bg-transparent border-2 border-white text-white rounded-xl font-semibold text-lg hover:bg-white/10 transition-all transform hover:scale-105"
+              className="px-8 py-4 bg-transparent border-2 border-white text-white rounded-xl font-semibold text-lg hover:bg-white dark:bg-gray-800/10 transition-all transform hover:scale-105"
             >
               Sign In
             </Link>

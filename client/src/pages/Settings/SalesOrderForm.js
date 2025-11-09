@@ -5,10 +5,11 @@ import { salesOrderAPI } from '../../utils/api';
 const SalesOrderForm = () => {
   const fields = [
     {
-      name: 'order_number',
-      label: 'Order Number',
+      name: 'so_number',
+      label: 'SO Number',
       type: 'text',
-      placeholder: 'Auto-generated if left empty'
+      placeholder: 'Auto-generated on save',
+      disabled: true
     },
     {
       name: 'customer_name',
@@ -24,24 +25,13 @@ const SalesOrderForm = () => {
       placeholder: 'customer@example.com'
     },
     {
-      name: 'customer_phone',
-      label: 'Customer Phone',
-      type: 'tel',
-      placeholder: '+1 (555) 123-4567'
-    },
-    {
       name: 'order_date',
       label: 'Order Date',
       type: 'date',
       required: true
     },
     {
-      name: 'delivery_date',
-      label: 'Expected Delivery Date',
-      type: 'date'
-    },
-    {
-      name: 'total_amount',
+      name: 'amount',
       label: 'Total Amount',
       type: 'number',
       required: true,
@@ -55,21 +45,14 @@ const SalesOrderForm = () => {
       options: [
         { value: 'Draft', label: 'Draft' },
         { value: 'Confirmed', label: 'Confirmed' },
-        { value: 'Invoiced', label: 'Invoiced' },
-        { value: 'Cancelled', label: 'Cancelled' }
+        { value: 'Billed', label: 'Billed' }
       ]
     },
     {
       name: 'description',
-      label: 'Description',
+      label: 'Description / Terms & Conditions',
       type: 'textarea',
-      placeholder: 'Order details and notes...'
-    },
-    {
-      name: 'terms_conditions',
-      label: 'Terms & Conditions',
-      type: 'textarea',
-      placeholder: 'Payment terms, delivery conditions...'
+      placeholder: 'Order details, payment terms, delivery conditions...'
     }
   ];
 

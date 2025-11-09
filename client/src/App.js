@@ -3,11 +3,9 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { NotificationProvider } from './contexts/NotificationContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import LoadingSpinner from './components/UI/LoadingSpinner';
 import Layout from './components/Layout/Layout';
-
-// Public Pages
-import Home from './pages/Home/Home';
 
 // Auth Pages
 import Login from './pages/Auth/Login';
@@ -20,8 +18,10 @@ import Dashboard from './pages/Dashboard/Dashboard';
 import Projects from './pages/Projects/Projects';
 import Analytics from './pages/Analytics/Analytics';
 import ProjectDetail from './pages/Projects/ProjectDetail';
+import Tasks from './pages/Tasks/Tasks';
 import Users from './pages/Users/Users';
 import Profile from './pages/Profile/Profile';
+import MyTimesheets from './pages/Timesheets/MyTimesheets';
 
 // Settings Pages
 import Settings from './pages/Settings/Settings';
@@ -31,6 +31,9 @@ import CustomerInvoicesList from './pages/Settings/CustomerInvoicesList';
 import VendorBillsList from './pages/Settings/VendorBillsList';
 import ExpensesList from './pages/Settings/ExpensesList';
 import SalesOrderForm from './pages/Settings/SalesOrderForm';
+import PurchaseOrderForm from './pages/Settings/PurchaseOrderForm';
+import CustomerInvoiceForm from './pages/Settings/CustomerInvoiceForm';
+import VendorBillForm from './pages/Settings/VendorBillForm';
 import ExpenseForm from './pages/Settings/ExpenseForm';
 
 // Protected Route Component
@@ -85,9 +88,6 @@ const PublicRoute = ({ children }) => {
 function AppRoutes() {
   return (
     <Routes>
-      {/* Home Page */}
-      <Route path="/" element={<Home />} />
-
       {/* Public Routes */}
       <Route
         path="/login"
@@ -154,10 +154,7 @@ function AppRoutes() {
         path="/tasks"
         element={
           <ProtectedRoute>
-            <div className="text-center py-12">
-              <h2 className="text-2xl font-bold text-gray-900">Tasks</h2>
-              <p className="text-gray-600 mt-2">Coming soon...</p>
-            </div>
+            <Tasks />
           </ProtectedRoute>
         }
       />
@@ -226,6 +223,7 @@ function AppRoutes() {
       />
 
       {/* Form Routes */}
+      {/* Sales Orders */}
       <Route
         path="/settings/sales-orders/new"
         element={
@@ -244,6 +242,64 @@ function AppRoutes() {
         }
       />
 
+      {/* Purchase Orders */}
+      <Route
+        path="/settings/purchase-orders/new"
+        element={
+          <ProtectedRoute allowedRoles={['Admin', 'Sales/Finance', 'Project Manager']}>
+            <PurchaseOrderForm />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/settings/purchase-orders/:id/edit"
+        element={
+          <ProtectedRoute allowedRoles={['Admin', 'Sales/Finance', 'Project Manager']}>
+            <PurchaseOrderForm />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Customer Invoices */}
+      <Route
+        path="/settings/customer-invoices/new"
+        element={
+          <ProtectedRoute allowedRoles={['Admin', 'Sales/Finance', 'Project Manager']}>
+            <CustomerInvoiceForm />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/settings/customer-invoices/:id/edit"
+        element={
+          <ProtectedRoute allowedRoles={['Admin', 'Sales/Finance', 'Project Manager']}>
+            <CustomerInvoiceForm />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Vendor Bills */}
+      <Route
+        path="/settings/vendor-bills/new"
+        element={
+          <ProtectedRoute allowedRoles={['Admin', 'Sales/Finance', 'Project Manager']}>
+            <VendorBillForm />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/settings/vendor-bills/:id/edit"
+        element={
+          <ProtectedRoute allowedRoles={['Admin', 'Sales/Finance', 'Project Manager']}>
+            <VendorBillForm />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Expenses */}
       <Route
         path="/settings/expenses/new"
         element={
@@ -280,8 +336,18 @@ function AppRoutes() {
         }
       />
 
-      {/* Default redirect for unknown routes */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route
+        path="/timesheets"
+        element={
+          <ProtectedRoute>
+            <MyTimesheets />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Default redirect */}
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );
 }
@@ -289,35 +355,38 @@ function AppRoutes() {
 function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <NotificationProvider>
-          <AppRoutes />
-          <Toaster
-            position="top-right"
-            toastOptions={{
-              duration: 4000,
-              style: {
-                background: '#fff',
-                color: '#363636',
-              },
-              success: {
-                duration: 3000,
-                iconTheme: {
-                  primary: '#22c55e',
-                  secondary: '#fff',
-                },
-              },
-              error: {
+      <ThemeProvider>
+        <AuthProvider>
+          <NotificationProvider>
+            <AppRoutes />
+            <Toaster
+              position="top-right"
+              toastOptions={{
                 duration: 4000,
-                iconTheme: {
-                  primary: '#ef4444',
-                  secondary: '#fff',
+                className: '',
+                style: {
+                  background: 'var(--toast-bg, #fff)',
+                  color: 'var(--toast-color, #363636)',
                 },
-              },
-            }}
-          />
-        </NotificationProvider>
-      </AuthProvider>
+                success: {
+                  duration: 3000,
+                  iconTheme: {
+                    primary: '#22c55e',
+                    secondary: '#fff',
+                  },
+                },
+                error: {
+                  duration: 4000,
+                  iconTheme: {
+                    primary: '#ef4444',
+                    secondary: '#fff',
+                  },
+                },
+              }}
+            />
+          </NotificationProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </BrowserRouter>
   );
 }

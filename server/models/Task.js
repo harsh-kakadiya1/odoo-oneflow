@@ -46,6 +46,10 @@ const Task = sequelize.define('Task', {
     type: DataTypes.ENUM('New', 'In Progress', 'Blocked', 'Done'),
     allowNull: false,
     defaultValue: 'New'
+  },
+  cover_image: {
+    type: DataTypes.TEXT,
+    allowNull: true
   }
 }, {
   tableName: 'tasks',

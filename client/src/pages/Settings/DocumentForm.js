@@ -22,7 +22,22 @@ const DocumentForm = ({
   const { id } = useParams();
   const isEdit = !!id;
 
-  const [formData, setFormData] = useState(initialData);
+  // Initialize formData with defaults for required fields
+  const getInitialFormData = () => {
+    const defaults = {};
+    fields.forEach(field => {
+      if (field.type === 'date' && field.required && !initialData[field.name]) {
+        defaults[field.name] = new Date().toISOString().split('T')[0];
+      } else if (field.type === 'select' && field.required && !initialData[field.name]) {
+        defaults[field.name] = field.options?.[0]?.value || '';
+      } else if (field.type === 'number' && !initialData[field.name]) {
+        defaults[field.name] = 0;
+      }
+    });
+    return { ...defaults, ...initialData };
+  };
+
+  const [formData, setFormData] = useState(getInitialFormData());
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -40,7 +55,11 @@ const DocumentForm = ({
     try {
       setLoading(true);
       const response = await documentApi.getById(id);
-      setFormData(response.data);
+      // Handle different response formats from backend
+      const docData = response.data.salesOrder || response.data.purchaseOrder || 
+                      response.data.customerInvoice || response.data.vendorBill || 
+                      response.data.expense || response.data;
+      setFormData(docData);
     } catch (error) {
       console.error('Error fetching document:', error);
       toast.error('Failed to load document');
@@ -71,22 +90,62 @@ const DocumentForm = ({
     try {
       setSaving(true);
       
+      // Clean up form data before sending
+      const cleanedData = { ...formData };
+      
+      // Remove auto-generated fields that shouldn't be sent
+      delete cleanedData.created_at;
+      delete cleanedData.updated_at;
+      delete cleanedData.createdAt;
+      delete cleanedData.updatedAt;
+      
+      // Convert empty strings to null for optional fields
+      Object.keys(cleanedData).forEach(key => {
+        if (cleanedData[key] === '') {
+          cleanedData[key] = null;
+        }
+        // Convert string booleans to actual booleans
+        if (cleanedData[key] === 'true') cleanedData[key] = true;
+        if (cleanedData[key] === 'false') cleanedData[key] = false;
+      });
+      
+      // Convert project_id to number or null
+      if (cleanedData.project_id) {
+        cleanedData.project_id = parseInt(cleanedData.project_id) || null;
+      } else if (cleanedData.project_id === '') {
+        cleanedData.project_id = null;
+      }
+      
+      // Remove disabled/auto-generated number fields if empty
+      if (!isEdit) {
+        ['order_number', 'so_number', 'po_number', 'invoice_number', 'bill_number'].forEach(field => {
+          if (cleanedData[field] === null || cleanedData[field] === '') {
+            delete cleanedData[field];
+          }
+        });
+      }
+      
+      console.log('Submitting form data:', cleanedData);
+      
       if (isEdit) {
-        await documentApi.update(id, formData);
-        toast.success('Document updated successfully');
+        await documentApi.update(id, cleanedData);
+        toast.success(`${title} updated successfully`);
       } else {
-        await documentApi.create(formData);
-        toast.success('Document created successfully');
+        const response = await documentApi.create(cleanedData);
+        console.log('Create response:', response.data);
+        toast.success(`${title} created successfully`);
       }
       
       if (onSave) {
-        onSave(formData);
+        onSave(cleanedData);
       }
       
       navigate(backPath);
     } catch (error) {
       console.error('Error saving document:', error);
-      toast.error('Failed to save document');
+      console.error('Error details:', error.response?.data);
+      const errorMessage = error.response?.data?.message || 'Failed to save document';
+      toast.error(errorMessage);
     } finally {
       setSaving(false);
     }
@@ -120,14 +179,14 @@ const DocumentForm = ({
       case 'select':
         return (
           <div key={name}>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               {label} {required && <span className="text-red-500">*</span>}
             </label>
             <select
               value={value}
               onChange={(e) => handleChange(name, e.target.value)}
               required={required}
-              className="w-full rounded-md border border-gray-300 px-3 py-2"
+              className="w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2"
               {...fieldProps}
             >
               <option value="">Select {label}</option>
@@ -143,7 +202,7 @@ const DocumentForm = ({
       case 'textarea':
         return (
           <div key={name}>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               {label} {required && <span className="text-red-500">*</span>}
             </label>
             <textarea
@@ -152,7 +211,7 @@ const DocumentForm = ({
               placeholder={placeholder}
               required={required}
               rows={3}
-              className="w-full rounded-md border border-gray-300 px-3 py-2"
+              className="w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2"
               {...fieldProps}
             />
           </div>
@@ -161,7 +220,7 @@ const DocumentForm = ({
       case 'number':
         return (
           <div key={name}>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               {label} {required && <span className="text-red-500">*</span>}
             </label>
             <Input
@@ -180,7 +239,7 @@ const DocumentForm = ({
       default:
         return (
           <div key={name}>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               {label} {required && <span className="text-red-500">*</span>}
             </label>
             <Input
@@ -211,15 +270,15 @@ const DocumentForm = ({
         <div className="flex items-center space-x-4">
           <Link
             to={backPath}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-gray-400 hover:text-gray-600 dark:text-gray-400 transition-colors"
           >
             <ArrowLeft className="h-6 w-6" />
           </Link>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
               {isEdit ? `Edit ${title}` : `Create ${title}`}
             </h1>
-            <p className="text-gray-600 mt-1">
+            <p className="text-gray-600 dark:text-gray-400 mt-1">
               {isEdit ? 'Update document details' : 'Fill in the form to create a new document'}
             </p>
           </div>
@@ -245,14 +304,14 @@ const DocumentForm = ({
             {/* Project Linking */}
             {allowProjectLinking && (
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   <LinkIcon className="h-4 w-4 inline mr-1" />
                   Link to Project
                 </label>
                 <select
                   value={formData.project_id || ''}
                   onChange={(e) => handleChange('project_id', e.target.value || null)}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2"
+                  className="w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2"
                 >
                   <option value="">No project</option>
                   {projects.map((project) => (
@@ -261,7 +320,7 @@ const DocumentForm = ({
                     </option>
                   ))}
                 </select>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                   Optional: Link this document to a project for better organization
                 </p>
               </div>

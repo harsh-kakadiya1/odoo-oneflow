@@ -18,9 +18,10 @@ router.get('/', protect, async (req, res) => {
     
     console.log(`Projects request from user: ${currentUser.name} (${currentUser.role}) from company: ${currentUser.company_id}`);
     
-    let where = {
-      company_id: currentUser.company_id // Only show projects from user's company
-    };
+    // Build where clause - handle NULL company_id
+    let where = currentUser.company_id 
+      ? { company_id: currentUser.company_id }
+      : {}; // Show all if no company_id
 
     if (status) {
       where.status = status;
@@ -50,6 +51,12 @@ router.get('/', protect, async (req, res) => {
             attributes: ['id', 'name', 'email', 'role'],
             through: { attributes: [] },
             where: { id: req.user.id }
+          },
+          {
+            model: Task,
+            as: 'tasks',
+            attributes: ['id', 'status'],
+            required: false
           }
         ],
         order: [['created_at', 'DESC']]
@@ -89,6 +96,12 @@ router.get('/', protect, async (req, res) => {
             as: 'members',
             attributes: ['id', 'name', 'email', 'role'],
             through: { attributes: [] }
+          },
+          {
+            model: Task,
+            as: 'tasks',
+            attributes: ['id', 'status'],
+            required: false
           }
         ],
         order: [['created_at', 'DESC']]
@@ -111,6 +124,12 @@ router.get('/', protect, async (req, res) => {
             attributes: ['id', 'name', 'email', 'role'],
             through: { attributes: [] },
             where: { id: req.user.id }
+          },
+          {
+            model: Task,
+            as: 'tasks',
+            attributes: ['id', 'status'],
+            required: false
           }
         ],
         order: [['created_at', 'DESC']]
@@ -148,6 +167,12 @@ router.get('/', protect, async (req, res) => {
             as: 'members',
             attributes: ['id', 'name', 'email', 'role'],
             through: { attributes: [] }
+          },
+          {
+            model: Task,
+            as: 'tasks',
+            attributes: ['id', 'status'],
+            required: false
           }
         ],
         order: [['created_at', 'DESC']]
@@ -282,16 +307,43 @@ router.post('/', protect, authorize('Admin', 'Project Manager'), async (req, res
     // Get current user's company for multi-tenancy
     const currentUser = await User.findByPk(req.user.id);
 
+    // Validate and format dates
+    let validStartDate = null;
+    let validEndDate = null;
+
+    if (start_date && start_date !== 'Invalid date') {
+      const parsedStart = new Date(start_date);
+      if (!isNaN(parsedStart.getTime())) {
+        validStartDate = parsedStart;
+      }
+    }
+
+    if (end_date && end_date !== 'Invalid date') {
+      const parsedEnd = new Date(end_date);
+      if (!isNaN(parsedEnd.getTime())) {
+        validEndDate = parsedEnd;
+      }
+    }
+
+    // Sanitize budget - convert empty string/null/undefined to 0
+    let sanitizedBudget = 0;
+    if (budget !== '' && budget !== null && budget !== undefined) {
+      const parsedBudget = parseFloat(budget);
+      if (!isNaN(parsedBudget) && parsedBudget >= 0) {
+        sanitizedBudget = parsedBudget;
+      }
+    }
+
     // Create project associated with user's company
     const project = await Project.create({
       name,
       description,
-      start_date,
-      end_date,
+      start_date: validStartDate,
+      end_date: validEndDate,
       status: status || 'Planned',
       project_manager_id: pmId,
       company_id: currentUser.company_id, // Associate with company
-      budget
+      budget: sanitizedBudget
     });
 
     // Add project members
@@ -383,10 +435,41 @@ router.put('/:id', protect, async (req, res) => {
     // Update fields
     if (name) project.name = name;
     if (description !== undefined) project.description = description;
-    if (start_date) project.start_date = start_date;
-    if (end_date) project.end_date = end_date;
+    
+    // Validate and update dates
+    if (start_date !== undefined) {
+      if (start_date === null || start_date === '') {
+        project.start_date = null;
+      } else if (start_date !== 'Invalid date') {
+        const parsedStart = new Date(start_date);
+        if (!isNaN(parsedStart.getTime())) {
+          project.start_date = parsedStart;
+        }
+      }
+    }
+    
+    if (end_date !== undefined) {
+      if (end_date === null || end_date === '') {
+        project.end_date = null;
+      } else if (end_date !== 'Invalid date') {
+        const parsedEnd = new Date(end_date);
+        if (!isNaN(parsedEnd.getTime())) {
+          project.end_date = parsedEnd;
+        }
+      }
+    }
+    
     if (status) project.status = status;
-    if (budget !== undefined) project.budget = budget;
+    
+    // Sanitize budget before updating
+    if (budget !== undefined) {
+      if (budget === '' || budget === null) {
+        project.budget = 0;
+      } else {
+        const parsedBudget = parseFloat(budget);
+        project.budget = !isNaN(parsedBudget) && parsedBudget >= 0 ? parsedBudget : 0;
+      }
+    }
 
     await project.save();
 
@@ -547,13 +630,100 @@ router.get('/:id/tasks', protect, async (req, res) => {
 // @access  Private
 router.get('/:id/links', protect, async (req, res) => {
   try {
-    // For now, return mock data - would query actual financial documents in real app
+    const projectId = req.params.id;
+    
+    // Import models
+    const { SalesOrder, PurchaseOrder, CustomerInvoice, VendorBill, Expense } = require('../models');
+    
+    // Fetch all linked documents in parallel
+    const [salesOrders, purchaseOrders, customerInvoices, vendorBills, expenses] = await Promise.all([
+      SalesOrder.findAll({
+        where: { project_id: projectId },
+        attributes: ['id', 'so_number', 'customer_name', 'customer_email', 'amount', 'status', 'order_date'],
+        order: [['created_at', 'DESC']]
+      }),
+      PurchaseOrder.findAll({
+        where: { project_id: projectId },
+        attributes: ['id', 'po_number', 'vendor_name', 'vendor_email', 'amount', 'status', 'order_date'],
+        order: [['created_at', 'DESC']]
+      }),
+      CustomerInvoice.findAll({
+        where: { project_id: projectId },
+        attributes: ['id', 'invoice_number', 'customer_name', 'amount', 'status', 'invoice_date', 'due_date'],
+        order: [['created_at', 'DESC']]
+      }),
+      VendorBill.findAll({
+        where: { project_id: projectId },
+        attributes: ['id', 'bill_number', 'vendor_name', 'amount', 'status', 'bill_date', 'due_date'],
+        order: [['created_at', 'DESC']]
+      }),
+      Expense.findAll({
+        where: { project_id: projectId },
+        attributes: ['id', 'description', 'amount', 'status', 'expense_date', 'category', 'is_billable'],
+        include: [{
+          model: User,
+          as: 'user',
+          attributes: ['id', 'firstName', 'lastName', 'email']
+        }],
+        order: [['created_at', 'DESC']]
+      })
+    ]);
+
     const links = {
-      salesOrders: [],
-      purchaseOrders: [],
-      customerInvoices: [],
-      vendorBills: [],
-      expenses: []
+      salesOrders: salesOrders.map(so => ({
+        id: so.id,
+        number: so.so_number,
+        partner_name: so.customer_name,
+        customer_name: so.customer_name,
+        customer_email: so.customer_email,
+        total_amount: so.amount,
+        amount: so.amount,
+        status: so.status,
+        date: so.order_date
+      })),
+      purchaseOrders: purchaseOrders.map(po => ({
+        id: po.id,
+        number: po.po_number,
+        vendor_name: po.vendor_name,
+        vendor_email: po.vendor_email,
+        total_amount: po.amount,
+        amount: po.amount,
+        status: po.status,
+        date: po.order_date
+      })),
+      customerInvoices: customerInvoices.map(inv => ({
+        id: inv.id,
+        number: inv.invoice_number,
+        customer_name: inv.customer_name,
+        partner_name: inv.customer_name,
+        total_amount: inv.amount,
+        amount: inv.amount,
+        status: inv.status,
+        date: inv.invoice_date,
+        due_date: inv.due_date
+      })),
+      vendorBills: vendorBills.map(bill => ({
+        id: bill.id,
+        number: bill.bill_number,
+        vendor_name: bill.vendor_name,
+        partner_name: bill.vendor_name,
+        total_amount: bill.amount,
+        amount: bill.amount,
+        status: bill.status,
+        date: bill.bill_date,
+        due_date: bill.due_date
+      })),
+      expenses: expenses.map(exp => ({
+        id: exp.id,
+        reference: `EXP-${exp.id}`,
+        description: exp.description,
+        amount: exp.amount,
+        status: exp.status,
+        date: exp.expense_date,
+        category: exp.category,
+        is_billable: exp.is_billable,
+        user_name: exp.user ? `${exp.user.firstName} ${exp.user.lastName}` : 'Unknown'
+      }))
     };
 
     res.status(200).json({

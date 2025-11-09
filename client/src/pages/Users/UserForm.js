@@ -114,16 +114,16 @@ const UserForm = ({ onSuccess, onCancel, editMode = false, existingUser = null }
       />
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           Role <span className="text-error-500">*</span>
         </label>
         {user?.role === 'Project Manager' ? (
           // Project Managers can only create Team Members
           <>
-            <div className="px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-700">
+            <div className="px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300">
               Team Member
             </div>
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
               Project Managers can only create Team Member accounts
             </p>
           </>
@@ -133,7 +133,7 @@ const UserForm = ({ onSuccess, onCancel, editMode = false, existingUser = null }
             name="role"
             value={formData.role}
             onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
           >
             <option value="Team Member">Team Member</option>
             <option value="Project Manager">Project Manager</option>
@@ -167,13 +167,13 @@ const UserForm = ({ onSuccess, onCancel, editMode = false, existingUser = null }
               name="can_manage_users"
               checked={formData.can_manage_users}
               onChange={(e) => setFormData({ ...formData, can_manage_users: e.target.checked })}
-              className="mt-1 h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+              className="mt-1 h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded"
             />
             <label htmlFor="can_manage_users" className="ml-3">
-              <span className="block text-sm font-medium text-gray-900">
+              <span className="block text-sm font-medium text-gray-900 dark:text-white">
                 Grant User Management Permission
               </span>
-              <span className="block text-sm text-gray-600">
+              <span className="block text-sm text-gray-600 dark:text-gray-400">
                 Allow this Project Manager to add, edit, and delete Team Members
               </span>
             </label>

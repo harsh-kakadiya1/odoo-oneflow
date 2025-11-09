@@ -12,4 +12,7 @@ export { default as ExpensesList } from './ExpensesList';
 
 // Form Views
 export { default as SalesOrderForm } from './SalesOrderForm';
+export { default as PurchaseOrderForm } from './PurchaseOrderForm';
+export { default as CustomerInvoiceForm } from './CustomerInvoiceForm';
+export { default as VendorBillForm } from './VendorBillForm';
 export { default as ExpenseForm } from './ExpenseForm';
