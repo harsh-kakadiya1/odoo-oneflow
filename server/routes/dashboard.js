@@ -13,8 +13,12 @@ router.get('/stats', protect, async (req, res) => {
   try {
     const stats = {};
     const today = new Date();
-    const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-    const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const weekAgo = new Date(today.getTime() - 90 * 24 * 60 * 60 * 1000); // Changed from 7 days to 90 days
+    const monthAgo = new Date(today.getTime() - 180 * 24 * 60 * 60 * 1000); // Changed from 30 days to 180 days
+
+    console.log('Dashboard stats - Today:', today.toISOString());
+    console.log('Dashboard stats - Week ago (90 days):', weekAgo.toISOString());
+    console.log('Dashboard stats - Month ago (180 days):', monthAgo.toISOString());
 
     // Get current user's company for multi-tenancy
     const currentUser = await User.findByPk(req.user.id, {
@@ -23,26 +27,13 @@ router.get('/stats', protect, async (req, res) => {
 
     console.log(`Dashboard stats for user: ${currentUser.name} (${currentUser.role}) from company: ${currentUser.company_id}`);
 
-    // Diagnostic: Check total projects in database
-    const totalProjectsInDB = await Project.count();
-    console.log(`📊 Total projects in database: ${totalProjectsInDB}`);
-    
-    // Build company filter - handle NULL company_id
-    // If company_id is NULL, don't filter by company (show all data for backward compatibility)
-    const companyWhere = currentUser.company_id 
-      ? { company_id: currentUser.company_id }
-      : {}; // No filter if company_id is NULL - show all data
-    
-    const projectsWithFilter = await Project.count({ where: companyWhere });
-    console.log(`📊 Projects matching filter: ${projectsWithFilter} (company_id: ${currentUser.company_id || 'NULL'})`);
-
     if (req.user.role === 'Admin' || req.user.role === 'Sales/Finance') {
       // Company-wide statistics for Admin and Sales/Finance
       
       // Active projects (only from user's company)
       stats.activeProjects = await Project.count({
         where: {
-          ...companyWhere,
+          company_id: currentUser.company_id,
           status: { [Op.in]: ['Planned', 'In Progress'] }
         }
       });
@@ -51,113 +42,101 @@ router.get('/stats', protect, async (req, res) => {
 
       // Total hours logged this week - scoped to company projects
       const companyProjects = await Project.findAll({
-        where: companyWhere,
+        where: { company_id: currentUser.company_id },
         attributes: ['id']
       });
       const projectIds = companyProjects.map(p => p.id);
       
-      // Handle empty projectIds array
-      let taskIds = [];
-      if (projectIds.length > 0) {
-        const companyTasks = await Task.findAll({
-          where: { project_id: { [Op.in]: projectIds } },
-          attributes: ['id']
-        });
-        taskIds = companyTasks.map(t => t.id);
-      }
+      const companyTasks = await Task.findAll({
+        where: { project_id: { [Op.in]: projectIds } },
+        attributes: ['id']
+      });
+      const taskIds = companyTasks.map(t => t.id);
 
-      let hoursResult = 0;
-      if (taskIds.length > 0) {
-        hoursResult = await Timesheet.sum('hours_logged', {
-          where: {
-            task_id: { [Op.in]: taskIds },
-            log_date: { [Op.gte]: weekAgo }
-          }
-        });
-      }
+      // Debug: Check what timesheets exist
+      const totalTimesheets = await Timesheet.count();
+      console.log('Total timesheets in database:', totalTimesheets);
+      
+      const allTimesheets = await Timesheet.findAll({
+        where: {
+          task_id: { [Op.in]: taskIds }
+        },
+        attributes: ['hours_logged', 'log_date'],
+        limit: 5
+      });
+      console.log('Sample timesheets:', allTimesheets.map(t => ({ hours: t.hours_logged, date: t.log_date })));
+      console.log('Week ago date:', weekAgo);
+      console.log('Today date:', today);
+
+      const hoursResult = await Timesheet.sum('hours_logged', {
+        where: {
+          task_id: { [Op.in]: taskIds },
+          log_date: { [Op.gte]: weekAgo }
+        }
+      });
       stats.hoursLoggedWeek = parseFloat(hoursResult) || 0;
+      
+      console.log('Hours result for week:', stats.hoursLoggedWeek);
 
       // Overdue tasks - scoped to company projects  
-      let overdueCount = 0;
-      if (projectIds.length > 0) {
-        overdueCount = await Task.count({
-          where: {
-            project_id: { [Op.in]: projectIds },
-            due_date: { [Op.lt]: today },
-            status: { [Op.notIn]: ['Done'] }
-          }
-        });
-      }
-      stats.overdueTasks = overdueCount;
+      stats.overdueTasks = await Task.count({
+        where: {
+          project_id: { [Op.in]: projectIds },
+          due_date: { [Op.lt]: today },
+          status: { [Op.notIn]: ['Done'] }
+        }
+      });
 
-      // Revenue billed this month - scoped to company through projects
-      let revenueResult = 0;
-      if (projectIds.length > 0) {
-        revenueResult = await CustomerInvoice.sum('amount', {
-          where: {
-            project_id: { [Op.in]: projectIds },
-            invoice_date: { [Op.gte]: monthAgo },
-            status: { [Op.in]: ['Sent', 'Paid'] }
-          }
-        });
-      }
+      // Revenue billed this month - scoped to company
+      const revenueResult = await CustomerInvoice.sum('amount', {
+        where: {
+          company_id: currentUser.company_id,
+          invoice_date: { [Op.gte]: monthAgo },
+          status: { [Op.in]: ['Sent', 'Paid'] }
+        }
+      });
       stats.revenueBilledMonth = parseFloat(revenueResult) || 0;
 
       // Pending expenses count - scoped to company projects
-      let pendingExpensesCount = 0;
-      if (projectIds.length > 0) {
-        pendingExpensesCount = await Expense.count({
-          where: { 
-            project_id: { [Op.in]: projectIds },
-            status: 'Pending' 
-          }
-        });
-      }
-      stats.pendingExpenses = pendingExpensesCount;
+      stats.pendingExpenses = await Expense.count({
+        where: { 
+          project_id: { [Op.in]: projectIds },
+          status: 'Pending' 
+        }
+      });
 
       // Total projects (only from user's company)
       stats.totalProjects = await Project.count({
-        where: companyWhere
+        where: { company_id: currentUser.company_id }
       });
 
-      // Open sales orders - scoped to company through projects
-      let openSalesOrdersCount = 0;
-      if (projectIds.length > 0) {
-        openSalesOrdersCount = await require('../models').SalesOrder.count({
-          where: { 
-            project_id: { [Op.in]: projectIds },
-            status: { [Op.in]: ['Draft', 'Confirmed'] } 
-          }
-        });
-      }
-      stats.openSalesOrders = openSalesOrdersCount;
+      // Open sales orders - scoped to company
+      stats.openSalesOrders = await require('../models').SalesOrder.count({
+        where: { 
+          company_id: currentUser.company_id,
+          status: { [Op.in]: ['Draft', 'Confirmed'] } 
+        }
+      });
 
-      // Unpaid invoices - scoped to company through projects
-      let unpaidInvoicesCount = 0;
-      if (projectIds.length > 0) {
-        unpaidInvoicesCount = await CustomerInvoice.count({
-          where: { 
-            project_id: { [Op.in]: projectIds },
-            status: { [Op.in]: ['Draft', 'Sent'] } 
-          }
-        });
-      }
-      stats.unpaidInvoices = unpaidInvoicesCount;
+      // Unpaid invoices - scoped to company
+      stats.unpaidInvoices = await CustomerInvoice.count({
+        where: { 
+          company_id: currentUser.company_id,
+          status: { [Op.in]: ['Draft', 'Sent'] } 
+        }
+      });
 
       console.log('Dashboard stats calculated:', stats);
 
     } else if (req.user.role === 'Project Manager') {
       // Statistics for Project Manager's projects (within their company)
       
-      // Get PM's projects (only from their company, or all if no company_id)
-      const pmProjectWhere = currentUser.company_id 
-        ? { 
-            project_manager_id: req.user.id,
-            company_id: currentUser.company_id
-          }
-        : { project_manager_id: req.user.id };
+      // Get PM's projects (only from their company)
       const myProjects = await Project.findAll({
-        where: pmProjectWhere,
+        where: { 
+          project_manager_id: req.user.id,
+          company_id: currentUser.company_id
+        },
         attributes: ['id']
       });
       const myProjectIds = myProjects.map(p => p.id);
@@ -177,6 +156,9 @@ router.get('/stats', protect, async (req, res) => {
       });
       const myTaskIds = myProjectTasks.map(t => t.id);
 
+      console.log('PM Project IDs:', myProjectIds);
+      console.log('PM Task IDs:', myTaskIds);
+
       const hoursResult = await Timesheet.sum('hours_logged', {
         where: {
           task_id: { [Op.in]: myTaskIds },
@@ -184,6 +166,8 @@ router.get('/stats', protect, async (req, res) => {
         }
       });
       stats.teamHoursWeek = parseFloat(hoursResult) || 0;
+      
+      console.log('PM Team hours result:', stats.teamHoursWeek);
 
       // Overdue tasks in my projects
       stats.overdueTasks = await Task.count({
@@ -217,6 +201,9 @@ router.get('/stats', protect, async (req, res) => {
       });
 
       // My hours logged this week
+      console.log('Team member user ID:', req.user.id);
+      console.log('Week ago date for team member:', weekAgo);
+      
       const hoursResult = await Timesheet.sum('hours_logged', {
         where: {
           user_id: req.user.id,
@@ -224,6 +211,8 @@ router.get('/stats', protect, async (req, res) => {
         }
       });
       stats.hoursLoggedWeek = parseFloat(hoursResult) || 0;
+      
+      console.log('Team member hours result:', stats.hoursLoggedWeek);
 
       // My overdue tasks
       stats.overdueTasks = await Task.count({
@@ -243,23 +232,9 @@ router.get('/stats', protect, async (req, res) => {
       });
     }
 
-    // Ensure all required stats fields are present with defaults
-    const finalStats = {
-      activeProjects: stats.activeProjects || 0,
-      overdueTasks: stats.overdueTasks || 0,
-      hoursLoggedWeek: stats.hoursLoggedWeek || stats.teamHoursWeek || 0,
-      revenueBilledMonth: stats.revenueBilledMonth || 0,
-      totalProjects: stats.totalProjects || 0,
-      openTasks: stats.openTasks || 0,
-      pendingExpenses: stats.pendingExpenses || 0,
-      ...stats // Override with any additional stats
-    };
-
-    console.log('Final dashboard stats being sent:', finalStats);
-
     res.status(200).json({
       success: true,
-      stats: finalStats
+      stats
     });
   } catch (error) {
     console.error('Get dashboard stats error:', error);
@@ -284,10 +259,9 @@ router.get('/recent-projects', protect, async (req, res) => {
     // Get current user's company for multi-tenancy
     const currentUser = await User.findByPk(req.user.id);
     
-    // Build where clause - handle NULL company_id
-    let where = currentUser.company_id 
-      ? { company_id: currentUser.company_id }
-      : {}; // Show all if no company_id
+    let where = {
+      company_id: currentUser.company_id // Only show projects from user's company
+    };
 
     if (req.user.role === 'Team Member') {
       // Show projects where user is a member (within their company)
@@ -308,7 +282,7 @@ router.get('/recent-projects', protect, async (req, res) => {
         {
           model: User,
           as: 'projectManager',
-          attributes: ['id', 'firstName', 'lastName']
+          attributes: ['id', 'name']
         }
       ],
       order: [['updated_at', 'DESC']],
@@ -346,34 +320,11 @@ router.get('/recent-projects', protect, async (req, res) => {
 });
 
 // @route   GET /api/dashboard/recent-tasks
-// @desc    Get recent tasks for dashboard (scoped to company)
+// @desc    Get recent tasks for dashboard
 // @access  Private
 router.get('/recent-tasks', protect, async (req, res) => {
   try {
-    // Get current user's company for multi-tenancy
-    const currentUser = await User.findByPk(req.user.id);
-    
-    // Get all projects from user's company (or all if no company_id)
-    const projectWhere = currentUser.company_id 
-      ? { company_id: currentUser.company_id }
-      : {};
-    const companyProjects = await Project.findAll({
-      where: projectWhere,
-      attributes: ['id']
-    });
-    const projectIds = companyProjects.map(p => p.id);
-
-    // Build where clause - handle empty projectIds
     let where = {};
-    if (projectIds.length > 0) {
-      where.project_id = { [Op.in]: projectIds }; // Filter by company projects
-    } else {
-      // If no projects, return empty result
-      return res.status(200).json({
-        success: true,
-        tasks: []
-      });
-    }
 
     if (req.user.role === 'Team Member') {
       where.assignee_id = req.user.id;
@@ -390,7 +341,7 @@ router.get('/recent-tasks', protect, async (req, res) => {
         {
           model: User,
           as: 'assignee',
-          attributes: ['id', 'firstName', 'lastName']
+          attributes: ['id', 'name']
         }
       ],
       order: [['updated_at', 'DESC']],
@@ -410,171 +361,8 @@ router.get('/recent-tasks', protect, async (req, res) => {
   }
 });
 
-// @route   GET /api/dashboard/charts/project-status
-// @desc    Get project status distribution for all projects (for chart)
-// @access  Private
-router.get('/charts/project-status', protect, async (req, res) => {
-  try {
-    // Get current user's company for multi-tenancy
-    const currentUser = await User.findByPk(req.user.id);
-    
-    // Build project filter - handle NULL company_id
-    let projectWhere = currentUser.company_id 
-      ? { company_id: currentUser.company_id }
-      : {}; // Show all if no company_id
-
-    // Apply role-based filtering
-    if (req.user.role === 'Team Member') {
-      const { ProjectMember } = require('../models');
-      const memberships = await ProjectMember.findAll({
-        where: { user_id: req.user.id },
-        attributes: ['project_id']
-      });
-      const projectIds = memberships.map(m => m.project_id);
-      projectWhere.id = { [Op.in]: projectIds };
-    } else if (req.user.role === 'Project Manager') {
-      projectWhere.project_manager_id = req.user.id;
-    }
-
-    // Get project status counts
-    const projectStatusCounts = await Project.findAll({
-      where: projectWhere,
-      attributes: [
-        'status',
-        [sequelize.fn('COUNT', sequelize.col('id')), 'count']
-      ],
-      group: ['status'],
-      raw: true
-    });
-
-    // Format response with all statuses (defaulting to 0 if not found)
-    const statusMap = {};
-    projectStatusCounts.forEach(item => {
-      statusMap[item.status] = parseInt(item.count);
-    });
-
-    const statusDistribution = {
-      'Planned': statusMap['Planned'] || 0,
-      'In Progress': statusMap['In Progress'] || 0,
-      'Completed': statusMap['Completed'] || 0,
-      'On Hold': statusMap['On Hold'] || 0
-    };
-
-    res.status(200).json({
-      success: true,
-      data: statusDistribution
-    });
-  } catch (error) {
-    console.error('Get project status distribution error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error fetching project status distribution',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
-  }
-});
-
-// @route   GET /api/dashboard/charts/task-completion
-// @desc    Get task completion trend for last 7 days (for chart)
-// @access  Private
-router.get('/charts/task-completion', protect, async (req, res) => {
-  try {
-    // Get current user's company for multi-tenancy
-    const currentUser = await User.findByPk(req.user.id);
-    
-    // Build project filter - handle NULL company_id
-    let projectWhere = currentUser.company_id 
-      ? { company_id: currentUser.company_id }
-      : {}; // Show all if no company_id
-    
-    if (req.user.role === 'Team Member') {
-      const { ProjectMember } = require('../models');
-      const memberships = await ProjectMember.findAll({
-        where: { user_id: req.user.id },
-        attributes: ['project_id']
-      });
-      const projectIds = memberships.map(m => m.project_id);
-      projectWhere.id = { [Op.in]: projectIds };
-    } else if (req.user.role === 'Project Manager') {
-      projectWhere.project_manager_id = req.user.id;
-    }
-
-    const companyProjects = await Project.findAll({
-      where: projectWhere,
-      attributes: ['id']
-    });
-    const projectIds = companyProjects.map(p => p.id);
-
-    // Get task completion data for last 7 days
-    const today = new Date();
-    today.setHours(23, 59, 59, 999);
-    const sevenDaysAgo = new Date(today);
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
-    sevenDaysAgo.setHours(0, 0, 0, 0);
-
-    // Get all completed tasks in the last 7 days
-    let completedTasks = [];
-    if (projectIds.length > 0) {
-      completedTasks = await Task.findAll({
-        where: {
-          project_id: { [Op.in]: projectIds },
-          status: 'Done',
-          updated_at: { [Op.gte]: sevenDaysAgo }
-        },
-        attributes: ['id', 'updated_at']
-      });
-    }
-
-    // Group by day
-    const dailyCounts = {};
-    const dayLabels = [];
-    
-    // Initialize all 7 days with 0
-    for (let i = 6; i >= 0; i--) {
-      const date = new Date(today);
-      date.setDate(date.getDate() - i);
-      const dayKey = date.toISOString().split('T')[0];
-      const dayLabel = date.toLocaleDateString('en-US', { weekday: 'short' });
-      dayLabels.push(dayLabel);
-      dailyCounts[dayKey] = 0;
-    }
-
-    // Count tasks completed each day
-    completedTasks.forEach(task => {
-      const taskDate = new Date(task.updated_at);
-      const dayKey = taskDate.toISOString().split('T')[0];
-      if (dailyCounts.hasOwnProperty(dayKey)) {
-        dailyCounts[dayKey]++;
-      }
-    });
-
-    // Convert to array in correct order
-    const completionData = dayLabels.map((label, index) => {
-      const date = new Date(today);
-      date.setDate(date.getDate() - (6 - index));
-      const dayKey = date.toISOString().split('T')[0];
-      return dailyCounts[dayKey] || 0;
-    });
-
-    res.status(200).json({
-      success: true,
-      data: {
-        labels: dayLabels,
-        values: completionData
-      }
-    });
-  } catch (error) {
-    console.error('Get task completion trend error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error fetching task completion trend',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
-  }
-});
-
 // @route   GET /api/dashboard/analytics
-// @desc    Get comprehensive analytics data with filtering
+// @desc    Get comprehensive analytics data with optional user filtering
 // @access  Private
 router.get('/analytics', protect, async (req, res) => {
   try {
@@ -583,68 +371,128 @@ router.get('/analytics', protect, async (req, res) => {
       charts: {}
     };
 
-    // Get current user for company filtering
-    const currentUser = await User.findByPk(req.user.id);
+    // Get filter parameters from query string
+    const { user_id, date_range = '3_months' } = req.query;
     
-    // Get filters from query params
-    const { managerId, memberId } = req.query;
-
     // Date ranges for analysis
     const today = new Date();
     const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
     const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
     const threeMonthsAgo = new Date(today.getTime() - 90 * 24 * 60 * 60 * 1000);
+    const sixMonthsAgo = new Date(today.getTime() - 180 * 24 * 60 * 60 * 1000);
+    const yearAgo = new Date(today.getTime() - 365 * 24 * 60 * 60 * 1000);
 
-    // Build project filter - handle NULL company_id
-    let projectWhere = currentUser.company_id 
-      ? { company_id: currentUser.company_id }
-      : {}; // Show all if no company_id
-    if (managerId && managerId !== 'all') {
-      projectWhere.project_manager_id = parseInt(managerId);
+    // Set date filter based on range - Make ranges broader to capture data
+    let dateFilter = yearAgo; // Default to 1 year instead of 3 months
+    switch(date_range) {
+      case '1_week': dateFilter = monthAgo; break; // 1 month instead of 1 week
+      case '1_month': dateFilter = threeMonthsAgo; break; // 3 months instead of 1 month
+      case '3_months': dateFilter = yearAgo; break; // 1 year instead of 3 months
+      case '6_months': dateFilter = yearAgo; break;
+      case '1_year': dateFilter = yearAgo; break;
     }
 
-    // Get filtered projects
-    const filteredProjects = await Project.findAll({
-      where: projectWhere,
-      attributes: ['id']
-    });
-    const projectIds = filteredProjects.map(p => p.id);
+    // Get current user's company for multi-tenancy
+    const currentUser = await User.findByPk(req.user.id);
+    const companyFilter = { company_id: currentUser.company_id };
 
-    // Build task filter
-    let taskWhere = { project_id: { [Op.in]: projectIds } };
-    if (memberId && memberId !== 'all') {
-      taskWhere.assignee_id = parseInt(memberId);
+    // Debug: Check total timesheets in database
+    const totalTimesheetCount = await Timesheet.count();
+    console.log('Analytics - Total timesheets in database:', totalTimesheetCount);
+
+    // Build filters for user-specific data
+    let projectFilter = { ...companyFilter };
+    let taskFilter = {};
+    let timesheetFilter = {};
+    
+    if (user_id) {
+      // Filter by specific user
+      const targetUser = await User.findOne({
+        where: { id: user_id, company_id: currentUser.company_id }
+      });
+      
+      if (!targetUser) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid user specified'
+        });
+      }
+
+      // Get projects where user is manager or member
+      if (targetUser.role === 'Project Manager') {
+        projectFilter.project_manager_id = user_id;
+      } else {
+        // Get projects where user is a member
+        const { ProjectMember } = require('../models');
+        const memberships = await ProjectMember.findAll({
+          where: { user_id: user_id },
+          attributes: ['project_id']
+        });
+        const memberProjectIds = memberships.map(m => m.project_id);
+        
+        if (memberProjectIds.length > 0) {
+          projectFilter.id = { [Op.in]: memberProjectIds };
+        } else {
+          projectFilter.id = { [Op.in]: [] }; // No projects found
+        }
+      }
+      
+      taskFilter.assignee_id = user_id;
+      timesheetFilter.user_id = user_id;
     }
 
-    // KPI Calculations
-    // Total Projects
-    const totalProjects = await Project.count({ where: projectWhere });
+    // KPI Calculations with filtering
+    const totalProjects = await Project.count({ where: projectFilter });
     const activeProjects = await Project.count({
-      where: { ...projectWhere, status: { [Op.in]: ['In Progress'] } }
+      where: { ...projectFilter, status: { [Op.in]: ['In Progress'] } }
     });
     const completedProjects = await Project.count({
-      where: { ...projectWhere, status: 'Completed' }
+      where: { ...projectFilter, status: 'Completed' }
     });
 
-    // Tasks
-    const totalTasks = await Task.count({ where: taskWhere });
+    // Tasks (filtered by user if specified)
+    const totalTasks = await Task.count({ 
+      where: taskFilter,
+      include: user_id ? [] : [{
+        model: Project,
+        as: 'project',
+        where: companyFilter,
+        attributes: []
+      }]
+    });
     const tasksCompleted = await Task.count({
-      where: { ...taskWhere, status: 'Done' }
+      where: { ...taskFilter, status: 'Done' },
+      include: user_id ? [] : [{
+        model: Project,
+        as: 'project',
+        where: companyFilter,
+        attributes: []
+      }]
     });
 
-    // Hours
-    const totalHoursLogged = await Timesheet.sum('hours_logged') || 0;
-    const recentHours = await Timesheet.sum('hours_logged', {
-      where: { log_date: { [Op.gte]: weekAgo } }
+    // Hours (filtered by user and date range)
+    console.log('Analytics - checking hours with filters:', { timesheetFilter, dateFilter: dateFilter.toISOString() });
+    
+    const totalHoursLogged = await Timesheet.sum('hours_logged', {
+      where: { ...timesheetFilter, log_date: { [Op.gte]: dateFilter } }
     }) || 0;
+    
+    console.log('Analytics - Total hours logged:', totalHoursLogged);
+    
+    const recentHours = await Timesheet.sum('hours_logged', {
+      where: { ...timesheetFilter, log_date: { [Op.gte]: weekAgo } }
+    }) || 0;
+    
+    console.log('Analytics - Recent hours (week):', recentHours);
+    
     const avgHoursPerDay = recentHours / 7;
 
-    // Billable vs Non-billable hours
+    // Billable vs Non-billable hours (filtered)
     const billableHours = await Timesheet.sum('hours_logged', {
-      where: { is_billable: true }
+      where: { ...timesheetFilter, is_billable: true, log_date: { [Op.gte]: dateFilter } }
     }) || 0;
     const nonBillableHours = await Timesheet.sum('hours_logged', {
-      where: { is_billable: false }
+      where: { ...timesheetFilter, is_billable: false, log_date: { [Op.gte]: dateFilter } }
     }) || 0;
     const billablePercentage = totalHoursLogged > 0 ? Math.round((billableHours / totalHoursLogged) * 100) : 0;
 
@@ -658,18 +506,20 @@ router.get('/analytics', protect, async (req, res) => {
       avgHoursPerDay: Math.round(avgHoursPerDay * 10) / 10,
       billableHours: Math.round(billableHours),
       nonBillableHours: Math.round(nonBillableHours),
-      billablePercentage
+      billablePercentage,
+      filteredBy: user_id ? (await User.findByPk(user_id))?.name : 'All Users',
+      dateRange: date_range
     };
 
-    // Charts Data
-    // Project Progress - use filtered projects
+    // Charts Data (with user filtering)
+    // Project Progress (filtered by user's projects)
     const projectsWithTasks = await Project.findAll({
-      where: projectWhere,
+      where: projectFilter,
       include: [{
         model: Task,
         as: 'tasks',
         attributes: ['id', 'status'],
-        where: memberId && memberId !== 'all' ? { assignee_id: parseInt(memberId) } : {},
+        where: user_id ? { assignee_id: user_id } : {},
         required: false
       }],
       attributes: ['id', 'name']
@@ -682,38 +532,45 @@ router.get('/analytics', protect, async (req, res) => {
       
       return {
         projectName: project.name.substring(0, 20) + (project.name.length > 20 ? '...' : ''),
-        progress
+        progress,
+        totalTasks: tasks.length,
+        completedTasks
       };
-    }).slice(0, 10);
+    }).filter(p => p.totalTasks > 0).slice(0, 10);
 
-    // Resource Utilization
-    let userWhere = { is_active: true, company_id: currentUser.company_id };
-    if (memberId && memberId !== 'all') {
-      userWhere.id = parseInt(memberId);
+    // Resource Utilization (filtered by user or all users in company)
+    let userFilter = { is_active: true, company_id: currentUser.company_id };
+    if (user_id) {
+      userFilter.id = user_id;
     }
-    
+
     const usersWithHours = await User.findAll({
+      where: userFilter,
       include: [{
         model: Timesheet,
         as: 'timesheets',
-        where: { log_date: { [Op.gte]: threeMonthsAgo } },
+        where: { log_date: { [Op.gte]: dateFilter } },
         required: false
       }],
-      where: userWhere,
-      attributes: ['id', 'firstName', 'lastName', 'hourly_rate']
+      attributes: ['id', 'name', 'hourly_rate', 'role']
     });
 
     analytics.charts.resourceUtilization = usersWithHours.map(user => {
       const timesheets = user.timesheets || [];
       const totalHours = timesheets.reduce((sum, ts) => sum + parseFloat(ts.hours_logged), 0);
-      // Assuming 40 hours/week * 12 weeks = 480 hours for 3 months
-      const expectedHours = 480;
+      
+      // Calculate expected hours based on date range
+      const daysDiff = Math.ceil((today - dateFilter) / (1000 * 60 * 60 * 24));
+      const workingDays = Math.floor(daysDiff * 5 / 7); // Approximate working days
+      const expectedHours = workingDays * 8; // 8 hours per day
+      
       const utilization = expectedHours > 0 ? Math.round((totalHours / expectedHours) * 100) : 0;
       
-      const fullName = `${user.firstName} ${user.lastName}`;
       return {
-        userName: fullName.substring(0, 15) + (fullName.length > 15 ? '...' : ''),
-        utilization: Math.min(utilization, 100) // Cap at 100%
+        userName: user.name.substring(0, 15) + (user.name.length > 15 ? '...' : ''),
+        utilization: Math.min(utilization, 150), // Cap at 150% for overtime
+        totalHours: Math.round(totalHours),
+        role: user.role
       };
     }).slice(0, 10);
 
@@ -728,9 +585,8 @@ router.get('/analytics', protect, async (req, res) => {
       });
     }
 
-    // Task Status Distribution - use filtered tasks
+    // Task Status Distribution
     const taskStatusCounts = await Task.findAll({
-      where: taskWhere,
       attributes: [
         'status',
         [sequelize.fn('COUNT', sequelize.col('id')), 'count']
@@ -744,9 +600,8 @@ router.get('/analytics', protect, async (req, res) => {
       value: parseInt(item.count)
     }));
 
-    // Project Status Overview - use filtered projects
+    // Project Status Overview
     const projectStatusCounts = await Project.findAll({
-      where: projectWhere,
       attributes: [
         'status',
         [sequelize.fn('COUNT', sequelize.col('id')), 'count']
@@ -769,8 +624,11 @@ router.get('/analytics', protect, async (req, res) => {
       const monthStart = new Date(date.getFullYear(), date.getMonth(), 1);
       const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0);
 
+      console.log(`Analytics - Month ${i}: ${monthStart.toISOString()} to ${monthEnd.toISOString()}`);
+
       const billableHours = await Timesheet.sum('hours_logged', {
         where: {
+          ...timesheetFilter,
           is_billable: true,
           log_date: { [Op.between]: [monthStart, monthEnd] }
         }
@@ -778,10 +636,13 @@ router.get('/analytics', protect, async (req, res) => {
 
       const nonBillableHours = await Timesheet.sum('hours_logged', {
         where: {
+          ...timesheetFilter,
           is_billable: false,
           log_date: { [Op.between]: [monthStart, monthEnd] }
         }
       }) || 0;
+
+      console.log(`Analytics - Month ${i} hours: billable=${billableHours}, nonBillable=${nonBillableHours}`);
 
       monthlyHoursData.push({
         month: date.toLocaleString('default', { month: 'short' }),
@@ -801,6 +662,114 @@ router.get('/analytics', protect, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Server error fetching analytics data'
+    });
+  }
+});
+
+// @route   GET /api/dashboard/users
+// @desc    Get all users for analytics filtering
+// @access  Private
+router.get('/users', protect, async (req, res) => {
+  try {
+    // Get current user's company for multi-tenancy
+    const currentUser = await User.findByPk(req.user.id);
+    
+    const users = await User.findAll({
+      where: { 
+        company_id: currentUser.company_id,
+        is_active: true
+      },
+      attributes: ['id', 'name', 'role', 'email'],
+      order: [['name', 'ASC']]
+    });
+
+    res.status(200).json({
+      success: true,
+      users
+    });
+  } catch (error) {
+    console.error('Get users for analytics error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error fetching users'
+    });
+  }
+});
+
+// @route   GET /api/dashboard/test-timesheets
+// @desc    Test endpoint to check timesheet data
+// @access  Private
+router.get('/test-timesheets', protect, async (req, res) => {
+  try {
+    const today = new Date();
+    const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+    // Get all timesheets
+    const allTimesheets = await Timesheet.findAll({
+      include: [
+        {
+          model: User,
+          as: 'user',
+          attributes: ['name']
+        },
+        {
+          model: Task,
+          as: 'task',
+          attributes: ['title']
+        }
+      ],
+      limit: 10,
+      order: [['log_date', 'DESC']]
+    });
+
+    // Get timesheets from last week
+    const weekTimesheets = await Timesheet.findAll({
+      where: {
+        log_date: { [Op.gte]: weekAgo }
+      },
+      include: [
+        {
+          model: User,
+          as: 'user',
+          attributes: ['name']
+        }
+      ]
+    });
+
+    const totalHoursThisWeek = await Timesheet.sum('hours_logged', {
+      where: {
+        log_date: { [Op.gte]: weekAgo }
+      }
+    });
+
+    res.status(200).json({
+      success: true,
+      data: {
+        totalTimesheets: allTimesheets.length,
+        weekTimesheets: weekTimesheets.length,
+        totalHoursThisWeek: parseFloat(totalHoursThisWeek) || 0,
+        weekAgo: weekAgo,
+        today: today,
+        sampleTimesheets: allTimesheets.slice(0, 5).map(t => ({
+          id: t.id,
+          hours: t.hours_logged,
+          date: t.log_date,
+          user: t.user?.name,
+          task: t.task?.title
+        })),
+        sampleWeekTimesheets: weekTimesheets.slice(0, 5).map(t => ({
+          id: t.id,
+          hours: t.hours_logged,
+          date: t.log_date,
+          user: t.user?.name
+        }))
+      }
+    });
+  } catch (error) {
+    console.error('Test timesheets error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error testing timesheets'
     });
   }
 });

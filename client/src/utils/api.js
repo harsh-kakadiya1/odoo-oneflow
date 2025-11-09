@@ -75,7 +75,6 @@ export const taskAPI = {
   getByProject: (projectId, params) => api.get(`/projects/${projectId}/tasks`, { params }),
   create: (data) => api.post('/tasks', data),
   update: (id, data) => api.put(`/tasks/${id}`, data),
-  updateStatus: (id, status) => api.put(`/tasks/${id}`, { status }), // Helper for status updates
   delete: (id) => api.delete(`/tasks/${id}`),
   logTime: (id, data) => api.post(`/tasks/${id}/time`, data),
   getTimeEntries: (id) => api.get(`/tasks/${id}/time`),
@@ -160,8 +159,8 @@ export const dashboardAPI = {
   getStats: () => api.get('/dashboard/stats'),
   getRecentProjects: () => api.get('/dashboard/recent-projects'),
   getRecentTasks: () => api.get('/dashboard/recent-tasks'),
-  getProjectStatusChart: () => api.get('/dashboard/charts/project-status'),
-  getTaskCompletionChart: () => api.get('/dashboard/charts/task-completion'),
+  getAnalytics: (params) => api.get('/dashboard/analytics', { params }),
+  getUsers: () => api.get('/dashboard/users'),
 };
 
 // Company APIs

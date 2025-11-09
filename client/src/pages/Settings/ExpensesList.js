@@ -19,6 +19,18 @@ const ExpensesList = () => {
     fetchProjects();
   }, [searchTerm, filters]);
 
+  useEffect(() => {
+    const handleExpensesUpdated = () => {
+      fetchData(); // Refresh the expenses list
+    };
+    
+    window.addEventListener('expensesUpdated', handleExpensesUpdated);
+    
+    return () => {
+      window.removeEventListener('expensesUpdated', handleExpensesUpdated);
+    };
+  }, []);
+
   const fetchData = async () => {
     try {
       setLoading(true);

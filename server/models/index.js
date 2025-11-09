@@ -61,6 +61,10 @@ Timesheet.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
 Project.hasMany(SalesOrder, { foreignKey: 'project_id', as: 'salesOrders' });
 SalesOrder.belongsTo(Project, { foreignKey: 'project_id', as: 'project' });
 
+// Company-SalesOrder Relationship
+Company.hasMany(SalesOrder, { foreignKey: 'company_id', as: 'salesOrders' });
+SalesOrder.belongsTo(Company, { foreignKey: 'company_id', as: 'company' });
+
 // Project-PurchaseOrder Relationship
 Project.hasMany(PurchaseOrder, { foreignKey: 'project_id', as: 'purchaseOrders' });
 PurchaseOrder.belongsTo(Project, { foreignKey: 'project_id', as: 'project' });
@@ -68,6 +72,10 @@ PurchaseOrder.belongsTo(Project, { foreignKey: 'project_id', as: 'project' });
 // Project-CustomerInvoice Relationship
 Project.hasMany(CustomerInvoice, { foreignKey: 'project_id', as: 'customerInvoices' });
 CustomerInvoice.belongsTo(Project, { foreignKey: 'project_id', as: 'project' });
+
+// Company-CustomerInvoice Relationship
+Company.hasMany(CustomerInvoice, { foreignKey: 'company_id', as: 'customerInvoices' });
+CustomerInvoice.belongsTo(Company, { foreignKey: 'company_id', as: 'company' });
 
 // SalesOrder-CustomerInvoice Relationship
 SalesOrder.hasMany(CustomerInvoice, { foreignKey: 'sales_order_id', as: 'invoices' });
