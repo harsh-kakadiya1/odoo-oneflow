@@ -38,16 +38,12 @@ const User = sequelize.define('User', {
   password_hash: {
     type: DataTypes.STRING(255),
     allowNull: false,
-    field: 'password'
+    field: 'password_hash'
   },
   role: {
     type: DataTypes.ENUM('Admin', 'Project Manager', 'Team Member', 'Sales/Finance'),
     allowNull: false,
     defaultValue: 'Team Member'
-  },
-  profile_picture_url: {
-    type: DataTypes.STRING(255),
-    allowNull: true
   },
   hourly_rate: {
     type: DataTypes.DECIMAL(10, 2),
@@ -77,6 +73,10 @@ const User = sequelize.define('User', {
       model: 'users',
       key: 'id'
     }
+  },
+  can_manage_users: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
   },
   is_active: {
     type: DataTypes.BOOLEAN,
